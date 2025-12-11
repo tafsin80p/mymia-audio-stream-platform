@@ -11,6 +11,8 @@ get_header(); ?>
     <div class="nymia-main">
         <?php get_template_part('template-parts/header'); ?>
         
+        <?php get_template_part('template-parts/filters'); ?>
+        
         <div class="nymia-content-wrapper">
             <div class="nymia-content">
                 <?php

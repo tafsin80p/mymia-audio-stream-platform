@@ -617,11 +617,11 @@ $creator_verified = nymia_is_creator_verified($profile_user->ID);
                         <button type="button" class="nymia-btn-outline" style="flex: 1;" onclick="document.getElementById('cover_image').click();">
                             <?php echo $user_cover_image ? esc_html__('Change Banner', 'nymia') : esc_html__('Upload Banner', 'nymia'); ?>
                         </button>
-                        <?php if ($user_cover_image): ?>
+                    <?php if ($user_cover_image): ?>
                         <button type="button" class="nymia-btn-outline" style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); color: #ef4444;" onclick="if(confirm('<?php echo esc_js(__('Are you sure you want to remove the banner?', 'nymia')); ?>')) { document.getElementById('cover_image').value = ''; document.getElementById('cover_preview').innerHTML = '<div style=\'text-align: center; color: #999; padding: 40px;\'><svg viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' style=\'width: 48px; height: 48px; margin: 0 auto 10px;\'><path d=\'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\'></path><polyline points=\'17 8 12 3 7 8\'></polyline><line x1=\'12\' y1=\'3\' x2=\'12\' y2=\'15\'></line></svg><p><?php esc_html_e('Click to upload cover image', 'nymia'); ?></p></div>'; const formData = new FormData(); formData.append('action', 'nymia_update_profile'); formData.append('nonce', '<?php echo wp_create_nonce("nymia_profile_update"); ?>'); formData.append('remove_cover_image', '1'); fetch('<?php echo admin_url('admin-ajax.php'); ?>', { method: 'POST', body: formData }).then(r => r.json()).then(d => { if(d.success) location.reload(); else alert('Failed to remove banner'); }); }">
                             <?php esc_html_e('Remove', 'nymia'); ?>
                         </button>
-                        <?php endif; ?>
+                    <?php endif; ?>
                     </div>
                 </div>
             </div>

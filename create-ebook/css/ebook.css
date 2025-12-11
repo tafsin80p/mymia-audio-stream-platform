@@ -1,0 +1,395 @@
+/**
+ * ========================================
+ * NYMIA EBOOK SYSTEM - STYLES
+ * ========================================
+ * All ebook-related CSS
+ * 
+ * @package Nymia
+ * @version 1.0
+ */
+
+/* ==========================================
+   EBOOK SUCCESS MESSAGE
+   ========================================== */
+.nymia-success-message {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(22, 163, 74, 0.1));
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    border-radius: 12px;
+    margin-bottom: 24px;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.nymia-success-message svg {
+    width: 24px;
+    height: 24px;
+    color: #22c55e;
+    flex-shrink: 0;
+}
+
+.nymia-success-message span {
+    color: #22c55e;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* ==========================================
+   EBOOK UPLOAD AREA
+   ========================================== */
+#ebookUploadArea {
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.02);
+    margin-bottom: 20px;
+}
+
+#ebookUploadArea:hover {
+    border-color: rgba(191, 76, 26, 0.5);
+    background: rgba(191, 76, 26, 0.05);
+}
+
+#ebookUploadArea.nymia-drag-over {
+    border-color: #BF4C1A;
+    background: rgba(191, 76, 26, 0.1);
+    transform: scale(1.02);
+}
+
+#ebookUploadArea .nymia-upload-content svg {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 20px;
+    color: #BF4C1A;
+}
+
+#ebookUploadArea .nymia-upload-text {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    margin: 10px 0;
+}
+
+#ebookUploadArea .nymia-upload-formats {
+    font-size: 0.9rem;
+    color: #999;
+}
+
+/* ==========================================
+   EBOOK UPLOAD PROGRESS
+   ========================================== */
+.ebook-upload-progress {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.ebook-progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.ebook-progress-fill {
+    height: 100%;
+    background: linear-gradient(135deg, #BF4C1A, #9F2B1A);
+    width: 0%;
+    transition: width 0.3s ease;
+    border-radius: 4px;
+}
+
+.ebook-progress-text {
+    text-align: center;
+    color: #FFFFFF;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* ==========================================
+   EBOOK SIDEBAR CONTENT
+   ========================================== */
+.ebook-posts-content {
+    display: none;
+}
+
+.ebook-posts-content.active {
+    display: block;
+}
+
+.ebook-post-card-compact {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.ebook-post-card-compact:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(191, 76, 26, 0.3);
+    transform: translateY(-2px);
+}
+
+.ebook-post-card-compact .ebook-cover {
+    width: 60px;
+    height: 80px;
+    background: linear-gradient(135deg, #BF4C1A, #9F2B1A);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    color: white;
+}
+
+.ebook-post-card-compact .ebook-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    margin-bottom: 4px;
+}
+
+.ebook-post-card-compact .ebook-meta {
+    font-size: 0.8rem;
+    color: #999;
+    margin-bottom: 8px;
+}
+
+.ebook-post-card-compact .ebook-stats {
+    display: flex;
+    gap: 12px;
+    font-size: 0.75rem;
+    color: #666;
+}
+
+/* ==========================================
+   EBOOK THUMBNAIL UPLOAD
+   ========================================== */
+.ebook-thumbnail-upload {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ebook-thumbnail-upload-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background-color: var(--input);
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+    pointer-events: auto;
+    user-select: none;
+}
+
+.ebook-thumbnail-upload-btn:hover {
+    border-color: var(--primary);
+    background-color: rgba(191, 76, 26, 0.05);
+    color: var(--primary);
+}
+
+.ebook-thumbnail-upload-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.ebook-thumbnail-preview {
+    position: relative;
+    width: 100%;
+    max-width: 200px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    display: none;
+    visibility: hidden;
+    cursor: pointer;
+    margin-bottom: 12px;
+}
+
+.ebook-thumbnail-preview.active,
+.ebook-thumbnail-preview.show-preview {
+    display: block !important;
+    visibility: visible !important;
+}
+
+.ebook-thumbnail-preview img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.ebook-thumbnail-preview img:hover {
+    opacity: 0.8;
+}
+
+.ebook-thumbnail-remove {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.ebook-thumbnail-remove:hover {
+    background-color: rgba(220, 38, 38, 0.9);
+    transform: scale(1.1);
+}
+
+/* Thumbnail Upload Progress */
+.ebook-thumbnail-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 8px;
+    border-radius: 0 0 8px 8px;
+}
+
+.ebook-thumbnail-progress-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.ebook-thumbnail-progress-fill {
+    height: 100%;
+    background: linear-gradient(135deg, #BF4C1A, #9F2B1A);
+    width: 0%;
+    transition: width 0.3s ease;
+    border-radius: 2px;
+}
+
+.ebook-thumbnail-progress-text {
+    display: block;
+    text-align: center;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* ==========================================
+   EBOOK LIBRARY PAGE
+   ========================================== */
+.nymia-ebook-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted-foreground);
+}
+
+.nymia-ebook-empty svg {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    color: var(--muted-foreground);
+    opacity: 0.5;
+}
+
+.nymia-ebook-empty h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--foreground);
+    margin-bottom: 12px;
+}
+
+.nymia-ebook-empty p {
+    font-size: 1rem;
+    color: var(--muted-foreground);
+}
+
+.nymia-ebook-cover-placeholder {
+    width: 100%;
+    height: 100%;
+    min-height: 300px;
+    background: linear-gradient(135deg, var(--primary) 0%, rgba(191, 76, 26, 0.3) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+}
+
+.nymia-ebook-cover-placeholder svg {
+    width: 80px;
+    height: 80px;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.nymia-ebook-category {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 4px 12px;
+    background-color: var(--muted);
+    color: var(--muted-foreground);
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.nymia-ebook-price {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.nymia-ebook-price svg {
+    width: 14px;
+    height: 14px;
+}
+
+.nymia-ebook-sidebar-empty {
+    text-align: center;
+    padding: 20px;
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+}
+

@@ -13,6 +13,8 @@ get_header();
     <div class="nymia-main">
         <?php get_template_part('template-parts/header'); ?>
         
+        <?php get_template_part('template-parts/filters'); ?>
+        
         <div class="nymia-policies-container">
             <!-- Policies Header -->
             <div class="nymia-policies-header">

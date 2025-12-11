@@ -12,7 +12,7 @@
 
 // GET: Dashboard data and filter options
 $dashboard_data = nymia_get_dashboard_data();
-$filter_buttons = array('All', 'Live Audio', 'E-Books', 'Audio Creator');
+$filter_buttons = array('All', 'Live Audio', 'E-Books', 'Audio Creator', 'Online Now', 'Secret Room');
 $login_url = home_url('/login/');
 ?>
 
@@ -57,6 +57,18 @@ $login_url = home_url('/login/');
                 <a class="nymia-filter-btn" href="<?php echo esc_url($audio_link); ?>">
                     <?php echo esc_html($filter); ?>
                 </a>
+            <?php elseif ($filter === 'Online Now') : ?>
+                <?php 
+                $online_now_page = get_page_by_path('online-now');
+                $online_now_link = $online_now_page ? get_permalink($online_now_page) : site_url('/online-now/');
+                ?>
+                <a class="nymia-filter-btn" href="<?php echo esc_url($online_now_link); ?>">
+                    <?php echo esc_html($filter); ?>
+                </a>
+            <?php elseif ($filter === 'Secret Room') : ?>
+                <button class="nymia-filter-btn" data-filter="secret-room" id="nymia-secret-room-filter-btn">
+                    <?php echo esc_html($filter); ?>
+                </button>
             <?php else: ?>
                 <button class="nymia-filter-btn <?php echo $filter === 'All' ? 'active' : ''; ?>" data-filter="<?php echo esc_attr(strtolower(str_replace(' ', '-', $filter))); ?>">
                     <?php echo esc_html($filter); ?>

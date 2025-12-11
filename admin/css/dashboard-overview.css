@@ -1,0 +1,1784 @@
+/* Nymia Admin Dashboard Overview Styles */
+
+:root {
+    --nymia-bg: #101010;
+    --nymia-panel: #151515;
+    --nymia-panel-solid: #1c1c1c;
+    --nymia-border: rgba(255, 255, 255, 0.06);
+    --nymia-text-primary: #f7f7f7;
+    --nymia-text-muted: #a1a1aa;
+    --nymia-accent: #e67444;
+    --nymia-accent-soft: rgba(230, 116, 68, 0.18);
+    --nymia-success: #34d399;
+    --nymia-warning: #f59e0b;
+    --nymia-danger: #f87171;
+    --nymia-info: #38bdf8;
+}
+
+.is-hidden {
+    display: none !important;
+}
+
+.nymia-settings-wrap {
+    margin: 0;
+    padding: 0;
+}
+
+.nymia-settings-wrap .nymia-dashboard-wrap {
+    padding: 32px 40px 48px;
+}
+
+.nymia-dashboard-wrap {
+    position: relative;
+    background: var(--nymia-bg);
+    color: var(--nymia-text-primary);
+    margin: 0 -20px;
+    padding: 24px 32px 48px;
+    min-height: calc(100vh - 32px);
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.nymia-settings-page {
+    background: rgba(15, 23, 42, 0.85);
+    border-radius: 28px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 24px 50px rgba(10, 14, 35, 0.6);
+}
+
+.nymia-dashboard-wrap h1,
+.nymia-dashboard-wrap h2,
+.nymia-dashboard-wrap h3,
+.nymia-dashboard-wrap h4,
+.nymia-dashboard-wrap h5,
+.nymia-dashboard-wrap h6 {
+    color: var(--nymia-text-primary);
+}
+
+.nymia-dashboard-wrap .nav-tab-wrapper,
+.nymia-dashboard-wrap .wrap h1 {
+    display: none;
+}
+
+.nymia-dashboard-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.nymia-dashboard-header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--nymia-text-primary);
+}
+
+.nymia-dashboard-header p {
+    margin: 4px 0 0;
+    color: var(--nymia-text-muted);
+    font-size: 15px;
+}
+
+.nymia-dashboard-nav {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
+    background: rgba(230, 116, 68, 0.08);
+    border-radius: 999px;
+    padding: 8px;
+    border: 1px solid rgba(230, 116, 68, 0.18);
+}
+
+.nymia-dashboard-nav a {
+    padding: 8px 18px;
+    border-radius: 999px;
+    color: var(--nymia-text-muted);
+    font-size: 13px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.nymia-dashboard-nav a:hover {
+    color: var(--nymia-text-primary);
+}
+
+.nymia-dashboard-nav a.active {
+    background: var(--nymia-accent);
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(230, 116, 68, 0.35);
+}
+
+.nymia-dashboard-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.nymia-primary-btn,
+.nymia-secondary-btn,
+.nymia-tertiary-btn,
+.nymia-link-btn {
+    cursor: pointer;
+    border-radius: 999px;
+    font-size: 14px;
+    line-height: 1;
+    padding: 10px 18px;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.nymia-primary-btn {
+    background: var(--nymia-accent);
+    color: #fff;
+    border-color: transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.nymia-primary-btn.is-spinning .dashicons {
+    animation: nymia-spin 0.9s linear infinite;
+}
+
+.nymia-primary-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.nymia-primary-btn:hover {
+    background: #cf6233;
+}
+
+.nymia-secondary-btn {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--nymia-text-primary);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.nymia-secondary-btn:hover {
+    border-color: rgba(230, 116, 68, 0.35);
+}
+
+.nymia-tertiary-btn,
+.nymia-link-btn {
+    background: transparent;
+    color: var(--nymia-accent);
+    padding: 6px 10px;
+}
+
+.nymia-tertiary-btn:hover,
+.nymia-link-btn:hover {
+    color: #f08a5d;
+}
+
+.nymia-dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    margin-bottom: 28px;
+}
+
+.nymia-stat-card {
+    background: var(--nymia-panel);
+    border: 1px solid var(--nymia-border);
+    padding: 20px;
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+}
+
+.nymia-stat-card::after {
+    content: '';
+    position: absolute;
+    inset: -60% -20% auto;
+    height: 120px;
+    background: linear-gradient(135deg, rgba(230, 116, 68, 0.28), transparent 60%);
+    transform: rotate(12deg);
+}
+
+.nymia-stat-label {
+    display: block;
+    font-size: 13px;
+    color: var(--nymia-text-muted);
+    margin-bottom: 8px;
+    z-index: 1;
+    position: relative;
+}
+
+.nymia-stat-value {
+    display: block;
+    font-size: 28px;
+    font-weight: 600;
+    z-index: 1;
+    position: relative;
+}
+
+.nymia-stat-change {
+    display: inline-flex;
+    padding: 4px 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    font-size: 12px;
+    margin-top: 12px;
+    z-index: 1;
+    position: relative;
+}
+
+.nymia-stat-card.is-up .nymia-stat-change {
+    color: var(--nymia-success);
+}
+
+.nymia-stat-card.is-down .nymia-stat-change {
+    color: var(--nymia-danger);
+}
+
+.nymia-dashboard-charts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 18px;
+    margin-bottom: 28px;
+}
+
+.nymia-chart-card,
+.nymia-card {
+    background: var(--nymia-panel);
+    border-radius: 18px;
+    border: 1px solid var(--nymia-border);
+    padding: 24px;
+}
+
+.nymia-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.nymia-card-head h2 {
+    margin: 0;
+    font-size: 18px;
+    color: var(--nymia-text-primary);
+}
+
+.nymia-card-head p {
+    margin: 6px 0 0;
+    color: var(--nymia-text-muted);
+    font-size: 14px;
+}
+
+.nymia-filter-select {
+    background: var(--nymia-panel-solid);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--nymia-text-primary);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 13px;
+}
+
+.nymia-filter-select:focus {
+    border-color: var(--nymia-accent);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(230, 116, 68, 0.28);
+}
+
+.nymia-flex-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 18px;
+    margin-bottom: 40px;
+}
+
+.nymia-module-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 28px;
+    background: rgba(230, 116, 68, 0.08);
+    border-radius: 14px;
+    padding: 8px;
+    border: 1px solid rgba(230, 116, 68, 0.18);
+}
+
+.nymia-module-tab-button {
+    border: none;
+    background: transparent;
+    color: var(--nymia-text-muted);
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.nymia-module-tab-button:hover,
+.nymia-module-tab-button:focus {
+    color: var(--nymia-text-primary);
+    outline: none;
+}
+
+.nymia-module-tab-button.is-active {
+    color: #fff;
+    border: 1px solid rgba(191, 76, 26, 0.45);
+    background-image: linear-gradient(135deg, #BF4C1A 0%, #9F2B1A 100%);
+    box-shadow: 0 12px 28px rgba(191, 76, 26, 0.32);
+    transform: translateY(-2px);
+}
+
+.nymia-tab-loader {
+    position: absolute;
+    top: 72px;
+    left: 32px;
+    right: 32px;
+    height: 3px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05);
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    pointer-events: none;
+}
+
+.nymia-tab-loader.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.nymia-tab-loader-spinner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    gap: 6px;
+}
+
+.nymia-tab-loader-spinner span {
+    flex: 1;
+    background: linear-gradient(135deg, rgba(191, 76, 26, 0.8), rgba(159, 43, 26, 0.8));
+    border-radius: 999px;
+    transform: translateX(-100%);
+    animation: nymia-tab-loader 1.2s infinite ease-in-out;
+}
+
+.nymia-tab-loader-spinner span:nth-child(2) {
+    animation-delay: 0.15s;
+}
+
+.nymia-tab-loader-spinner span:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+@keyframes nymia-tab-loader {
+    0% {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    25% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    75% {
+        transform: translateX(100%);
+        opacity: 0.2;
+    }
+    100% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.nymia-module-panel[hidden] {
+    display: none;
+}
+
+.nymia-module-panel {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.32s ease, transform 0.32s ease;
+    pointer-events: none;
+}
+
+.nymia-module-panel.is-active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.nymia-activity-list,
+.nymia-alert-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 16px;
+}
+
+.nymia-activity-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 14px;
+    padding: 16px;
+}
+
+.nymia-activity-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-top: 6px;
+    background: var(--nymia-accent);
+}
+
+.nymia-activity-sale .nymia-activity-indicator { background: var(--nymia-success); }
+.nymia-activity-review .nymia-activity-indicator { background: var(--nymia-warning); }
+.nymia-activity-upload .nymia-activity-indicator { background: var(--nymia-accent); }
+.nymia-activity-signup .nymia-activity-indicator { background: var(--nymia-info); }
+.nymia-activity-audio .nymia-activity-indicator { background: var(--nymia-accent); }
+.nymia-activity-ebook .nymia-activity-indicator { background: var(--nymia-info); }
+.nymia-activity-live .nymia-activity-indicator { background: var(--nymia-warning); }
+
+.nymia-activity-item p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.nymia-activity-time {
+    display: block;
+    font-size: 12px;
+    color: var(--nymia-text-muted);
+    margin-top: 6px;
+}
+
+.nymia-alert-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 14px;
+    padding: 18px;
+}
+
+.nymia-alert-item h3 {
+    margin: 0 0 6px;
+    font-size: 15px;
+    color: var(--nymia-text-primary);
+}
+
+.nymia-alert-item p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--nymia-text-muted);
+}
+
+.nymia-alert-warning { border-left: 3px solid var(--nymia-warning); }
+.nymia-alert-critical { border-left: 3px solid var(--nymia-danger); }
+.nymia-alert-info { border-left: 3px solid var(--nymia-info); }
+
+.nymia-section {
+    margin-bottom: 48px;
+}
+
+.nymia-section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.nymia-section-head h2 {
+    margin: 0;
+    font-size: 20px;
+    color: var(--nymia-text-primary);
+}
+
+.nymia-section-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.nymia-user-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.nymia-user-search {
+    margin-bottom: 16px;
+}
+
+.nymia-user-search-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+
+.nymia-user-search-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 8px 14px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nymia-user-search-field:focus-within {
+    border-color: rgba(191, 76, 26, 0.4);
+    box-shadow: 0 0 0 3px rgba(191, 76, 26, 0.16);
+}
+
+.nymia-user-search-field .dashicons {
+    color: rgba(226, 232, 240, 0.6);
+    font-size: 16px;
+}
+
+.nymia-user-search-field input[type="search"] {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: rgba(248, 250, 252, 0.92);
+    font-size: 0.95rem;
+    outline: none;
+    padding: 0;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.nymia-user-search-field input[type="search"]:focus {
+    outline: none;
+    border: none;
+    box-shadow: none;
+}
+
+.nymia-user-search-clear {
+    border: none;
+    background: transparent;
+    color: rgba(226, 232, 240, 0.6);
+    font-size: 0.95rem;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateX(6px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.nymia-user-search-field.has-value .nymia-user-search-clear {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.nymia-user-search-field.is-loading::after {
+    content: '';
+    position: absolute;
+    right: 14px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid rgba(226, 232, 240, 0.35);
+    border-top-color: transparent;
+    animation: nymia-chip-spin 0.8s linear infinite;
+}
+
+.nymia-user-filter {
+    min-width: 140px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(15, 23, 42, 0.6);
+    color: rgba(248, 250, 252, 0.92);
+    padding: 8px 38px 8px 14px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 7l5 6 5-6' stroke='%23f8fafc' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px 14px;
+}
+
+.nymia-user-filter:focus {
+    outline: none;
+    border-color: rgba(191, 76, 26, 0.4);
+    box-shadow: 0 0 0 3px rgba(191, 76, 26, 0.16);
+}
+
+.wp-core-ui .wrap .nymia-user-filter {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: rgba(248, 250, 252, 0.92);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: none;
+    border-radius: 12px;
+    padding: 8px 38px 8px 14px;
+    background-color: rgba(15, 23, 42, 0.6);
+}
+
+.nymia-users-empty td {
+    text-align: center;
+    padding: 32px 0;
+    color: rgba(226, 232, 240, 0.65);
+    font-size: 0.95rem;
+}
+
+.nymia-product-undo {
+    margin-top: 16px;
+    display: none;
+}
+
+.nymia-product-undo.is-visible {
+    display: block;
+}
+
+.nymia-product-undo-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 18px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(15, 23, 42, 0.65);
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.35);
+}
+
+.nymia-product-undo-message {
+    color: rgba(248, 250, 252, 0.92);
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.nymia-product-undo-helper {
+    margin-top: 4px;
+    color: rgba(226, 232, 240, 0.7);
+    font-size: 0.85rem;
+    font-weight: 400;
+}
+
+.nymia-product-undo-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nymia-product-restore-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: linear-gradient(135deg, rgba(63, 131, 248, 0.32), rgba(14, 116, 233, 0.18));
+    color: rgba(248, 250, 252, 0.95);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.nymia-product-restore-btn:hover {
+    border-color: rgba(147, 197, 253, 0.5);
+    box-shadow: 0 8px 18px rgba(14, 116, 233, 0.28);
+    transform: translateY(-1px);
+}
+
+.nymia-product-restore-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.nymia-deleted-date {
+    display: inline-block;
+    color: rgba(226, 232, 240, 0.78);
+    font-size: 0.9rem;
+}
+
+.nymia-deleted-note {
+    display: block;
+    color: rgba(226, 232, 240, 0.85);
+    font-size: 0.9rem;
+    line-height: 1.45;
+    white-space: normal;
+}
+
+.nymia-deleted-note.is-empty {
+    color: rgba(226, 232, 240, 0.6);
+    font-style: italic;
+}
+
+.nymia-user-summary-card {
+    background: var(--nymia-panel);
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 18px;
+}
+
+.nymia-user-summary-card .nymia-user-summary-label {
+    display: block;
+    font-size: 13px;
+    color: var(--nymia-text-muted);
+}
+
+.nymia-user-summary-value {
+    display: block;
+    margin-top: 10px;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.nymia-status-up .nymia-user-summary-value { color: var(--nymia-success); }
+.nymia-status-warning .nymia-user-summary-value { color: var(--nymia-warning); }
+
+.nymia-table-wrap {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+}
+
+.nymia-kyc-review {
+    margin-top: 28px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.nymia-kyc-grid {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.nymia-kyc-card {
+    background: rgba(15, 23, 42, 0.3);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    position: relative;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.nymia-kyc-card:hover {
+    border-color: rgba(230, 116, 68, 0.38);
+    box-shadow: 0 18px 32px rgba(230, 116, 68, 0.18);
+    transform: translateY(-2px);
+}
+
+.nymia-kyc-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.nymia-kyc-card-head h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.nymia-kyc-email {
+    display: block;
+    font-size: 13px;
+    color: var(--nymia-text-muted);
+    margin-top: 4px;
+}
+
+.nymia-kyc-status {
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 11px;
+}
+
+.nymia-kyc-card.is-approved {
+    border-color: rgba(52, 211, 153, 0.45);
+    box-shadow: 0 22px 36px rgba(52, 211, 153, 0.18);
+}
+
+.nymia-kyc-card.is-rejected {
+    border-color: rgba(248, 113, 113, 0.45);
+    box-shadow: 0 22px 36px rgba(248, 113, 113, 0.16);
+}
+
+.nymia-kyc-meta {
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+}
+
+.nymia-kyc-meta > div {
+    display: grid;
+    gap: 4px;
+}
+
+.nymia-kyc-meta dt {
+    margin: 0;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: rgba(226, 232, 240, 0.65);
+}
+
+.nymia-kyc-meta dd {
+    margin: 0;
+    font-size: 14px;
+}
+
+.nymia-kyc-meta-muted {
+    color: var(--nymia-text-muted);
+    font-size: 12px;
+    margin-left: 6px;
+}
+
+.nymia-kyc-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.nymia-kyc-links {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.nymia-kyc-decisions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.nymia-kyc-decisions .nymia-secondary-btn,
+.nymia-kyc-decisions .nymia-tertiary-btn {
+    flex: 1;
+    min-width: 130px;
+}
+
+.nymia-kyc-feedback {
+    min-height: 18px;
+    font-size: 13px;
+    color: var(--nymia-text-muted);
+}
+
+.nymia-kyc-feedback.is-success {
+    color: var(--nymia-success);
+}
+
+.nymia-kyc-feedback.is-error {
+    color: var(--nymia-danger);
+}
+
+.nymia-kyc-empty {
+    padding: 24px;
+    border-radius: 16px;
+    border: 1px dashed rgba(148, 163, 184, 0.26);
+    text-align: center;
+    color: var(--nymia-text-muted);
+    background: rgba(15, 23, 42, 0.26);
+}
+
+.nymia-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--nymia-text-primary);
+}
+
+.nymia-table thead {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.nymia-table th,
+.nymia-table td {
+    padding: 14px 18px;
+    text-align: left;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nymia-table tbody tr:hover {
+    background: var(--nymia-accent-soft);
+}
+
+.nymia-user-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nymia-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    background-size: cover;
+    background-position: center;
+}
+
+.nymia-status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.18);
+    font-size: 12px;
+}
+
+.nymia-status-pill.is-active {
+    background: rgba(52, 211, 153, 0.16);
+    color: var(--nymia-success);
+}
+
+.nymia-status-pill.is-suspended {
+    background: rgba(251, 191, 36, 0.18);
+    color: var(--nymia-warning);
+}
+
+.nymia-status-pill.is-banned {
+    background: rgba(248, 113, 113, 0.18);
+    color: var(--nymia-danger);
+}
+
+.nymia-status-pill.is-paid {
+    background: rgba(59, 130, 246, 0.18);
+    color: rgba(147, 197, 253, 0.95);
+}
+
+.nymia-status-pill.is-free {
+    background: rgba(52, 211, 153, 0.16);
+    color: var(--nymia-success);
+}
+
+.nymia-user-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.nymia-user-actions .nymia-link-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 11px;
+    margin-top: 0;
+    letter-spacing: 0.02em;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.nymia-user-actions .nymia-link-btn:hover {
+    color: #ffffff;
+    border-color: rgba(191, 76, 26, 0.35);
+}
+
+.nymia-chip-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+}
+
+.nymia-chip-btn.is-warning {
+    border-color: rgba(251, 191, 36, 0.32);
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(240, 173, 0, 0.08));
+    color: #fbbf24;
+}
+
+.nymia-chip-btn.is-success {
+    border-color: rgba(52, 211, 153, 0.32);
+    background: linear-gradient(135deg, rgba(52, 211, 153, 0.22), rgba(16, 185, 129, 0.1));
+    color: #34d399;
+}
+
+.nymia-chip-btn.is-danger {
+    border-color: rgba(248, 113, 113, 0.34);
+    background: linear-gradient(135deg, rgba(248, 113, 113, 0.22), rgba(220, 38, 38, 0.08));
+    color: #f87171;
+}
+
+.nymia-chip-btn.is-muted {
+    border-color: rgba(148, 163, 184, 0.26);
+    background: linear-gradient(135deg, rgba(148, 163, 184, 0.16), rgba(71, 85, 105, 0.08));
+    color: rgba(226, 232, 240, 0.82);
+}
+
+.nymia-chip-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.35);
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+.nymia-chip-btn:disabled,
+.nymia-chip-btn.is-loading {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.nymia-chip-btn.is-loading {
+    position: relative;
+    padding-right: 28px;
+}
+
+.nymia-chip-btn.is-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    width: 14px;
+    height: 14px;
+    margin-top: -7px;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    animation: nymia-chip-spin 0.8s linear infinite;
+}
+
+@keyframes nymia-chip-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.nymia-admin-dialog {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(7, 7, 9, 0.78);
+    backdrop-filter: blur(10px);
+    z-index: 99999;
+    padding: 24px;
+}
+
+.nymia-admin-dialog.is-visible {
+    display: flex;
+    animation: nymia-dialog-fade 0.2s ease;
+}
+
+.nymia-admin-dialog-card {
+    width: 100%;
+    max-width: 420px;
+    background: linear-gradient(135deg, rgba(34, 34, 40, 0.98), rgba(20, 20, 24, 0.96));
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 40px 90px rgba(0, 0, 0, 0.55);
+    padding: 28px;
+    color: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.nymia-admin-dialog-card h3 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #ffffff;
+    padding: 10px 16px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(191, 76, 26, 0.22), rgba(159, 43, 26, 0.12));
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.nymia-admin-dialog-card p {
+    margin: 0;
+    color: rgba(226, 232, 240, 0.75);
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.nymia-admin-dialog-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.nymia-admin-dialog-meta span {
+    font-size: 0.85rem;
+    color: rgba(226, 232, 240, 0.65);
+}
+
+.nymia-admin-dialog-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 6px;
+}
+
+.nymia-admin-dialog-actions button {
+    flex: 1;
+    padding: 12px 0;
+    border-radius: 12px;
+    border: none;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.nymia-admin-dialog-actions button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+}
+
+.nymia-dialog-btn-cancel {
+    background: rgba(148, 163, 184, 0.16);
+    color: rgba(226, 232, 240, 0.92);
+}
+
+.nymia-dialog-btn-confirm {
+    background: linear-gradient(135deg, #BF4C1A, #9F2B1A);
+    color: #fff;
+}
+
+.nymia-dialog-btn-danger {
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.92), rgba(185, 28, 28, 0.9));
+}
+
+.nymia-dialog-btn-warning {
+    background: linear-gradient(135deg, rgba(234, 179, 8, 0.92), rgba(202, 138, 4, 0.9));
+    color: #0f172a;
+}
+
+.nymia-dialog-btn-muted {
+    background: linear-gradient(135deg, rgba(71, 85, 105, 0.6), rgba(51, 65, 85, 0.8));
+}
+
+.nymia-dialog-btn-confirm:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+@keyframes nymia-dialog-fade {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.nymia-admin-dialog-note {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.nymia-admin-dialog-note.is-visible {
+    display: flex;
+}
+
+.nymia-admin-dialog-note label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(226, 232, 240, 0.88);
+}
+
+.nymia-admin-dialog-note textarea {
+    width: 100%;
+    min-height: 96px;
+    resize: vertical;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(15, 23, 42, 0.45);
+    color: rgba(226, 232, 240, 0.92);
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nymia-admin-dialog-note textarea:focus {
+    outline: none;
+    border-color: rgba(191, 76, 26, 0.6);
+    box-shadow: 0 0 0 3px rgba(191, 76, 26, 0.2);
+}
+
+.nymia-dialog-note-hint {
+    font-size: 0.78rem;
+    color: rgba(248, 113, 113, 0.85);
+    display: none;
+}
+
+.nymia-admin-dialog-duration {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.nymia-admin-dialog-duration.is-visible {
+    display: flex;
+}
+
+.nymia-admin-dialog-duration label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(226, 232, 240, 0.88);
+}
+
+.nymia-duration-row {
+    display: flex;
+    gap: 10px;
+}
+
+.nymia-duration-row input,
+.nymia-duration-row select {
+    flex: 1;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(15, 23, 42, 0.45);
+    color: rgba(226, 232, 240, 0.92);
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nymia-duration-row input:focus,
+.nymia-duration-row select:focus {
+    outline: none;
+    border-color: rgba(191, 76, 26, 0.6);
+    box-shadow: 0 0 0 3px rgba(191, 76, 26, 0.2);
+}
+
+.nymia-dialog-duration-hint {
+    font-size: 0.78rem;
+    color: rgba(226, 232, 240, 0.6);
+    display: none;
+}
+
+.nymia-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    border: 1px solid transparent;
+}
+
+.nymia-pill-warning {
+    background: rgba(251, 191, 36, 0.16);
+    border-color: rgba(251, 191, 36, 0.24);
+    color: var(--nymia-warning);
+}
+
+.nymia-pill-info {
+    background: rgba(59, 130, 246, 0.18);
+    border-color: rgba(59, 130, 246, 0.28);
+    color: rgba(147, 197, 253, 0.95);
+}
+
+.nymia-pill-success {
+    background: rgba(52, 211, 153, 0.16);
+    border-color: rgba(52, 211, 153, 0.26);
+    color: var(--nymia-success);
+}
+
+.nymia-pill-danger {
+    background: rgba(248, 113, 113, 0.18);
+    border-color: rgba(248, 113, 113, 0.28);
+    color: var(--nymia-danger);
+}
+
+.nymia-financial-grid,
+.nymia-moderation-grid,
+.nymia-marketing-grid,
+.nymia-settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    margin-bottom: 20px;
+}
+
+.nymia-finance-card,
+.nymia-moderation-card,
+.nymia-marketing-card,
+.nymia-settings-card {
+    background: var(--nymia-panel);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.nymia-finance-label {
+    font-size: 13px;
+    color: var(--nymia-text-muted);
+}
+
+.nymia-finance-value {
+    display: block;
+    font-size: 24px;
+    font-weight: 600;
+    margin: 10px 0;
+    color: var(--nymia-text-primary);
+}
+
+.nymia-finance-card p {
+    margin: 0;
+    color: var(--nymia-text-muted);
+    font-size: 13px;
+}
+
+.nymia-moderation-value {
+    display: block;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--nymia-text-primary);
+}
+
+.nymia-moderation-card p {
+    margin: 8px 0 0;
+    color: var(--nymia-text-muted);
+}
+
+.nymia-marketing-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.nymia-marketing-card h3,
+.nymia-settings-card h3 {
+    margin: 0 0 6px;
+    font-size: 16px;
+    color: var(--nymia-text-primary);
+}
+
+.nymia-marketing-card p,
+.nymia-settings-card p {
+    margin: 0;
+    color: var(--nymia-text-muted);
+    font-size: 13px;
+}
+
+.nymia-settings-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.nymia-settings-card button {
+    align-self: flex-start;
+}
+
+.nymia-settings-form {
+    display: grid;
+    gap: 40px;
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
+.nymia-form-grid {
+    display: grid;
+    gap: 24px;
+}
+
+.nymia-form-card {
+    background: var(--nymia-panel);
+    border: 1px solid var(--nymia-border);
+    border-radius: 18px;
+    padding: 26px;
+    display: grid;
+    gap: 24px;
+}
+
+.nymia-form-row {
+    display: grid;
+    grid-template-columns: minmax(220px, 320px) 1fr;
+    gap: 24px;
+    align-items: center;
+}
+
+.nymia-form-label {
+    display: grid;
+    gap: 6px;
+}
+
+.nymia-form-title {
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--nymia-text-primary);
+}
+
+.nymia-form-description {
+    color: var(--nymia-text-muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.nymia-form-control {
+    display: grid;
+    gap: 10px;
+    justify-content: flex-start;
+}
+
+.nymia-toggle {
+    position: relative;
+    display: inline-block;
+    width: 54px;
+    height: 30px;
+}
+
+.nymia-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.nymia-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    transition: background 0.2s ease;
+}
+
+.nymia-toggle-slider::before {
+    content: "";
+    position: absolute;
+    height: 24px;
+    width: 24px;
+    left: 3px;
+    top: 3px;
+    background-color: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+}
+
+.nymia-toggle input:checked + .nymia-toggle-slider {
+    background: var(--nymia-accent);
+}
+
+.nymia-toggle input:checked + .nymia-toggle-slider::before {
+    transform: translateX(24px);
+}
+
+.nymia-inline-input {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 6px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nymia-inline-input input[type="radio"],
+.nymia-inline-input input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+}
+
+.nymia-input-help,
+.nymia-settings-form .description {
+    color: var(--nymia-text-muted);
+    font-size: 13px;
+    margin: 0;
+    max-width: 520px;
+}
+
+.nymia-settings-form input[type="text"],
+.nymia-settings-form input[type="url"],
+.nymia-settings-form input[type="number"],
+.nymia-settings-form input[type="password"],
+.nymia-settings-form input[type="email"],
+.nymia-settings-form textarea {
+    width: 100%;
+    max-width: 440px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: var(--nymia-text-primary);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 14px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nymia-settings-form input:focus,
+.nymia-settings-form textarea:focus,
+.nymia-settings-form select:focus {
+    border-color: var(--nymia-accent);
+    box-shadow: 0 0 0 3px rgba(230, 116, 68, 0.22);
+    outline: none;
+}
+
+.nymia-settings-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.nymia-settings-actions .button-primary,
+.nymia-settings-actions .button {
+    background: var(--nymia-accent);
+    border: none;
+    color: #fff;
+    border-radius: 999px;
+    padding: 12px 28px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.nymia-settings-actions .button-primary:hover,
+.nymia-settings-actions .button:hover {
+    background: #cf6233;
+}
+
+.nymia-note-card {
+    padding: 16px 20px;
+    border-left: 4px solid var(--nymia-accent);
+    background: rgba(230, 116, 68, 0.12);
+    border-radius: 12px;
+    color: var(--nymia-text-primary);
+    font-size: 14px;
+    display: grid;
+    gap: 10px;
+}
+
+.nymia-note-card ul,
+.nymia-note-card ol {
+    margin: 0;
+    padding-left: 20px;
+    color: var(--nymia-text-muted);
+}
+
+.nymia-note-card li {
+    line-height: 1.6;
+}
+
+.nymia-highlight-card {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 18px;
+    padding: 20px 24px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(230,116,68,0.22), rgba(15,23,42,0.8));
+    border: 1px solid rgba(230, 116, 68, 0.32);
+    margin-bottom: 24px;
+}
+
+.nymia-highlight-card h3 {
+    margin: 0;
+    font-size: 18px;
+    color: var(--nymia-text-primary);
+}
+
+.nymia-highlight-card p {
+    margin: 4px 0 0;
+    color: var(--nymia-text-muted);
+}
+
+.nymia-highlight-card .nymia-highlight-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--nymia-warning);
+    box-shadow: 0 0 0 6px rgba(230,116,68,0.15);
+}
+
+.nymia-highlight-card.is-live .nymia-highlight-dot {
+    background: var(--nymia-success);
+    box-shadow: 0 0 0 6px rgba(52,211,153,0.18);
+}
+
+.nymia-highlight-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.nymia-highlight-actions .nymia-link-btn {
+    font-weight: 600;
+}
+
+.nymia-key-grid {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.nymia-key-grid-compact {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+.nymia-key-card {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 22px;
+    display: grid;
+    gap: 16px;
+}
+
+.nymia-key-card input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 11px 14px;
+    color: var(--nymia-text-primary);
+    font-size: 13px;
+}
+
+.nymia-key-card input:focus {
+    border-color: var(--nymia-accent);
+    box-shadow: 0 0 0 3px rgba(230,116,68,0.22);
+    outline: none;
+}
+
+.nymia-key-card h3 {
+    margin: 0;
+    font-size: 16px;
+    color: var(--nymia-text-primary);
+}
+
+.nymia-key-card p {
+    margin: 0;
+    color: var(--nymia-text-muted);
+    font-size: 13px;
+}
+
+.nymia-key-field {
+    display: grid;
+    gap: 6px;
+}
+
+.nymia-key-field span {
+    font-size: 13px;
+    color: var(--nymia-text-muted);
+}
+
+.nymia-pill-toggle {
+    display: inline-flex;
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 999px;
+    padding: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    gap: 4px;
+}
+
+.nymia-pill-option {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    color: var(--nymia-text-muted);
+    transition: all 0.2s ease;
+}
+
+.nymia-pill-option input {
+    display: none;
+}
+
+.nymia-pill-option span {
+    font-size: 13px;
+}
+
+.nymia-pill-option.is-active,
+.nymia-pill-option:hover {
+    background: var(--nymia-accent);
+    color: #fff;
+}
+
+@media (max-width: 960px) {
+    .nymia-dashboard-wrap {
+        margin: 0;
+        padding: 20px;
+    }
+
+    .nymia-dashboard-header {
+        align-items: flex-start;
+    }
+
+    .nymia-card-head,
+    .nymia-section-head {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .nymia-dashboard-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 600px) {
+    .nymia-table th,
+    .nymia-table td {
+        padding: 12px;
+        font-size: 12px;
+    }
+
+    .nymia-dashboard-header h1 {
+        font-size: 24px;
+    }
+
+    .nymia-primary-btn,
+    .nymia-secondary-btn {
+        flex: 1;
+        justify-content: center;
+    }
+}
+
+@keyframes nymia-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+

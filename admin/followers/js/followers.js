@@ -1,0 +1,331 @@
+/**
+ * ========================================
+ * NYMIA FOLLOWERS SYSTEM - JAVASCRIPT
+ * ========================================
+ * Handles all followers/following UI interactions including popup modal
+ * 
+ * @package Nymia
+ * @version 1.0
+ */
+
+// ==========================================
+// FOLLOW/UNFOLLOW FUNCTIONALITY
+// ==========================================
+/**
+ * TOGGLE FOLLOW STATUS
+ * Handles follow/unfollow button clicks
+ */
+function nymiaToggleFollow(button, user_id) {
+    // Prevent default action
+    if (typeof event !== 'undefined') {
+        event.stopPropagation();
+    }
+
+    // Get current state
+    const currentText = button.textContent.trim();
+    const isFollowing = currentText === 'Following';
+
+    // Check if nymiaAjax is defined
+    if (typeof nymiaAjax === 'undefined' || !nymiaAjax.followNonce) {
+        alert('Configuration error. Please refresh the page.');
+        return;
+    }
+
+    // Disable button during request
+    button.disabled = true;
+    button.textContent = isFollowing ? 'Unfollowing...' : 'Following...';
+
+    // Prepare data for AJAX request
+    const formData = new FormData();
+    formData.append('action', 'nymia_toggle_follow');
+    formData.append('user_id', user_id);
+    formData.append('nonce', nymiaAjax.followNonce);
+
+    // Send AJAX request
+    fetch(nymiaAjax.ajaxurl, {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Enable button
+            button.disabled = false;
+
+            // Check if request was successful
+            if (data.success) {
+                // Update button text and state
+                if (data.data.is_following) {
+                    button.textContent = 'Following';
+                    button.classList.add('following');
+                } else {
+                    button.textContent = 'Follow';
+                    button.classList.remove('following');
+                }
+            } else {
+                // Reset button to previous state
+                button.textContent = isFollowing ? 'Following' : 'Follow';
+                alert(data.data.message || 'Something went wrong. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Follow toggle error:', error);
+            button.disabled = false;
+            button.textContent = isFollowing ? 'Following' : 'Follow';
+            alert('Network error. Please check console for details and try again.');
+        });
+}
+
+// ==========================================
+// FOLLOWER LIST POPUP MODAL
+// ==========================================
+/**
+ * Show User List Modal
+ * Opens modal and fetches the list of followers or following users
+ */
+function nymiaShowUserList(userId, type, isOwnProfile) {
+    const modal = document.getElementById('nymia-followers-modal');
+    const title = document.getElementById('nymia-followers-modal-title');
+    const body = document.getElementById('nymia-followers-modal-body');
+
+    if (!modal || !title || !body) {
+        console.error('Follower modal elements not found');
+        return;
+    }
+
+    // Set title
+    title.textContent = type === 'followers' ? 'Followers' : 'Following';
+
+    // Show loading
+    body.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">Loading...</div>';
+
+    // Open modal
+    modal.classList.add('active');
+
+    // Store modal context
+    window.nymiaModalContext = { userId, type, isOwnProfile };
+
+    // Fetch user list via AJAX
+    const ajaxUrl = (typeof nymiaAjax !== 'undefined' && nymiaAjax.ajaxurl) ? nymiaAjax.ajaxurl : '/wp-admin/admin-ajax.php';
+
+    fetch(ajaxUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            action: 'nymia_get_user_list',
+            user_id: userId,
+            type: type
+        })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayUserList(data.data.users);
+            } else {
+                body.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">' + data.data.message + '</div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            body.innerHTML = '<div style="text-align: center; padding: 40px; color: #dc3545;">Error loading users. Please try again.</div>';
+        });
+}
+
+/**
+ * Display User List
+ * Renders the list of users in the modal
+ */
+function displayUserList(users) {
+    const body = document.getElementById('nymia-followers-modal-body');
+    if (!body) return;
+
+    const context = window.nymiaModalContext || {};
+    const type = context.type || 'followers';
+    const isOwnProfile = context.isOwnProfile || false;
+
+    if (!users || users.length === 0) {
+        body.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">No users found.</div>';
+        return;
+    }
+
+    let html = '';
+    users.forEach(user => {
+        const avatar = user.avatar || '';
+        const profileUrl = '<?php echo home_url(' / profile / '); ?>?user_id=' + user.id;
+
+        // Show action button based on type - only if viewing own profile
+        let actionButton = '';
+        if (isOwnProfile) {
+            if (type === 'following') {
+                actionButton = `
+                    <button class="nymia-user-list-action-btn" onclick="nymiaUnfollowUser(${user.id}, this)">
+                        Unfollow
+                    </button>
+                `;
+            } else if (type === 'followers') {
+                actionButton = `
+                    <button class="nymia-user-list-action-btn" onclick="nymiaRemoveFollower(${user.id}, this)">
+                        Remove
+                    </button>
+                `;
+            }
+        }
+
+        html += `
+            <div class="nymia-followers-item-wrapper">
+                <div class="nymia-followers-item" onclick="window.location.href='${profileUrl}'">
+                    <img src="${avatar}" alt="${user.name}" class="nymia-followers-item-avatar" onerror="this.src='<?php echo get_template_directory_uri(); ?>/assets/images/profile.png';" />
+                    <div class="nymia-followers-item-info">
+                        <div class="nymia-followers-item-name">${user.name}</div>
+                        <div class="nymia-followers-item-username">@${user.username}</div>
+                    </div>
+                </div>
+                ${actionButton}
+            </div>
+        `;
+    });
+
+    body.innerHTML = html;
+}
+
+/**
+ * Close User List Modal
+ */
+function nymiaCloseUserList() {
+    const modal = document.getElementById('nymia-followers-modal');
+    if (modal) {
+        modal.classList.remove('active');
+        window.nymiaModalContext = null;
+    }
+}
+
+/**
+ * Unfollow User
+ * Unfollows a user from the list
+ */
+function nymiaUnfollowUser(userId, button) {
+    if (typeof event !== 'undefined') {
+        event.stopPropagation();
+    }
+
+    if (confirm('Are you sure you want to unfollow this user?')) {
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = 'Unfollowing...';
+
+        const ajaxUrl = (typeof nymiaAjax !== 'undefined' && nymiaAjax.ajaxurl) ? nymiaAjax.ajaxurl : '/wp-admin/admin-ajax.php';
+        const followNonce = (typeof nymiaAjax !== 'undefined' && nymiaAjax.followNonce) ? nymiaAjax.followNonce : '';
+
+        fetch(ajaxUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                action: 'nymia_toggle_follow',
+                user_id: userId,
+                nonce: followNonce
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                button.disabled = false;
+
+                if (data.success) {
+                    const item = button.closest('.nymia-followers-item-wrapper');
+                    if (item) {
+                        item.style.opacity = '0';
+                        item.style.transform = 'translateX(-20px)';
+                        item.style.transition = 'all 0.3s ease';
+                        setTimeout(() => {
+                            item.remove();
+                            location.reload();
+                        }, 300);
+                    }
+                } else {
+                    button.textContent = originalText;
+                    alert('Failed to unfollow user. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                button.disabled = false;
+                button.textContent = originalText;
+                alert('Network error. Please try again.');
+            });
+    }
+}
+
+/**
+ * Remove Follower
+ * Removes a follower from the list
+ */
+function nymiaRemoveFollower(userId, button) {
+    if (typeof event !== 'undefined') {
+        event.stopPropagation();
+    }
+
+    if (confirm('Are you sure you want to remove this follower?')) {
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = 'Removing...';
+
+        const ajaxUrl = (typeof nymiaAjax !== 'undefined' && nymiaAjax.ajaxurl) ? nymiaAjax.ajaxurl : '/wp-admin/admin-ajax.php';
+
+        fetch(ajaxUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                action: 'nymia_remove_follower',
+                follower_id: userId
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                button.disabled = false;
+
+                if (data.success) {
+                    const item = button.closest('.nymia-followers-item-wrapper');
+                    if (item) {
+                        item.style.opacity = '0';
+                        item.style.transform = 'translateX(-20px)';
+                        item.style.transition = 'all 0.3s ease';
+                        setTimeout(() => {
+                            item.remove();
+                            location.reload();
+                        }, 300);
+                    }
+                } else {
+                    button.textContent = originalText;
+                    alert('Failed to remove follower. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                button.disabled = false;
+                button.textContent = originalText;
+                alert('Network error. Please try again.');
+            });
+    }
+}
+
+// Close modal when clicking outside
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('nymia-followers-modal');
+    if (modal) {
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) {
+                nymiaCloseUserList();
+            }
+        });
+    }
+});
+

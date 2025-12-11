@@ -13,6 +13,10 @@ get_sidebar();
     <main class="nymia-main">
         <?php get_template_part('template-parts/header'); ?>
         
+        <?php get_template_part('template-parts/back-button'); ?>
+        
+        <?php get_template_part('template-parts/filters'); ?>
+        
         <div class="nymia-pdf-page">
             <!-- PDF Header -->
             <div class="nymia-pdf-header">

@@ -863,15 +863,84 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     filterButtons.forEach(button => {
-        button.addEventListener('click', function () {
+        button.addEventListener('click', function (e) {
+            // Allow links to navigate normally (like "Online Now", "Live Audio", etc.)
+            if (this.tagName === 'A' && !this.hasAttribute('data-filter')) {
+                // This is a link without data-filter, allow normal navigation
+                return;
+            }
+            
             // Get the filter value
             const filterValue = this.getAttribute('data-filter');
             console.log('Filter clicked:', filterValue);
 
-            if (filterValue) {
+            // Check if this is the Secret Room button
+            if (filterValue === 'secret-room' || this.id === 'nymia-secret-room-filter-btn') {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Show Secret Room modal
+                const secretRoomModal = document.getElementById('nymia-secret-room-modal');
+                if (secretRoomModal) {
+                    secretRoomModal.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                }
+            } else if (filterValue) {
+                e.preventDefault();
                 applyFilter(filterValue);
             }
         });
+    });
+
+    // ========================================
+    // SECRET ROOM MODAL HANDLING
+    // ========================================
+    const secretRoomModal = document.getElementById('nymia-secret-room-modal');
+    const secretRoomClose = document.getElementById('nymia-secret-room-close');
+    const secretRoomGoBack = document.getElementById('nymia-secret-room-go-back');
+    const secretRoomContinue = document.getElementById('nymia-secret-room-continue');
+
+    function closeSecretRoomModal() {
+        if (secretRoomModal) {
+            secretRoomModal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    }
+
+    // Close button
+    if (secretRoomClose) {
+        secretRoomClose.addEventListener('click', closeSecretRoomModal);
+    }
+
+    // Go Back button
+    if (secretRoomGoBack) {
+        secretRoomGoBack.addEventListener('click', closeSecretRoomModal);
+    }
+
+    // Continue button - navigate to secret room page
+    if (secretRoomContinue) {
+        secretRoomContinue.addEventListener('click', function() {
+            closeSecretRoomModal();
+            // Navigate to secret room page - get URL from data attribute or construct it
+            const secretRoomUrl = this.getAttribute('data-secret-room-url') || (window.location.origin + '/secret-room/');
+            window.location.href = secretRoomUrl;
+        });
+    }
+
+    // Close modal when clicking outside
+    if (secretRoomModal) {
+        secretRoomModal.addEventListener('click', function(e) {
+            if (e.target === secretRoomModal || e.target.classList.contains('nymia-secret-room-overlay')) {
+                closeSecretRoomModal();
+            }
+        });
+    }
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && secretRoomModal && secretRoomModal.style.display !== 'none') {
+            closeSecretRoomModal();
+        }
     });
 
     // ========================================
@@ -1168,10 +1237,9 @@ document.addEventListener('DOMContentLoaded', function () {
             html += '<div class="nymia-live-search-section"><div class="nymia-live-search-section-title">Users</div>';
             results.users.forEach(function (user) {
                 html += '<a href="' + user.profile_url + '" class="nymia-live-search-item nymia-live-search-user">';
-                html += '<img src="' + (user.avatar || '/wp-content/themes/nymia-wp-theme/assets/images/profile.png') + '" alt="' + user.name + '" class="nymia-live-search-avatar" />';
+                html += '<img src="' + (user.avatar || '/wp-content/themes/nymia-wp-theme/assets/images/profile.png') + '" alt="' + (user.username || user.name) + '" class="nymia-live-search-avatar" />';
                 html += '<div class="nymia-live-search-item-info">';
-                html += '<div class="nymia-live-search-item-title">' + user.name + '</div>';
-                html += '<div class="nymia-live-search-item-meta">' + user.username + '</div>';
+                html += '<div class="nymia-live-search-item-title">' + user.username + '</div>';
                 html += '</div></a>';
             });
             html += '</div>';

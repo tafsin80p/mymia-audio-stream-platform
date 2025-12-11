@@ -1,0 +1,3172 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Nymia Theme\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-12-07 13:42+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.8.0; wp-6.9; php-8.2.4\n"
+"X-Domain: nymia"
+
+#: page-ebook.php:320 page-audio.php:208 page-audio.php:323
+#: page-single-ebook.php:47 page-single-ebook.php:424
+#: ebook-archive/page-ebook.php:173 ebook-archive/page-ebook.php:314
+#: ebook-archive/page-single-ebook.php:47
+#: ebook-archive/page-single-ebook.php:416
+msgid "%d review"
+msgid_plural "%d reviews"
+msgstr[0] ""
+msgstr[1] ""
+
+#: page-single-ebook.php:372 ebook-archive/page-single-ebook.php:364
+msgid "%d star"
+msgstr ""
+
+#: auth/auth-signup.php:206
+msgid "(Alternative to camera)"
+msgstr ""
+
+#: auth/auth-signup.php:224
+msgid "(or upload file above)"
+msgstr ""
+
+#: admin/footer-menu-settings.php:233
+msgid "+1 (123) 456-7890"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:73
+msgid "1 hour before"
+msgstr ""
+
+#: page-policies.php:112
+msgid "1. Acceptance of Terms"
+msgstr ""
+
+#: page-policies.php:171
+msgid "1. Be Respectful"
+msgstr ""
+
+#: page-policies.php:84 page-privacy.php:44
+msgid "1. Information We Collect"
+msgstr ""
+
+#: page-policies.php:141
+msgid "1. What Are Cookies"
+msgstr ""
+
+#: admin/footer-menu-settings.php:243
+msgid "123 Street Name, City, State, ZIP Code, Country"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:71
+msgid "15 minutes before"
+msgstr ""
+
+#: page-profile.php:646
+msgid "1500x500px recommended"
+msgstr ""
+
+#: template-parts/dashboard-public.php:175
+msgid "1:1 Private Session"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:74
+msgid "2 hours before"
+msgstr ""
+
+#: page-policies.php:144
+msgid "2. How We Use Cookies"
+msgstr ""
+
+#: page-policies.php:87 page-privacy.php:69
+msgid "2. How We Use Your Information"
+msgstr ""
+
+#: page-policies.php:174
+msgid "2. Share Authentic Content"
+msgstr ""
+
+#: page-policies.php:115
+msgid "2. User Accounts"
+msgstr ""
+
+#: admin/stripe-settings.php:107
+msgid "3-letter ISO code, e.g. USD, EUR, GBP. Enter in uppercase."
+msgstr ""
+
+#: page-policies.php:118
+msgid "3. Content Guidelines"
+msgstr ""
+
+#: page-policies.php:90
+msgid "3. Information Sharing"
+msgstr ""
+
+#: page-privacy.php:96
+msgid "3. Information Sharing and Disclosure"
+msgstr ""
+
+#: page-policies.php:177
+msgid "3. Protect Privacy"
+msgstr ""
+
+#: page-policies.php:147
+msgid "3. Types of Cookies We Use"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:72
+msgid "30 minutes before"
+msgstr ""
+
+#: page-policies.php:93 page-privacy.php:125
+msgid "4. Data Security"
+msgstr ""
+
+#: page-policies.php:121
+msgid "4. Intellectual Property"
+msgstr ""
+
+#: page-policies.php:153
+msgid "4. Managing Cookies"
+msgstr ""
+
+#: page-policies.php:180
+msgid "4. Report Violations"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:70
+msgid "5 minutes before"
+msgstr ""
+
+#: page-policies.php:183
+msgid "5. Have Fun!"
+msgstr ""
+
+#: page-policies.php:124
+msgid "5. Termination"
+msgstr ""
+
+#: page-policies.php:96
+msgid "5. Your Rights"
+msgstr ""
+
+#: page-privacy.php:147
+msgid "5. Your Rights and Choices"
+msgstr ""
+
+#: page-privacy.php:176
+msgid "6. Data Retention"
+msgstr ""
+
+#: page-privacy.php:196
+msgid "7. Children's Privacy"
+msgstr ""
+
+#: page-privacy.php:212
+msgid "8. Changes to This Privacy Policy"
+msgstr ""
+
+#. Description of the theme
+msgid ""
+"A modern WordPress theme for audio content platform with dashboard "
+"functionality"
+msgstr ""
+
+#: page-profile.php:317
+msgid "About"
+msgstr ""
+
+#: page-privacy.php:152
+msgid "Access and Portability"
+msgstr ""
+
+#: page-privacy.php:133
+msgid "Access controls and authentication mechanisms"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:41
+msgid "Access to the entire live session"
+msgstr ""
+
+#: page-earnings.php:393
+msgid "Account Holder Name"
+msgstr ""
+
+#: template-parts/settings-modal.php:89
+msgid "Account Management"
+msgstr ""
+
+#: page-earnings.php:397
+msgid "Account Number"
+msgstr ""
+
+#: page-settings.php:43 template-parts/settings-modal.php:41
+msgid "Account Settings"
+msgstr ""
+
+#: page-earnings.php:409
+msgid "Account Type"
+msgstr ""
+
+#: admin/stripe-settings.php:52
+msgid "Action Needed"
+msgstr ""
+
+#: page-payment-methods.php:53
+msgid ""
+"Add a new payment method by making a purchase. Your payment method will be "
+"saved for future use."
+msgstr ""
+
+#: admin/footer-menu-settings.php:197
+msgid "Add Column"
+msgstr ""
+
+#: admin/footer-menu-settings.php:187 admin/footer-menu-settings.php:288
+msgid "Add Link"
+msgstr ""
+
+#: page-payment-methods.php:51
+msgid "Add Payment Method"
+msgstr ""
+
+#: admin/social-login-settings.php:102
+msgid "Add the redirect URI above to the authorized list."
+msgstr ""
+
+#: admin/social-login-settings.php:137
+msgid "Add the redirect URI above to your Facebook Login configuration."
+msgstr ""
+
+#: admin/social-login-settings.php:184
+msgid "Add the redirect URL above to the configuration."
+msgstr ""
+
+#: page-earnings.php:58
+msgid "Add your Stripe details to start receiving payouts."
+msgstr ""
+
+#: admin/zegocloud-settings.php:110
+msgid "Add your ZEGO credentials to unlock live streaming features."
+msgstr ""
+
+#: page-contact.php:108
+msgid "Address"
+msgstr ""
+
+#: template-parts/chat-modal.php:111
+msgid "ago"
+msgstr ""
+
+#: page-earnings.php:97
+#, php-format
+msgid "All amounts include your %s%% share after the platform commission."
+msgstr ""
+
+#: page-event-calendar.php:30
+msgid "All Events"
+msgstr ""
+
+#: template-parts/settings-modal.php:131
+msgid "All your account settings and preferences"
+msgstr ""
+
+#: template-parts/settings-modal.php:129
+msgid "All your content (posts, audio, ebooks, etc.)"
+msgstr ""
+
+#: admin/social-login-settings.php:110
+msgid "Allow creators and fans to authenticate with their Facebook accounts."
+msgstr ""
+
+#: admin/general-settings.php:107
+msgid "Allow users to upload audio files"
+msgstr ""
+
+#: page-earnings.php:303
+msgid "Amount"
+msgstr ""
+
+#: page-checkout.php:287 page-single-post.php:1467 page-single-post.php:1519
+#: page-single-post.php:1606 page-single-post.php:1977
+#: page-single-post.php:2020 page-single-ebook.php:906 page-profile.php:930
+#: page-profile.php:1153 template-parts/settings-modal.php:293
+#: template-parts/settings-modal.php:300
+msgid "An error occurred. Please try again."
+msgstr ""
+
+#: page-contact.php:161 template-parts/become-creator-modal.php:550
+msgid "An unexpected error occurred. Please try again later."
+msgstr ""
+
+#: admin/stripe-settings.php:84
+msgid "API Credentials"
+msgstr ""
+
+#: admin/zegocloud-settings.php:74 admin/social-login-settings.php:122
+msgid "App ID"
+msgstr ""
+
+#: admin/zegocloud-settings.php:34
+msgid "App ID and Server Secret look valid."
+msgstr ""
+
+#: admin/zegocloud-settings.php:28
+msgid "App ID must be numeric and not empty."
+msgstr ""
+
+#: admin/social-login-settings.php:126
+msgid "App Secret"
+msgstr ""
+
+#: admin/stripe-settings.php:147
+msgid ""
+"Appears on customer bank statements. Up to 22 characters, capital letters."
+msgstr ""
+
+#: page-payment-methods.php:181
+msgid "Are you sure you want to delete this payment method?"
+msgstr ""
+
+#: page-single-post.php:1493
+msgid ""
+"Are you sure you want to delete this post? This action cannot be undone."
+msgstr ""
+
+#: page-profile.php:656
+msgid "Are you sure you want to remove the banner?"
+msgstr ""
+
+#: admin/footer-menu-settings.php:299
+msgid "Are you sure you want to remove this column?"
+msgstr ""
+
+#: template-parts/settings-modal.php:125
+msgid "Are you sure?"
+msgstr ""
+
+#: page-privacy.php:181
+msgid "As required by law or for legitimate business purposes"
+msgstr ""
+
+#. Name of the template
+#: page-audiobook.php:2
+msgid "Audio Book"
+msgstr ""
+
+#: page-privacy.php:57
+msgid ""
+"Audio files, ebooks, images, posts, comments, and other content you upload "
+"or create."
+msgstr ""
+
+#: page-earnings.php:167 template-parts/dashboard.php:834
+msgid "Available"
+msgstr ""
+
+#: page-profile.php:238 template-parts/live-booking-modal.php:359
+msgid "Available Now"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:447
+msgid "Available Now - You can join!"
+msgstr ""
+
+#: template-parts/dashboard.php:472
+msgid "Available Slots"
+msgstr ""
+
+#: template-parts/become-creator-modal.php:239
+#: template-parts/back-button.php:13
+msgid "Back"
+msgstr ""
+
+#: page-checkout.php:143
+msgid "Back to Audio"
+msgstr ""
+
+#: page-checkout.php:143
+msgid "Back to Ebook"
+msgstr ""
+
+#: page-reset-password.php:158 page-single-post.php:35 page-single-post.php:69
+msgid "Back to Home"
+msgstr ""
+
+#: page-earnings.php:349
+msgid "Bank Account"
+msgstr ""
+
+#: page-earnings.php:649
+msgid "Bank account details saved successfully."
+msgstr ""
+
+#: page-earnings.php:389
+msgid "Bank Name"
+msgstr ""
+
+#: admin/zegocloud-settings.php:126
+msgid "Basic Validation"
+msgstr ""
+
+#: admin/zegocloud-settings.php:34
+msgid "Basic validation passed."
+msgstr ""
+
+#: template-parts/header.php:168 template-parts/header.php:174
+msgid "Become a Creator"
+msgstr ""
+
+#: template-parts/header.php:167 template-parts/header.php:173
+msgid "Become a creator"
+msgstr ""
+
+#: admin/general-settings.php:114
+msgid "Best Practices"
+msgstr ""
+
+#: page-profile.php:717
+msgid "Bio"
+msgstr ""
+
+#: template-parts/dashboard-public.php:327 template-parts/dashboard.php:645
+msgid "Book Event"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:26
+#: template-parts/dashboard-public.php:328 template-parts/dashboard.php:646
+msgid "Book Live Session"
+msgstr ""
+
+#: page-live-streams.php:319
+msgid "Book Now"
+msgstr ""
+
+#: page-event-calendar.php:450 template-parts/dashboard-public.php:187
+msgid "Book Private Session"
+msgstr ""
+
+#: template-parts/dashboard-public.php:327 template-parts/dashboard.php:645
+msgid "Book Scheduled Stream"
+msgstr ""
+
+#: template-parts/dashboard.php:634 template-parts/dashboard.php:652
+#: template-parts/dashboard.php:831 template-parts/dashboard.php:834
+msgid "Booked"
+msgstr ""
+
+#: template-parts/dashboard.php:453
+msgid "Booked day"
+msgstr ""
+
+#: template-parts/dashboard.php:801
+msgid ""
+"Booked sessions are locked automatically. Manage edits from the creator "
+"dashboard."
+msgstr ""
+
+#: template-parts/live-booking-modal.php:655
+msgid "Booking failed. Please try again."
+msgstr ""
+
+#: page-event-calendar.php:458 template-parts/dashboard-public.php:196
+msgid "Booking modal unavailable"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:392
+msgid "Booking Successful!"
+msgstr ""
+
+#: page-single-ebook.php:94 page-single-ebook.php:841 page-single-ebook.php:872
+#: page-single-ebook.php:887 page-single-ebook.php:904
+msgid "Bookmark"
+msgstr ""
+
+#: page-single-ebook.php:94 page-single-ebook.php:846 page-single-ebook.php:867
+#: page-single-ebook.php:882 page-single-ebook.php:899
+msgid "Bookmarked"
+msgstr ""
+
+#: page-event-calendar.php:24
+msgid "Browse and book scheduled live streams and group events"
+msgstr ""
+
+#: page-payment-methods.php:56
+msgid "Browse Content"
+msgstr ""
+
+#: page-privacy.php:113
+msgid "Business Transfers"
+msgstr ""
+
+#: page-audio.php:218 page-audio.php:331
+msgid "Buy"
+msgstr ""
+
+#: page-profile.php:244 page-profile.php:1148 page-profile.php:1155
+msgid "Call Now"
+msgstr ""
+
+#: template-parts/become-creator-modal.php:327
+msgid "Camera access is not supported in this browser."
+msgstr ""
+
+#: auth/auth-scripts.php:167
+msgid ""
+"Camera access is not supported in this browser. Please use a modern browser "
+"like Chrome, Firefox, or Safari. You can still upload a document file "
+"instead."
+msgstr ""
+
+#: auth/auth-scripts.php:181
+msgid ""
+"Camera access requires HTTPS connection. Please access this site via HTTPS. "
+"You can still upload a document file instead."
+msgstr ""
+
+#: auth/auth-scripts.php:272
+msgid "Camera constraints not satisfied. Trying with default settings..."
+msgstr ""
+
+#: auth/auth-scripts.php:270
+msgid ""
+"Camera is being used by another application. Please close other apps using "
+"the camera and try again."
+msgstr ""
+
+#: auth/auth-scripts.php:326 template-parts/become-creator-modal.php:367
+msgid "Camera not ready. Please enable camera first."
+msgstr ""
+
+#: auth/auth-scripts.php:252
+msgid ""
+"Camera permission denied. Please allow camera access in your browser "
+"settings and try again."
+msgstr ""
+
+#: auth/auth-scripts.php:333 template-parts/become-creator-modal.php:374
+msgid "Camera stream not ready yet. Try again in a moment."
+msgstr ""
+
+#: page-single-post.php:1402 page-profile.php:746
+#: template-parts/live-booking-modal.php:90
+#: template-parts/live-booking-modal.php:126
+#: template-parts/settings-modal.php:144
+msgid "Cancel"
+msgstr ""
+
+#: admin/stripe-settings.php:133
+msgid "Cancel URL"
+msgstr ""
+
+#: auth/auth-signup.php:232 template-parts/become-creator-modal.php:215
+msgid "Capture"
+msgstr ""
+
+#: auth/auth-signup.php:241 template-parts/become-creator-modal.php:224
+msgid "Captured document"
+msgstr ""
+
+#: page-profile.php:653 page-profile.php:849
+msgid "Change Banner"
+msgstr ""
+
+#: page-profile.php:167
+msgid "Change Cover Image"
+msgstr ""
+
+#: page-single-post.php:1394
+msgid "Change Image"
+msgstr ""
+
+#: page-settings.php:62 page-settings.php:66
+#: template-parts/settings-modal.php:58 template-parts/settings-modal.php:62
+msgid "Change Password"
+msgstr ""
+
+#: page-profile.php:617
+msgid "Change Picture"
+msgstr ""
+
+#: page-earnings.php:412
+msgid "Checking"
+msgstr ""
+
+#. Name of the template
+#: page-checkout.php:2
+msgid "Checkout"
+msgstr ""
+
+#: template-parts/become-creator-modal.php:144
+#: template-parts/become-creator-modal.php:465
+msgid "City"
+msgstr ""
+
+#: page-profile.php:645 page-profile.php:656
+msgid "Click to upload cover image"
+msgstr ""
+
+#: admin/social-login-settings.php:86
+msgid "Client ID"
+msgstr ""
+
+#: admin/social-login-settings.php:157
+msgid "Client ID (Service ID)"
+msgstr ""
+
+#: admin/social-login-settings.php:91
+msgid "Client Secret"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:18
+#: template-parts/live-booking-modal.php:103 template-parts/dashboard.php:429
+msgid "Close"
+msgstr ""
+
+#: admin/footer-menu-settings.php:142 admin/footer-menu-settings.php:272
+msgid "Column Title"
+msgstr ""
+
+#: template-parts/sidebar-right.php:100
+msgid "Coming Soon"
+msgstr ""
+
+#: page-single-post.php:171
+msgid "Comments"
+msgstr ""
+
+#: page-privacy.php:52
+msgid "Communicate with us or other users"
+msgstr ""
+
+#: page-policies.php:65 page-policies.php:168
+msgid "Community Guidelines"
+msgstr ""
+
+#: template-parts/become-creator-modal.php:111
+msgid ""
+"Complete KYC verification so we can review and approve your creator "
+"application."
+msgstr ""
+
+#: template-parts/live-booking-modal.php:111
+msgid "Complete Payment"
+msgstr ""
+
+#: page-checkout.php:149
+msgid "Complete your purchase to unlock this content"
+msgstr ""
+
+#: admin/zegocloud-settings.php:15
+msgid "Configuration Incomplete"
+msgstr ""
+
+#: admin/social-login-settings.php:56
+msgid "Configure third-party OAuth providers to streamline user sign-in flows."
+msgstr ""
+
+#: admin/social-login-settings.php:74
+msgid "Connect your Google Cloud OAuth credentials to allow one-click sign-in."
+msgstr ""
+
+#: admin/zegocloud-settings.php:49
+msgid ""
+"Connect your live streaming credentials to enable high-quality broadcasts "
+"and rooms."
+msgstr ""
+
+#: admin/stripe-settings.php:30
+msgid ""
+"Connect your marketplace to Stripe for secure payments, payouts, and "
+"subscriptions."
+msgstr ""
+
+#: admin/stripe-settings.php:52
+msgid "Connected"
+msgstr ""
+
+#: page-profile.php:1127
+msgid "Connecting..."
+msgstr ""
+
+#: admin/zegocloud-settings.php:99 admin/stripe-settings.php:50
+msgid "Connection Status"
+msgstr ""
+
+#: page-contact.php:68 admin/footer-menu-settings.php:211
+msgid "Contact Information"
+msgstr ""
+
+#: admin/footer-menu-settings.php:51
+msgid "Contact information saved successfully!"
+msgstr ""
+
+#: admin/footer-menu-settings.php:234
+msgid "Contact phone number with country code."
+msgstr ""
+
+#. Name of the template
+#: page-contact.php:2 page-contact.php:29
+msgid "Contact Us"
+msgstr ""
+
+#: page-live-audio.php:428
+msgid "Container not found."
+msgstr ""
+
+#: page-privacy.php:57
+msgid "Content Information:"
+msgstr ""
+
+#: admin/general-settings.php:94
+msgid "Content Uploads"
+msgstr ""
+
+#: admin/general-settings.php:40
+msgid ""
+"Control core platform defaults for onboarding, verification, and upload "
+"permissions."
+msgstr ""
+
+#: page-policies.php:56 page-policies.php:138
+msgid "Cookie Policy"
+msgstr ""
+
+#: page-privacy.php:164
+msgid "Cookie Preferences"
+msgstr ""
+
+#: admin/zegocloud-settings.php:115
+msgid "Copy the App ID and Server Secret into the form on this page."
+msgstr ""
+
+#: admin/social-login-settings.php:138
+msgid "Copy your App ID and Secret into the fields here."
+msgstr ""
+
+#: admin/stripe-settings.php:85
+msgid "Copy your keys from Stripe Dashboard → Developers → API Keys."
+msgstr ""
+
+#: page-privacy.php:155
+msgid "Correction"
+msgstr ""
+
+#: page-earnings.php:417 template-parts/become-creator-modal.php:148
+#: template-parts/become-creator-modal.php:466
+msgid "Country"
+msgstr ""
+
+#: page-profile.php:626
+msgid "Cover Picture (Banner)"
+msgstr ""
+
+#: template-parts/header.php:162
+msgid "Create"
+msgstr ""
+
+#: admin/social-login-settings.php:183
+msgid "Create a Service ID and Sign in with Apple key in Apple Developer."
+msgstr ""
+
+#: admin/stripe-settings.php:159
+msgid "Create a Stripe account and activate it for live payments."
+msgstr ""
+
+#: admin/stripe-settings.php:161
+msgid ""
+"Create a webhook endpoint (e.g. /wp-json/nymia/v1/stripe/webhook) and copy "
+"the signing secret."
+msgstr ""
+
+#: template-parts/dashboard-public.php:34
+msgid "Create Account"
+msgstr ""
+
+#: page-privacy.php:49
+msgid "Create an account or update your profile"
+msgstr ""
+
+#: admin/social-login-settings.php:136
+msgid "Create an app in Facebook Developers and enable Facebook Login."
+msgstr ""
+
+#: template-parts/header.php:161
+msgid "Create new content"
+msgstr ""
+
+#: admin/social-login-settings.php:88
+msgid "Create OAuth credentials in Google Cloud Console."
+msgstr ""
+
+#: admin/payout-requests.php:74
+msgid "Creator"
+msgstr ""
+
+#: page-profile.php:1118
+msgid "Creator is not available for instant calls."
+msgstr ""
+
+#: admin/payout-requests.php:47
+msgid "Creator Payments"
+msgstr ""
+
+#: page-settings.php:80 template-parts/settings-modal.php:70
+msgid "Creator Settings"
+msgstr ""
+
+#: admin/payout-requests.php:67
+msgid "Creators & Stripe Accounts"
+msgstr ""
+
+#: admin/zegocloud-settings.php:64
+msgid "Credentials"
+msgstr ""
+
+#: admin/zegocloud-settings.php:106
+msgid ""
+"Credentials look good. Generate tokens server-side and initialize the UIKit "
+"to go live."
+msgstr ""
+
+#: admin/stripe-settings.php:76
+msgid "Currency"
+msgstr ""
+
+#: admin/general-settings.php:45 admin/zegocloud-settings.php:54
+#: admin/stripe-settings.php:40 admin/social-login-settings.php:61
+#: admin/footer-menu-settings.php:105
+msgid "Dashboard Overview"
+msgstr ""
+
+#: page-earnings.php:299
+msgid "Date"
+msgstr ""
+
+#: template-parts/become-creator-modal.php:128
+#: template-parts/become-creator-modal.php:462
+msgid "Date of Birth"
+msgstr ""
+
+#: admin/stripe-settings.php:105
+msgid "Default Currency"
+msgstr ""
+
+#: admin/general-settings.php:87
+msgid ""
+"Define how long a verification code remains valid (5-60 minutes). Default: "
+"15 minutes."
+msgstr ""
+
+#: page-payment-methods.php:136 page-single-post.php:117
+msgid "Delete"
+msgstr ""
+
+#: template-parts/settings-modal.php:92 template-parts/settings-modal.php:96
+#: template-parts/settings-modal.php:108
+msgid "Delete Account"
+msgstr ""
+
+#: template-parts/settings-modal.php:147 template-parts/settings-modal.php:295
+#: template-parts/settings-modal.php:302
+msgid "Delete My Account"
+msgstr ""
+
+#: template-parts/settings-modal.php:274
+msgid "Deleting..."
+msgstr ""
+
+#: page-privacy.php:158
+msgid "Deletion"
+msgstr ""
+
+#: page-earnings.php:300 page-single-post.php:1386
+msgid "Description"
+msgstr ""
+
+#: admin/footer-menu-settings.php:122
+msgid "Description Text"
+msgstr ""
+
+#: page-privacy.php:80
+msgid "Detect, prevent, and address technical issues"
+msgstr ""
+
+#: page-privacy.php:78
+msgid "Develop new features and services"
+msgstr ""
+
+#: page-privacy.php:220
+msgid "Displaying a notice on our website"
+msgstr ""
+
+#: auth/auth-signup.php:191
+msgid "Driver's License"
+msgstr ""
+
+#: template-parts/become-creator-modal.php:185
+msgid "Driver’s License"
+msgstr ""
+
+#: page-event-calendar.php:440 template-parts/dashboard.php:830
+msgid "Duration"
+msgstr ""
+
+#. Name of the template
+#: page-earnings.php:2 page-earnings.php:457
+msgid "Earnings"
+msgstr ""
+
+#: page-earnings.php:195
+msgid "Earnings Breakdown"
+msgstr ""
+
+#: page-earnings.php:95
+msgid "Earnings Dashboard"
+msgstr ""
+
+#. Name of the template
+#: page-ebook.php:2 ebook-archive/page-ebook.php:2
+msgid "Ebook"
+msgstr ""
+
+#: create-ebook/includes/ebook-functions.php:406
+msgid "Ebook post not found or you do not have permission to edit it."
+msgstr ""
+
+#: create-ebook/includes/ebook-functions.php:389
+#: create-ebook/includes/ebook-functions.php:527
+#: create-ebook/includes/ebook-functions.php:540
+msgid "Ebook post not found."
+msgstr ""
+
+#: create-ebook/includes/ebook-functions.php:500
+msgid "Ebook updated successfully!"
+msgstr ""
+
+#: page-single-post.php:110
+msgid "Edit"
+msgstr ""
+
+#: page-single-post.php:1370
+msgid "Edit Post"
+msgstr ""
+
+#: page-settings.php:51 page-profile.php:264 page-profile.php:599
+#: template-parts/profile-modal.php:101 template-parts/settings-modal.php:48
+#: template-parts/header.php:212
+msgid "Edit Profile"
+msgstr ""
+
+#: page-contact.php:46 page-contact.php:83 page-profile.php:357
+#: page-profile.php:679 admin/payout-requests.php:75
+msgid "Email"
+msgstr ""
+
+#: admin/footer-menu-settings.php:216
+msgid "Email Address"
+msgstr ""
+
+#: page-privacy.php:134
+msgid "Employee training on data protection"
+msgstr ""
+
+#: admin/social-login-settings.php:151
+msgid "Enable Apple Login"
+msgstr ""
+
+#: admin/social-login-settings.php:116
+msgid "Enable Facebook Login"
+msgstr ""
+
+#: admin/social-login-settings.php:80
+msgid "Enable Google Login"
+msgstr ""
+
+#: admin/stripe-settings.php:184
+msgid ""
+"Enable these events when setting up the webhook endpoint inside Stripe so "
+"the platform can react to payments, subscriptions, and payouts."
+msgstr ""
+
+#: page-privacy.php:130
+msgid "Encryption of data in transit using SSL/TLS"
+msgstr ""
+
+#: auth/auth-signup.php:49
+msgid "English"
+msgstr ""
+
+#: admin/social-login-settings.php:195
+msgid "Ensure callback URLs exactly match provider settings."
+msgstr ""
+
+#: admin/general-settings.php:118
+msgid ""
+"Ensure your WordPress email settings are configured so codes can be "
+"delivered."
+msgstr ""
+
+#: admin/footer-menu-settings.php:124
+msgid ""
+"Enter a brief description that will appear in the footer below your logo."
+msgstr ""
+
+#: page-earnings.php:394
+msgid "Enter account holder name"
+msgstr ""
+
+#: page-earnings.php:398
+msgid "Enter account number"
+msgstr ""
+
+#: page-earnings.php:390
+msgid "Enter bank name"
+msgstr ""
+
+#: page-earnings.php:418
+msgid "Enter country"
+msgstr ""
+
+#: auth/auth-signup.php:198 template-parts/become-creator-modal.php:191
+msgid "Enter numbers only"
+msgstr ""
+
+#: page-earnings.php:402
+msgid "Enter routing number"
+msgstr ""
+
+#: page-earnings.php:406
+msgid "Enter SWIFT/BIC code"
+msgstr ""
+
+#: template-parts/become-creator-modal.php:145
+msgid "Enter your city"
+msgstr ""
+
+#: template-parts/become-creator-modal.php:118
+msgid "Enter your first name"
+msgstr ""
+
+#: admin/social-login-settings.php:185
+msgid "Enter your identifiers and paste the private key."
+msgstr ""
+
+#: template-parts/become-creator-modal.php:122
+msgid "Enter your last name"
+msgstr ""
+
+#: page-reset-password.php:134
+msgid "Enter your new password below"
+msgstr ""
+
+#: template-parts/become-creator-modal.php:133
+msgid "Enter your phone number"
+msgstr ""
+
+#: template-parts/become-creator-modal.php:139
+msgid "Enter your street address"
+msgstr ""
+
+#: page-profile.php:706
+msgid "Enter your Stripe account ID (starts with acct_)."
+msgstr ""
+
+#: admin/stripe-settings.php:62
+msgid "Enter your Stripe API keys to enable payments across the marketplace."
+msgstr ""
+
+#: page-profile.php:711
+msgid "Enter your SWIFT or BIC code."
+msgstr ""
+
+#: template-parts/become-creator-modal.php:176
+msgid "Enter your ZIP/postal code"
+msgstr ""
+
+#: admin/zegocloud-settings.php:86 admin/stripe-settings.php:96
+msgid "Environment"
+msgstr ""
+
+#: page-payment-methods.php:204
+msgid "Error deleting payment method. Please try again."
+msgstr ""
+
+#: page-payment-methods.php:173
+msgid "Error loading payment methods. Please refresh the page."
+msgstr ""
+
+#. Name of the template
+#: page-event-calendar.php:2 page-event-calendar.php:22
+msgid "Event Calendar"
+msgstr ""
+
+#: template-parts/dashboard-public.php:385 template-parts/dashboard.php:629
+msgid "Event Full"
+msgstr ""
+
+#: admin/social-login-settings.php:109
+msgid "Facebook Login"
+msgstr ""
+
+#: page-profile.php:723
+msgid "Facebook URL"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:545
+msgid "Failed to create payment form."
+msgstr ""
+
+#: page-payment-methods.php:199
+msgid "Failed to delete payment method."
+msgstr ""
+
+#: page-live-audio.php:406
+msgid "Failed to get room access."
+msgstr ""
+
+#: template-parts/live-booking-modal.php:540
+msgid "Failed to initialize payment system."
+msgstr ""
+
+#: template-parts/live-booking-modal.php:738
+#: template-parts/live-booking-modal.php:747
+msgid "Failed to initialize payment."
+msgstr ""
+
+#: template-parts/live-booking-modal.php:753
+msgid "Failed to initialize payment. Please try again."
+msgstr ""
+
+#: page-profile.php:1146
+msgid "Failed to initiate call. Please try again."
+msgstr ""
+
+#: page-live-audio.php:507
+msgid "Failed to join the call. Please try again."
+msgstr ""
+
+#: page-payment-methods.php:162
+msgid "Failed to load payment methods."
+msgstr ""
+
+#: page-profile.php:923
+msgid "Failed to update profile"
+msgstr ""
+
+#: page-profile.php:536
+msgid "Favorites"
+msgstr ""
+
+#: page-profile.php:830
+msgid "File size too large. Maximum size is 5MB."
+msgstr ""
+
+#: admin/zegocloud-settings.php:108
+msgid "Finish filling both the App ID and Server Secret to complete setup."
+msgstr ""
+
+#: template-parts/become-creator-modal.php:117
+#: template-parts/become-creator-modal.php:460
+msgid "First Name"
+msgstr ""
+
+#: page-profile.php:258
+msgid "Follow"
+msgstr ""
+
+#: page-profile.php:220 page-profile.php:467
+msgid "Followers"
+msgstr ""
+
+#: page-profile.php:224 page-profile.php:258 page-profile.php:486
+msgid "Following"
+msgstr ""
+
+#: admin/footer-menu-settings.php:118
+msgid "Footer Description"
+msgstr ""
+
+#: admin/footer-menu-settings.php:110
+msgid "Footer Menu"
+msgstr ""
+
+#: admin/footer-menu-settings.php:130
+msgid "Footer Menu Columns"
+msgstr ""
+
+#: admin/footer-menu-settings.php:99
+msgid "Footer Menu Settings"
+msgstr ""
+
+#: admin/footer-menu-settings.php:41
+msgid "Footer menu settings saved successfully!"
+msgstr ""
+
+#: page-privacy.php:183
+msgid "For safety and security purposes"
+msgstr ""
+
+#: page-live-streams.php:313
+msgid "Free"
+msgstr ""
+
+#: page-profile.php:333 page-profile.php:666
+msgid "Full Name"
+msgstr ""
+
+#: admin/footer-menu-settings.php:244
+msgid "Full physical address for your business or organization."
+msgstr ""
+
+#: template-parts/live-booking-modal.php:38
+msgid "Full Session"
+msgstr ""
+
+#: page-live-streams.php:319 template-parts/dashboard.php:400
+msgid "Fully Booked"
+msgstr ""
+
+#: admin/general-settings.php:46 admin/zegocloud-settings.php:55
+#: admin/stripe-settings.php:41 admin/social-login-settings.php:62
+#: admin/footer-menu-settings.php:106
+msgid "General Settings"
+msgstr ""
+
+#: admin/zegocloud-settings.php:116
+msgid "Generate access tokens in WordPress when users join a room."
+msgstr ""
+
+#: admin/stripe-settings.php:160
+msgid "Generate API keys in Stripe Dashboard → Developers → API Keys."
+msgstr ""
+
+#: admin/stripe-settings.php:124
+msgid "Generated when you create a webhook endpoint in Stripe."
+msgstr ""
+
+#: admin/stripe-settings.php:156
+msgid "Getting Started Checklist"
+msgstr ""
+
+#: page-profile.php:740
+msgid "GitHub URL"
+msgstr ""
+
+#: template-parts/content-none.php:27
+msgid "Go to Home"
+msgstr ""
+
+#: admin/social-login-settings.php:73
+msgid "Google Sign-In"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:416
+msgid "Got it"
+msgstr ""
+
+#: page-event-calendar.php:33
+msgid "Group Events"
+msgstr ""
+
+#: template-parts/header.php:239
+msgid "Help Center"
+msgstr ""
+
+#: template-parts/header.php:41
+msgid "Home"
+msgstr ""
+
+#: page-profile.php:631
+msgid "Home feed (Recent Audio section)"
+msgstr ""
+
+#: page-live-audio.php:195
+msgid "Hosted by"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:56
+msgid "How many minutes?"
+msgstr ""
+
+#: page-privacy.php:59
+msgid ""
+"How you interact with our services, including pages visited, features used, "
+"and time spent."
+msgstr ""
+
+#: page-privacy.php:136
+msgid ""
+"However, no method of transmission over the Internet or electronic storage "
+"is 100% secure. While we strive to use commercially acceptable means to "
+"protect your information, we cannot guarantee absolute security."
+msgstr ""
+
+#: auth/auth-signup.php:197 template-parts/become-creator-modal.php:190
+#: template-parts/become-creator-modal.php:469
+msgid "ID Number"
+msgstr ""
+
+#: auth/auth-signup.php:199 auth/auth-scripts.php:375
+#: template-parts/become-creator-modal.php:192
+msgid "ID Number must contain only numbers"
+msgstr ""
+
+#: auth/auth-scripts.php:499
+msgid "ID Number must contain only numbers."
+msgstr ""
+
+#: auth/auth-signup.php:187 template-parts/become-creator-modal.php:181
+#: template-parts/become-creator-modal.php:468
+msgid "ID Type"
+msgstr ""
+
+#: auth/auth-signup.php:181
+msgid "Identity Verification (KYC)"
+msgstr ""
+
+#: page-privacy.php:200
+msgid ""
+"If you are a parent or guardian and believe your child has provided us with "
+"personal information, please contact us immediately."
+msgstr ""
+
+#: auth/auth-signup.php:210
+msgid ""
+"If you don't have a camera, you can upload a photo of your ID document from "
+"your device."
+msgstr ""
+
+#: page-policies.php:200
+msgid "If you have any questions about these policies, please contact us at:"
+msgstr ""
+
+#: page-privacy.php:237
+msgid ""
+"If you have any questions, concerns, or requests regarding this Privacy "
+"Policy or our data practices, please contact us at:"
+msgstr ""
+
+#: page-single-post.php:1391
+msgid "Image (optional)"
+msgstr ""
+
+#: page-privacy.php:114
+msgid ""
+"In the event of a merger, acquisition, or sale of assets, your information "
+"may be transferred as part of that transaction."
+msgstr ""
+
+#: admin/footer-menu-settings.php:222
+msgid "info@example.com"
+msgstr ""
+
+#: page-live-audio.php:156
+msgid "Instant Call"
+msgstr ""
+
+#: page-single-ebook.php:827 create-ebook/includes/ebook-functions.php:380
+#: create-ebook/includes/ebook-functions.php:519
+msgid "Invalid ebook ID."
+msgstr ""
+
+#: page-profile.php:838
+msgid "Invalid file type. Please upload JPG, PNG, GIF, or WebP image."
+msgstr ""
+
+#: page-reset-password.php:155
+msgid "Invalid or missing reset link. Please request a new password reset."
+msgstr ""
+
+#: template-parts/live-booking-modal.php:717
+msgid "Invalid response from server. Please try again."
+msgstr ""
+
+#: template-parts/content-none.php:31
+msgid "It seems we can&rsquo;t find what you&rsquo;re looking for."
+msgstr ""
+
+#: auth/auth-signup.php:50
+msgid "Italiano"
+msgstr ""
+
+#: page-live-streams.php:317 page-live-streams.php:320
+#: page-live-streams.php:320
+msgid "Join Now"
+msgstr ""
+
+#: template-parts/dashboard.php:640
+msgid "Join Session"
+msgstr ""
+
+#: page-live-audio.php:466
+msgid "Join Stream"
+msgstr ""
+
+#: page-profile.php:417
+msgid "Joined"
+msgstr ""
+
+#: admin/social-login-settings.php:194
+msgid "Keep all secrets stored securely and rotate them periodically."
+msgstr ""
+
+#: admin/general-settings.php:117
+msgid "Keep email verification enabled to reduce spam and fraudulent accounts."
+msgstr ""
+
+#: admin/zegocloud-settings.php:81
+msgid "Keep this secure — used to generate access tokens."
+msgstr ""
+
+#: admin/social-login-settings.php:168
+msgid "Key ID"
+msgstr ""
+
+#: auth/auth-signup.php:46
+msgid "Language"
+msgstr ""
+
+#: page-earnings.php:183
+msgid "Last 3 months"
+msgstr ""
+
+#: page-earnings.php:182
+msgid "Last 30 days"
+msgstr ""
+
+#: page-earnings.php:181
+msgid "Last 7 days"
+msgstr ""
+
+#: template-parts/become-creator-modal.php:121
+#: template-parts/become-creator-modal.php:461
+msgid "Last Name"
+msgstr ""
+
+#: template-parts/chat-modal.php:110
+msgid "Last seen"
+msgstr ""
+
+#: admin/payout-requests.php:78
+msgid "Last Updated"
+msgstr ""
+
+#: page-policies.php:28
+msgid "Last updated: January 15, 2024"
+msgstr ""
+
+#: page-privacy.php:29
+msgid "Last updated: November 20, 2025"
+msgstr ""
+
+#: page-earnings.php:184
+msgid "Last year"
+msgstr ""
+
+#: page-privacy.php:107
+msgid "Legal Requirements"
+msgstr ""
+
+#: page-ebook.php:457 page-ebook.php:470 page-single-ebook.php:967
+#: page-single-ebook.php:980
+msgid "Link copied to clipboard!"
+msgstr ""
+
+#: admin/footer-menu-settings.php:162 admin/footer-menu-settings.php:314
+msgid "Link Text"
+msgstr ""
+
+#: admin/footer-menu-settings.php:170 admin/footer-menu-settings.php:322
+msgid "Link URL"
+msgstr ""
+
+#: page-profile.php:735
+msgid "LinkedIn URL"
+msgstr ""
+
+#: admin/stripe-settings.php:69
+msgid "Live"
+msgstr ""
+
+#: page-live-audio.php:154
+msgid "Live Audio Stream"
+msgstr ""
+
+#: admin/stripe-settings.php:99
+msgid "Live Mode (Production)"
+msgstr ""
+
+#: admin/stripe-settings.php:59
+msgid "Live payments are active. Funds will flow into your Stripe account."
+msgstr ""
+
+#: template-parts/live-booking-modal.php:393 template-parts/dashboard.php:434
+msgid "Live Session"
+msgstr ""
+
+#: page-live-streams.php:339
+msgid "Live Stream"
+msgstr ""
+
+#: page-ebook.php:381 page-audiobook.php:385 page-single-post.php:312
+msgid "Load More"
+msgstr ""
+
+#: admin/zegocloud-settings.php:117
+msgid "Load the ZEGO UIKit Web SDK on your streaming pages."
+msgstr ""
+
+#: page-single-post.php:211 page-single-post.php:1742
+msgid "Loading comments..."
+msgstr ""
+
+#: page-event-calendar.php:42
+msgid "Loading events..."
+msgstr ""
+
+#: page-payment-methods.php:45
+msgid "Loading payment methods..."
+msgstr ""
+
+#: page-event-calendar.php:49 page-event-calendar.php:482
+#: template-parts/dashboard-public.php:150
+msgid "Loading private slots…"
+msgstr ""
+
+#: page-single-ebook.php:642 ebook-archive/page-single-ebook.php:634
+msgid "Loading reviews…"
+msgstr ""
+
+#: template-parts/dashboard.php:845
+msgid "Loading slots…"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:688
+msgid "Loading…"
+msgstr ""
+
+#: page-profile.php:404 page-profile.php:691
+msgid "Location"
+msgstr ""
+
+#: page-single-post.php:203
+msgid "Log in"
+msgstr ""
+
+#: admin/zegocloud-settings.php:114
+msgid "Log in to ZEGO Cloud Console and create an application."
+msgstr ""
+
+#: template-parts/header.php:248
+msgid "Logout"
+msgstr ""
+
+#: page-privacy.php:51
+msgid "Make purchases or transactions"
+msgstr ""
+
+#: admin/general-settings.php:57
+msgid ""
+"Manage email confirmation rules and grace periods for new registrations."
+msgstr ""
+
+#: admin/footer-menu-settings.php:131
+msgid ""
+"Manage footer menu columns and links. You can add, remove, and reorder "
+"columns and links."
+msgstr ""
+
+#: admin/footer-menu-settings.php:100
+msgid ""
+"Manage footer navigation links, description, and contact information "
+"displayed across your site."
+msgstr ""
+
+#: page-settings.php:38
+msgid "Manage your account settings and preferences"
+msgstr ""
+
+#: page-settings.php:85 template-parts/settings-modal.php:74
+msgid "Manage your earnings and payout settings"
+msgstr ""
+
+#: page-payment-methods.php:39
+msgid "Manage your saved payment methods for faster checkout."
+msgstr ""
+
+#: page-contact.php:57
+msgid "Message"
+msgstr ""
+
+#: page-event-calendar.php:440 template-parts/dashboard.php:830
+msgid "min"
+msgstr ""
+
+#: admin/stripe-settings.php:68
+msgid "Mode"
+msgstr ""
+
+#: page-privacy.php:79
+msgid "Monitor and analyze trends, usage, and activities"
+msgstr ""
+
+#: admin/payout-requests.php:48
+msgid ""
+"Monitor every creator connected to Stripe. Search by name or email to "
+"quickly review their payout status."
+msgstr ""
+
+#: page-ebook.php:245 page-ebook.php:382 page-audiobook.php:293
+#: page-audiobook.php:386 page-single-post.php:313
+#: ebook-archive/page-ebook.php:262
+msgid "more"
+msgstr ""
+
+#: page-privacy.php:165
+msgid ""
+"Most web browsers allow you to control cookies through their settings. You "
+"can adjust your browser settings to refuse cookies or alert you when cookies "
+"are being sent."
+msgstr ""
+
+#: page-contact.php:41
+msgid "Name"
+msgstr ""
+
+#: page-privacy.php:56
+msgid ""
+"Name, email address, username, phone number, date of birth, and profile "
+"picture."
+msgstr ""
+
+#: auth/auth-signup.php:192 template-parts/become-creator-modal.php:186
+msgid "National ID"
+msgstr ""
+
+#: admin/stripe-settings.php:165
+msgid ""
+"Need help integrating Stripe in the frontend? Visit the developer "
+"documentation for code samples."
+msgstr ""
+
+#: admin/payout-requests.php:93
+msgid "Never"
+msgstr ""
+
+#: admin/zegocloud-settings.php:34
+msgid ""
+"Next step: generate access tokens server-side and initialize ZEGO UIKit on "
+"the front-end."
+msgstr ""
+
+#: template-parts/dashboard-public.php:83 template-parts/dashboard.php:76
+msgid "No audio content available."
+msgstr ""
+
+#: auth/auth-scripts.php:254
+msgid ""
+"No camera found. Please connect a camera device or use the file upload "
+"option above to upload your ID document."
+msgstr ""
+
+#: page-single-post.php:1758
+msgid "No comments yet."
+msgstr ""
+
+#: page-single-post.php:1772
+msgid "No comments yet. Be the first to comment!"
+msgstr ""
+
+#: admin/payout-requests.php:116
+msgid "No creators found. Try adjusting your search."
+msgstr ""
+
+#: page-earnings.php:280
+msgid ""
+"No earnings recorded yet. Once you make sales, you’ll see how they break "
+"down here."
+msgstr ""
+
+#: page-live-streams.php:222 template-parts/dashboard.php:533
+msgid "No live or scheduled streams available."
+msgstr ""
+
+#: template-parts/dashboard-public.php:163
+msgid "No private sessions available right now."
+msgstr ""
+
+#: page-event-calendar.php:425
+msgid "No private sessions available."
+msgstr ""
+
+#: template-parts/dashboard.php:819
+msgid ""
+"No private slots published yet. Use the Manage button above to add some."
+msgstr ""
+
+#: page-single-post.php:324
+msgid "No related posts available."
+msgstr ""
+
+#: template-parts/live-booking-modal.php:69
+msgid "No reminder"
+msgstr ""
+
+#: page-ebook.php:320 page-single-ebook.php:48 page-single-ebook.php:425
+#: ebook-archive/page-ebook.php:173 ebook-archive/page-ebook.php:314
+#: ebook-archive/page-single-ebook.php:48
+#: ebook-archive/page-single-ebook.php:417
+msgid "No reviews yet"
+msgstr ""
+
+#: page-single-ebook.php:387 page-single-ebook.php:644
+#: ebook-archive/page-single-ebook.php:379
+#: ebook-archive/page-single-ebook.php:636
+msgid "No reviews yet. Be the first to share something!"
+msgstr ""
+
+#: page-payment-methods.php:99
+msgid "No saved payment methods."
+msgstr ""
+
+#: page-profile.php:583
+msgid "No social links added yet."
+msgstr ""
+
+#: template-parts/sidebar-right.php:29
+msgid "No suggestions available at this time."
+msgstr ""
+
+#: page-earnings.php:336
+msgid "No transactions found yet. Complete a sale to see it here."
+msgstr ""
+
+#: template-parts/dashboard.php:407
+msgid "Not available"
+msgstr ""
+
+#: page-earnings.php:57 admin/payout-requests.php:89
+msgid "Not Connected"
+msgstr ""
+
+#: admin/payout-requests.php:87
+msgid "Not connected"
+msgstr ""
+
+#: page-profile.php:87
+msgid "Not linked"
+msgstr ""
+
+#: template-parts/dashboard.php:404 template-parts/dashboard.php:494
+msgid "Not scheduled"
+msgstr ""
+
+#: page-earnings.php:560 page-profile.php:89 admin/stripe-settings.php:73
+msgid "Not set"
+msgstr ""
+
+#: page-earnings.php:64 page-earnings.php:561
+msgid "Not updated yet"
+msgstr ""
+
+#: template-parts/content-none.php:16
+msgid "Nothing here"
+msgstr ""
+
+#: notifications/templates/notification-panel.php:20
+msgid "Notifications"
+msgstr ""
+
+#: admin/zegocloud-settings.php:76
+msgid "Numeric App ID from ZEGO Cloud Console."
+msgstr ""
+
+#. Author of the theme
+msgid "Nymia Team"
+msgstr ""
+
+#. Name of the theme
+msgid "Nymia Theme"
+msgstr ""
+
+#: admin/social-login-settings.php:145
+msgid "Offer a privacy-focused login option for Apple users."
+msgstr ""
+
+#: template-parts/chat-modal.php:62 template-parts/chat-modal.php:109
+msgid "Offline"
+msgstr ""
+
+#: template-parts/chat-modal.php:108
+msgid "Online"
+msgstr ""
+
+#: admin/payout-requests.php:68
+msgid ""
+"Only creators with connected Stripe accounts are eligible for payouts. Keep "
+"an eye on onboarding status."
+msgstr ""
+
+#: auth/auth-signup.php:198 template-parts/become-creator-modal.php:191
+msgid "Only numbers are allowed"
+msgstr ""
+
+#: template-parts/header.php:196
+msgid "Open profile menu"
+msgstr ""
+
+#: admin/stripe-settings.php:34
+msgid "Open Stripe Dashboard"
+msgstr ""
+
+#: page-privacy.php:161
+msgid "Opt-Out"
+msgstr ""
+
+#: page-privacy.php:199
+msgid ""
+"Our services are not intended for children under the age of 13. We do not "
+"knowingly collect personal information from children under 13. If we become "
+"aware that we have collected personal information from a child under 13, we "
+"will take steps to delete such information promptly."
+msgstr ""
+
+#: template-parts/content-page.php:17
+msgid "Pages:"
+msgstr ""
+
+#: admin/zegocloud-settings.php:21
+msgid "Partially Configured"
+msgstr ""
+
+#: page-privacy.php:53
+msgid "Participate in surveys or promotions"
+msgstr ""
+
+#: auth/auth-signup.php:190 template-parts/become-creator-modal.php:184
+msgid "Passport"
+msgstr ""
+
+#: admin/social-login-settings.php:174
+msgid "Paste the contents of your Apple .p8 private key file."
+msgstr ""
+
+#: admin/social-login-settings.php:103
+msgid "Paste your Client ID and Secret, then save."
+msgstr ""
+
+#: admin/zegocloud-settings.php:65
+msgid ""
+"Paste your ZEGO Cloud identifiers used for token generation and SDK "
+"initialization."
+msgstr ""
+
+#: template-parts/live-booking-modal.php:129
+#: template-parts/live-booking-modal.php:797
+#: template-parts/live-booking-modal.php:848
+msgid "Pay Now"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:54
+msgid "Pay only for the time you watch"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:51
+msgid "Pay Per Minute"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:835
+msgid "Payment confirmation failed."
+msgstr ""
+
+#: template-parts/live-booking-modal.php:843
+msgid "Payment failed. Please try again."
+msgstr ""
+
+#: page-privacy.php:58
+msgid "Payment Information:"
+msgstr ""
+
+#: page-privacy.php:58
+msgid ""
+"Payment method details, billing address, and transaction history (processed "
+"securely through third-party payment processors)."
+msgstr ""
+
+#. Name of the template
+#: page-payment-methods.php:2 page-payment-methods.php:32
+msgid "Payment Methods"
+msgstr ""
+
+#: page-payment-methods.php:102
+msgid "Payment methods will be saved automatically when you make a purchase."
+msgstr ""
+
+#: page-live-audio.php:211
+msgid "Payment successful! Joining the call..."
+msgstr ""
+
+#: template-parts/live-booking-modal.php:730
+msgid "Payment system not loaded. Please refresh the page."
+msgstr ""
+
+#: admin/payout-requests.php:46
+msgid "Payments · Stripe"
+msgstr ""
+
+#. Name of the template
+#: page-pdf.php:2
+msgid "PDF"
+msgstr ""
+
+#: page-earnings.php:153
+msgid "Pending"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:309
+msgid "per minute"
+msgstr ""
+
+#: template-parts/settings-modal.php:93
+msgid ""
+"Permanently delete your account and all associated data. This action cannot "
+"be undone."
+msgstr ""
+
+#: page-profile.php:325
+msgid "Personal Information"
+msgstr ""
+
+#: page-privacy.php:56
+msgid "Personal Information:"
+msgstr ""
+
+#: page-privacy.php:81
+msgid "Personalize your experience and show you relevant content"
+msgstr ""
+
+#: page-contact.php:95 page-profile.php:367 page-profile.php:684
+msgid "Phone"
+msgstr ""
+
+#: admin/footer-menu-settings.php:227
+#: template-parts/become-creator-modal.php:132
+#: template-parts/become-creator-modal.php:463
+msgid "Phone Number"
+msgstr ""
+
+#: admin/footer-menu-settings.php:238
+msgid "Physical Address"
+msgstr ""
+
+#: page-checkout.php:242
+msgid "Please agree to the Terms and Privacy Policy to continue."
+msgstr ""
+
+#: template-parts/become-creator-modal.php:482
+msgid "Please complete all required fields:"
+msgstr ""
+
+#: create-ebook/includes/ebook-functions.php:420
+msgid "Please enter a title."
+msgstr ""
+
+#: auth/auth-scripts.php:491
+msgid "Please enter your ID Number."
+msgstr ""
+
+#: page-single-ebook.php:821
+msgid "Please log in to bookmark ebooks."
+msgstr ""
+
+#: create-ebook/includes/ebook-functions.php:372
+msgid "Please log in to edit ebook."
+msgstr ""
+
+#: page-single-ebook.php:383 ebook-archive/page-single-ebook.php:375
+msgid "Please log in to leave a review."
+msgstr ""
+
+#: create-ebook/includes/ebook-functions.php:511
+msgid "Please log in."
+msgstr ""
+
+#: auth/auth-signup.php:182
+msgid ""
+"Please provide your ID document for verification. This is required for "
+"creators."
+msgstr ""
+
+#: auth/auth-scripts.php:484
+msgid "Please select an ID Type for verification."
+msgstr ""
+
+#: page-single-post.php:1559
+msgid "Please select an image file."
+msgstr ""
+
+#: template-parts/settings-modal.php:268
+msgid "Please type \"DELETE\" to confirm"
+msgstr ""
+
+#: template-parts/become-creator-modal.php:513
+msgid "Please upload a document or capture a photo for verification."
+msgstr ""
+
+#: auth/auth-scripts.php:510
+msgid "Please upload an ID document or capture a photo for verification."
+msgstr ""
+
+#. Name of the template
+#: page-policies.php:2
+msgid "Policies"
+msgstr ""
+
+#: page-policies.php:26
+msgid "Policies & Terms"
+msgstr ""
+
+#: page-single-post.php:294 template-parts/dashboard.php:951
+msgid "Post"
+msgstr ""
+
+#: page-single-post.php:1511
+msgid "Post deleted successfully."
+msgstr ""
+
+#: page-single-post.php:33
+msgid "Post Not Found"
+msgstr ""
+
+#: page-single-post.php:1382
+msgid "Post Title"
+msgstr ""
+
+#: page-single-post.php:1598
+msgid "Post updated successfully!"
+msgstr ""
+
+#: page-privacy.php:217
+msgid "Posting the new Privacy Policy on this page"
+msgstr ""
+
+#: page-profile.php:524
+msgid "Posts"
+msgstr ""
+
+#: template-parts/dashboard.php:793
+msgid "Pre-booked Private Sessions"
+msgstr ""
+
+#: page-audio.php:34
+msgid "Premium Audio Locked"
+msgstr ""
+
+#: page-single-post.php:1396
+msgid "Preview"
+msgstr ""
+
+#: template-parts/dashboard.php:653 template-parts/dashboard.php:830
+msgid "Price"
+msgstr ""
+
+#: admin/footer-menu-settings.php:223
+msgid "Primary contact email address."
+msgstr ""
+
+#: page-settings.php:58 template-parts/settings-modal.php:55
+msgid "Privacy & Security"
+msgstr ""
+
+#. Name of the template
+#: page-policies.php:41 page-policies.php:81 page-privacy.php:2
+#: page-privacy.php:27
+msgid "Privacy Policy"
+msgstr ""
+
+#: page-event-calendar.php:47
+msgid "Private 1:1 Availability"
+msgstr ""
+
+#: template-parts/dashboard-public.php:148
+msgid "Private 1:1 Sessions"
+msgstr ""
+
+#: admin/social-login-settings.php:172
+msgid "Private Key"
+msgstr ""
+
+#: page-event-calendar.php:437
+msgid "Private Session"
+msgstr ""
+
+#: page-event-calendar.php:466 template-parts/dashboard-public.php:204
+msgid "Private session with"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:93
+msgid "Proceed to Payment"
+msgstr ""
+
+#: page-privacy.php:75
+msgid "Process transactions and send related information"
+msgstr ""
+
+#: page-earnings.php:155
+msgid "Processing"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:642
+#: template-parts/live-booking-modal.php:776
+msgid "Processing…"
+msgstr ""
+
+#: admin/zegocloud-settings.php:88
+msgid "Production"
+msgstr ""
+
+#: admin/payout-requests.php:79 template-parts/profile-modal.php:43
+#: template-parts/header.php:205
+msgid "Profile"
+msgstr ""
+
+#: page-settings.php:47 template-parts/settings-modal.php:44
+msgid "Profile Information"
+msgstr ""
+
+#: page-profile.php:611
+msgid "Profile Picture"
+msgstr ""
+
+#: page-profile.php:915
+msgid "Profile updated successfully!"
+msgstr ""
+
+#: page-privacy.php:110
+msgid "Protection of Rights"
+msgstr ""
+
+#: page-privacy.php:74
+msgid "Provide, maintain, and improve our services"
+msgstr ""
+
+#: admin/stripe-settings.php:72 admin/stripe-settings.php:112
+msgid "Publishable Key"
+msgstr ""
+
+#: page-policies.php:199
+msgid "Questions About Our Policies?"
+msgstr ""
+
+#: page-privacy.php:236
+msgid "Questions About Our Privacy Policy?"
+msgstr ""
+
+#: page-single-ebook.php:356 ebook-archive/page-single-ebook.php:348
+msgid "Reader Feedback"
+msgstr ""
+
+#: admin/zegocloud-settings.php:18
+msgid "Ready for Token Generation"
+msgstr ""
+
+#: page-earnings.php:169
+msgid "Ready to withdraw"
+msgstr ""
+
+#: template-parts/chat-modal.php:15
+msgid "Recent chats"
+msgstr ""
+
+#: template-parts/dashboard.php:930
+msgid "Recent Posts"
+msgstr ""
+
+#: page-earnings.php:290
+msgid "Recent Transactions"
+msgstr ""
+
+#: page-profile.php:628
+msgid "Recommended Banner Size:"
+msgstr ""
+
+#: admin/social-login-settings.php:97
+msgid "Redirect URI:"
+msgstr ""
+
+#: admin/social-login-settings.php:179
+msgid "Redirect URL:"
+msgstr ""
+
+#: template-parts/dashboard.php:803
+msgid "Refresh"
+msgstr ""
+
+#: page-privacy.php:132
+msgid "Regular security assessments and updates"
+msgstr ""
+
+#: page-single-post.php:269 page-single-post.php:323
+msgid "Related Posts"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:231
+msgid "Remaining Slot"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:232
+msgid "Remaining Slots"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:66
+msgid "Reminder"
+msgstr ""
+
+#: page-profile.php:657 admin/footer-menu-settings.php:150
+#: admin/footer-menu-settings.php:280
+msgid "Remove"
+msgstr ""
+
+#: page-single-post.php:1397
+msgid "Remove image"
+msgstr ""
+
+#: page-single-post.php:1811
+msgid "Reply"
+msgstr ""
+
+#: admin/general-settings.php:69
+msgid "Require email verification for new user registrations"
+msgstr ""
+
+#: admin/stripe-settings.php:141
+msgid "Required if creators receive payouts directly (Stripe Connect)."
+msgstr ""
+
+#: admin/payout-requests.php:59
+msgid "Reset"
+msgstr ""
+
+#: page-reset-password.php:133 page-reset-password.php:179
+msgid "Reset Password"
+msgstr ""
+
+#: page-privacy.php:77
+msgid "Respond to your comments, questions, and requests"
+msgstr ""
+
+#: auth/auth-signup.php:243 template-parts/become-creator-modal.php:227
+msgid "Retake"
+msgstr ""
+
+#: page-earnings.php:179
+msgid "Revenue Overview"
+msgstr ""
+
+#: page-single-ebook.php:648 ebook-archive/page-single-ebook.php:640
+msgid "review"
+msgstr ""
+
+#: admin/general-settings.php:119
+msgid ""
+"Review audio upload permissions regularly to maintain quality standards."
+msgstr ""
+
+#: page-single-ebook.php:649 ebook-archive/page-single-ebook.php:641
+msgid "reviews"
+msgstr ""
+
+#: page-profile.php:427
+msgid "Role"
+msgstr ""
+
+#: page-live-audio.php:239
+msgid "Room ID is missing."
+msgstr ""
+
+#: page-earnings.php:401
+msgid "Routing Number / Sort Code"
+msgstr ""
+
+#: admin/zegocloud-settings.php:127
+msgid "Run a quick check to ensure your App ID and Server Secret look correct."
+msgstr ""
+
+#: admin/zegocloud-settings.php:132
+msgid "Run Basic Check"
+msgstr ""
+
+#: page-earnings.php:422 page-earnings.php:669
+msgid "Save Bank Account"
+msgstr ""
+
+#: page-single-post.php:1403 page-profile.php:747
+msgid "Save Changes"
+msgstr ""
+
+#: admin/footer-menu-settings.php:248
+msgid "Save Contact Information"
+msgstr ""
+
+#: admin/footer-menu-settings.php:202
+msgid "Save Footer Menu Settings"
+msgstr ""
+
+#: admin/general-settings.php:122
+msgid "Save General Settings"
+msgstr ""
+
+#: admin/social-login-settings.php:200
+msgid "Save Social Login Settings"
+msgstr ""
+
+#: admin/stripe-settings.php:150
+msgid "Save Stripe Settings"
+msgstr ""
+
+#: admin/zegocloud-settings.php:93
+msgid "Save ZEGO Settings"
+msgstr ""
+
+#: page-profile.php:904
+msgid "Saving..."
+msgstr ""
+
+#: page-earnings.php:413
+msgid "Savings"
+msgstr ""
+
+#: page-earnings.php:630
+msgid "Saving…"
+msgstr ""
+
+#: page-live-streams.php:258 template-parts/dashboard.php:571
+msgid "Scheduled"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:401
+msgid "Scheduled Date:"
+msgstr ""
+
+#: template-parts/dashboard.php:433
+msgid "Scheduled Session"
+msgstr ""
+
+#: page-live-audio.php:158
+msgid "Scheduled Stream"
+msgstr ""
+
+#: admin/payout-requests.php:57 template-parts/header.php:64
+msgid "Search"
+msgstr ""
+
+#: admin/payout-requests.php:55
+msgid "Search creators…"
+msgstr ""
+
+#: template-parts/header.php:69
+msgid "Search or @username"
+msgstr ""
+
+#: template-parts/header.php:74
+msgid "Searching..."
+msgstr ""
+
+#: admin/stripe-settings.php:117
+msgid "Secret Key"
+msgstr ""
+
+#: page-privacy.php:131
+msgid "Secure storage of sensitive information"
+msgstr ""
+
+#: admin/social-login-settings.php:191
+msgid "Security Checklist"
+msgstr ""
+
+#: page-single-ebook.php:645 ebook-archive/page-single-ebook.php:637
+msgid "Select a star rating before submitting."
+msgstr ""
+
+#: page-earnings.php:411
+msgid "Select account type"
+msgstr ""
+
+#: auth/auth-signup.php:189 template-parts/become-creator-modal.php:183
+msgid "Select document type"
+msgstr ""
+
+#: template-parts/become-creator-modal.php:150
+msgid "Select your country"
+msgstr ""
+
+#: template-parts/dashboard.php:458
+msgid "Selected Date"
+msgstr ""
+
+#: template-parts/dashboard.php:462
+msgid "Selected Time"
+msgstr ""
+
+#: page-contact.php:63
+msgid "Send Message"
+msgstr ""
+
+#: page-privacy.php:76
+msgid "Send technical notices, updates, and support messages"
+msgstr ""
+
+#: page-contact.php:35
+msgid "Send us a Message"
+msgstr ""
+
+#: page-privacy.php:82
+msgid "Send you promotional communications (with your consent)"
+msgstr ""
+
+#: page-privacy.php:219
+msgid "Sending you an email notification (for significant changes)"
+msgstr ""
+
+#: page-contact.php:133
+msgid "Sending..."
+msgstr ""
+
+#: template-parts/live-booking-modal.php:707
+msgid "Server returned an invalid response. Please try again."
+msgstr ""
+
+#: admin/zegocloud-settings.php:79 admin/zegocloud-settings.php:80
+msgid "Server Secret"
+msgstr ""
+
+#: admin/zegocloud-settings.php:31
+msgid "Server Secret must be at least 8 characters."
+msgstr ""
+
+#: page-privacy.php:104
+msgid "Service Providers"
+msgstr ""
+
+#: admin/stripe-settings.php:162
+msgid "Set the success and cancel URLs to match your checkout flow."
+msgstr ""
+
+#: page-settings.php:37 template-parts/settings-modal.php:29
+#: template-parts/header.php:230
+msgid "Settings"
+msgstr ""
+
+#: page-single-ebook.php:379 ebook-archive/page-single-ebook.php:371
+msgid "Share your thoughts about this ebook..."
+msgstr ""
+
+#: page-ebook.php:244 page-audiobook.php:292 ebook-archive/page-ebook.php:261
+msgid "Show More"
+msgstr ""
+
+#: page-earnings.php:197
+msgid "Shows items sold, prices, and one-to-one session minutes"
+msgstr ""
+
+#: template-parts/dashboard-public.php:31
+#: template-parts/dashboard-public.php:139
+#: template-parts/dashboard-public.php:517
+#: template-parts/dashboard-public.php:624 template-parts/header.php:296
+msgid "Sign In"
+msgstr ""
+
+#: template-parts/dashboard-public.php:137
+msgid "Sign in to access all audio content"
+msgstr ""
+
+#: template-parts/dashboard-public.php:515
+msgid "Sign in to access full ebook library"
+msgstr ""
+
+#: template-parts/dashboard-public.php:622
+msgid "Sign in to follow creators and access exclusive content"
+msgstr ""
+
+#: admin/social-login-settings.php:144
+msgid "Sign In with Apple"
+msgstr ""
+
+#: template-parts/login-modal.php:58 template-parts/header.php:293
+msgid "Sign Up as Creator"
+msgstr ""
+
+#. Name of the template
+#: page-single-ebook.php:2 ebook-archive/page-single-ebook.php:2
+msgid "Single Ebook"
+msgstr ""
+
+#. Name of the template
+#: page-single-post.php:2
+msgid "Single Post"
+msgstr ""
+
+#: page-event-calendar.php:36
+msgid "Single User"
+msgstr ""
+
+#: template-parts/dashboard-public.php:379 template-parts/dashboard.php:468
+#: template-parts/dashboard.php:602 template-parts/dashboard.php:608
+msgid "Slots Booked"
+msgstr ""
+
+#: template-parts/dashboard.php:399
+msgid "slots left"
+msgstr ""
+
+#: page-profile.php:544
+msgid "Social Links"
+msgstr ""
+
+#: admin/general-settings.php:47 admin/zegocloud-settings.php:56
+#: admin/stripe-settings.php:42 admin/social-login-settings.php:63
+#: admin/footer-menu-settings.php:107
+msgid "Social Login"
+msgstr ""
+
+#: page-contact.php:154
+msgid "Sorry, there was an error sending your message. Please try again."
+msgstr ""
+
+#: page-live-streams.php:79 template-parts/dashboard.php:203
+msgid "Starting soon"
+msgstr ""
+
+#: template-parts/dashboard.php:481
+msgid "Starts In"
+msgstr ""
+
+#: page-live-streams.php:86 page-live-streams.php:89 page-live-streams.php:91
+#: template-parts/dashboard.php:210 template-parts/dashboard.php:213
+#: template-parts/dashboard.php:215
+msgid "Starts in"
+msgstr ""
+
+#: admin/stripe-settings.php:145
+msgid "Statement Descriptor (optional)"
+msgstr ""
+
+#: page-profile.php:450
+msgid "Statistics"
+msgstr ""
+
+#: page-earnings.php:302 admin/payout-requests.php:77
+msgid "Status"
+msgstr ""
+
+#: auth/auth-signup.php:221 template-parts/become-creator-modal.php:207
+msgid "Stop Camera"
+msgstr ""
+
+#: admin/stream-settings.php:113
+msgid "Stream settings saved."
+msgstr ""
+
+#: template-parts/live-booking-modal.php:27
+msgid "Stream Title"
+msgstr ""
+
+#: template-parts/become-creator-modal.php:138
+#: template-parts/become-creator-modal.php:464
+msgid "Street"
+msgstr ""
+
+#: admin/payout-requests.php:76
+msgid "Stripe Account ID"
+msgstr ""
+
+#: page-profile.php:381 page-profile.php:704
+msgid "Stripe Account No."
+msgstr ""
+
+#: admin/stripe-settings.php:139
+msgid "Stripe Connect Client ID (optional)"
+msgstr ""
+
+#: admin/stripe-settings.php:167
+msgid "Stripe Documentation"
+msgstr ""
+
+#: admin/general-settings.php:49 admin/zegocloud-settings.php:58
+#: admin/stripe-settings.php:29 admin/stripe-settings.php:44
+#: admin/social-login-settings.php:65 admin/footer-menu-settings.php:109
+msgid "Stripe Payments"
+msgstr ""
+
+#: page-contact.php:52
+msgid "Subject"
+msgstr ""
+
+#: page-single-ebook.php:380 page-single-ebook.php:796
+#: ebook-archive/page-single-ebook.php:372
+#: ebook-archive/page-single-ebook.php:788
+msgid "Submit Review"
+msgstr ""
+
+#: template-parts/become-creator-modal.php:242
+#: template-parts/become-creator-modal.php:294
+msgid "Submit Verification"
+msgstr ""
+
+#: template-parts/become-creator-modal.php:526
+msgid "Submitting..."
+msgstr ""
+
+#: admin/stripe-settings.php:129
+msgid "Success URL"
+msgstr ""
+
+#: page-profile.php:632
+msgid "Suggestions sidebar (400x250px will be cropped from your banner)"
+msgstr ""
+
+#: page-earnings.php:405
+msgid "SWIFT / BIC Code"
+msgstr ""
+
+#: page-profile.php:392 page-profile.php:709
+msgid "SWIFT/BIC Code"
+msgstr ""
+
+#: admin/stripe-settings.php:163
+msgid "Switch to Live mode and test a real transaction when ready."
+msgstr ""
+
+#: admin/stripe-settings.php:101
+msgid "Switch to Live once you are ready to accept real payments."
+msgstr ""
+
+#: auth/auth-signup.php:237 template-parts/become-creator-modal.php:220
+msgid ""
+"Take a photo with your document close to your face, so that both the "
+"document and your face are visible"
+msgstr ""
+
+#: admin/social-login-settings.php:161
+msgid "Team ID"
+msgstr ""
+
+#: page-policies.php:48 page-policies.php:109
+msgid "Terms of Service"
+msgstr ""
+
+#: admin/stripe-settings.php:69
+msgid "Test"
+msgstr ""
+
+#: admin/zegocloud-settings.php:89
+msgid "Test / Sandbox"
+msgstr ""
+
+#: admin/social-login-settings.php:196
+msgid "Test each provider after updates using a private window."
+msgstr ""
+
+#: admin/stripe-settings.php:98
+msgid "Test Mode (Sandbox)"
+msgstr ""
+
+#: admin/stripe-settings.php:60
+msgid "Test mode enabled. Use Stripe test cards to simulate purchases."
+msgstr ""
+
+#: page-contact.php:149
+msgid "Thank you! Your message has been sent."
+msgstr ""
+
+#: page-single-ebook.php:647 ebook-archive/page-single-ebook.php:639
+msgid "Thanks for sharing your thoughts!"
+msgstr ""
+
+#: page-audio.php:35
+msgid ""
+"That creator’s track requires a purchase before listening. Explore other "
+"tracks or upgrade your plan."
+msgstr ""
+
+#: page-single-post.php:34
+msgid "The post you are looking for does not exist."
+msgstr ""
+
+#: template-parts/content-none.php:24
+#, php-format
+msgid ""
+"The user \"@%s\" could not be found. Please check the username and try again."
+msgstr ""
+
+#: template-parts/dashboard.php:794
+msgid ""
+"These are the 1:1 availability slots you have published. Customers book them "
+"from the public dashboard."
+msgstr ""
+
+#: template-parts/settings-modal.php:134
+msgid "This action cannot be undone."
+msgstr ""
+
+#: page-profile.php:629
+msgid "This banner will be displayed on:"
+msgstr ""
+
+#: admin/footer-menu-settings.php:212
+msgid "This information will be displayed on the Contact Us page."
+msgstr ""
+
+#: page-earnings.php:133
+msgid "This Month"
+msgstr ""
+
+#: admin/footer-menu-settings.php:119
+msgid "This text appears below the logo in the footer."
+msgstr ""
+
+#: template-parts/settings-modal.php:126
+msgid ""
+"This will permanently delete your account and all associated data including:"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:405
+msgid "Time Remaining:"
+msgstr ""
+
+#: page-single-post.php:203
+msgid "to post a comment."
+msgstr ""
+
+#: page-privacy.php:182
+msgid "To resolve disputes and enforce our agreements"
+msgstr ""
+
+#: admin/general-settings.php:95
+msgid "Toggle creator audio uploads for the entire platform."
+msgstr ""
+
+#: template-parts/live-booking-modal.php:83
+msgid "Total Amount"
+msgstr ""
+
+#: page-earnings.php:111
+msgid "Total Earnings"
+msgstr ""
+
+#: page-earnings.php:96
+msgid "Track your revenue and manage payouts"
+msgstr ""
+
+#: page-profile.php:728
+msgid "Twitter URL"
+msgstr ""
+
+#: page-earnings.php:301
+msgid "Type"
+msgstr ""
+
+#: template-parts/settings-modal.php:138
+msgid "Type \"DELETE\" to confirm:"
+msgstr ""
+
+#: auth/auth-scripts.php:292
+msgid ""
+"Unable to access camera. Please check your browser settings and camera "
+"permissions."
+msgstr ""
+
+#: auth/auth-scripts.php:249
+msgid "Unable to access the camera."
+msgstr ""
+
+#: template-parts/become-creator-modal.php:344
+msgid "Unable to access the camera. Please check permissions."
+msgstr ""
+
+#: page-ebook.php:473 page-single-ebook.php:983
+msgid "Unable to copy link. Please copy manually."
+msgstr ""
+
+#: page-single-post.php:1514
+msgid "Unable to delete post."
+msgstr ""
+
+#: page-single-post.php:1763
+msgid "Unable to load comments."
+msgstr ""
+
+#: page-single-post.php:1462
+msgid "Unable to load post data."
+msgstr ""
+
+#: page-single-ebook.php:643 ebook-archive/page-single-ebook.php:635
+msgid "Unable to load reviews. Please try again."
+msgstr ""
+
+#: page-single-post.php:2015
+msgid "Unable to post comment."
+msgstr ""
+
+#: page-single-post.php:1972
+msgid "Unable to post reply."
+msgstr ""
+
+#: page-earnings.php:646 page-earnings.php:661
+msgid "Unable to save bank account details."
+msgstr ""
+
+#: template-parts/become-creator-modal.php:543
+msgid "Unable to submit verification. Please check your details and try again."
+msgstr ""
+
+#: page-single-ebook.php:646 ebook-archive/page-single-ebook.php:638
+msgid "Unable to submit your review. Please try again."
+msgstr ""
+
+#: page-single-ebook.php:874
+msgid "Unable to update bookmark. Please try again."
+msgstr ""
+
+#: page-single-post.php:1601
+msgid "Unable to update post."
+msgstr ""
+
+#: admin/product-management.php:23 admin/product-management.php:66
+#: admin/product-management.php:105 admin/user-management.php:22
+msgid "Unauthorized"
+msgstr ""
+
+#: template-parts/chat-modal.php:370
+msgid "Unknown user"
+msgstr ""
+
+#: page-audio.php:220 page-audio.php:333
+msgid "Unlocked"
+msgstr ""
+
+#: template-parts/dashboard.php:800
+msgid "Upcoming Slots"
+msgstr ""
+
+#: page-settings.php:63 template-parts/settings-modal.php:59
+msgid "Update your password to keep your account secure"
+msgstr ""
+
+#: page-settings.php:48 template-parts/settings-modal.php:45
+msgid "Update your profile information and personal details"
+msgstr ""
+
+#: page-privacy.php:218
+msgid "Updating the \"Last updated\" date at the top of this policy"
+msgstr ""
+
+#: page-profile.php:653
+msgid "Upload Banner"
+msgstr ""
+
+#: page-privacy.php:50
+msgid "Upload content (audio files, ebooks, posts)"
+msgstr ""
+
+#: auth/auth-signup.php:205 template-parts/become-creator-modal.php:197
+msgid "Upload ID Document (PDF/JPG/PNG)"
+msgstr ""
+
+#: page-privacy.php:59
+msgid "Usage Information:"
+msgstr ""
+
+#: auth/auth-signup.php:218 template-parts/become-creator-modal.php:204
+msgid "Use Camera"
+msgstr ""
+
+#: template-parts/content-none.php:14
+#, php-format
+msgid "User \"@%s\" not found"
+msgstr ""
+
+#: admin/payout-requests.php:99
+msgid "User ID: %d"
+msgstr ""
+
+#: admin/general-settings.php:56
+msgid "User Verification"
+msgstr ""
+
+#: page-profile.php:346 page-profile.php:671
+msgid "Username"
+msgstr ""
+
+#: page-profile.php:673
+msgid "Username cannot be changed"
+msgstr ""
+
+#: admin/social-login-settings.php:132
+msgid "Valid OAuth Redirect URI:"
+msgstr ""
+
+#: admin/zegocloud-settings.php:36
+msgid "Validation failed"
+msgstr ""
+
+#: admin/general-settings.php:77
+msgid "Verification code expiry (minutes)"
+msgstr ""
+
+#: template-parts/become-creator-modal.php:536
+msgid "Verification submitted! Our team will contact you soon."
+msgstr ""
+
+#: template-parts/become-creator-modal.php:110
+msgid "Verify Your Identity"
+msgstr ""
+
+#: admin/payout-requests.php:107
+msgid "View"
+msgstr ""
+
+#: page-earnings.php:292
+msgid "View All"
+msgstr ""
+
+#: page-settings.php:92 template-parts/settings-modal.php:81
+msgid "View Wallet"
+msgstr ""
+
+#: admin/social-login-settings.php:101
+msgid "Visit Google Cloud Console and create an OAuth 2.0 Client ID."
+msgstr ""
+
+#: template-parts/header.php:221
+msgid "Wallet"
+msgstr ""
+
+#: page-settings.php:84 template-parts/settings-modal.php:73
+msgid "Wallet & Earnings"
+msgstr ""
+
+#: page-privacy.php:47
+msgid "We collect information you provide directly to us, such as when you:"
+msgstr ""
+
+#: page-privacy.php:99
+msgid ""
+"We do not sell your personal information. We may share your information in "
+"the following circumstances:"
+msgstr ""
+
+#: page-privacy.php:222
+msgid ""
+"We encourage you to review this Privacy Policy periodically. Your continued "
+"use of our services after changes become effective constitutes your "
+"acceptance of the updated Privacy Policy."
+msgstr ""
+
+#: page-privacy.php:128
+msgid ""
+"We implement appropriate technical and organizational security measures to "
+"protect your personal information against unauthorized access, alteration, "
+"disclosure, or destruction. These measures include:"
+msgstr ""
+
+#: page-privacy.php:108
+msgid ""
+"We may disclose your information if required by law or in response to valid "
+"requests by public authorities (e.g., court orders, government agencies)."
+msgstr ""
+
+#: page-privacy.php:111
+msgid ""
+"We may share information when we believe disclosure is necessary to protect "
+"our rights, protect your safety or the safety of others, investigate fraud, "
+"or respond to a government request."
+msgstr ""
+
+#: page-privacy.php:105
+msgid ""
+"We may share information with third-party service providers who perform "
+"services on our behalf, such as payment processing, data analysis, email "
+"delivery, and hosting services."
+msgstr ""
+
+#: page-privacy.php:102
+msgid ""
+"We may share your information when you explicitly consent to such sharing."
+msgstr ""
+
+#: page-privacy.php:215
+msgid ""
+"We may update this Privacy Policy from time to time. We will notify you of "
+"any material changes by:"
+msgstr ""
+
+#: page-privacy.php:179
+msgid ""
+"We retain your personal information for as long as necessary to provide our "
+"services and fulfill the purposes described in this policy. We may retain "
+"certain information:"
+msgstr ""
+
+#: page-privacy.php:72
+msgid "We use the information we collect to:"
+msgstr ""
+
+#: page-contact.php:30
+msgid "We'd love to hear from you. Get in touch with us!"
+msgstr ""
+
+#: admin/stripe-settings.php:173
+msgid "Webhook Events to Enable"
+msgstr ""
+
+#: admin/stripe-settings.php:122
+msgid "Webhook Signing Secret"
+msgstr ""
+
+#: page-profile.php:440 page-profile.php:696
+msgid "Website"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:77
+msgid "We’ll remind you before the scheduled start time."
+msgstr ""
+
+#: admin/general-settings.php:72
+msgid ""
+"When enabled, users must confirm their email via a verification code before "
+"activation."
+msgstr ""
+
+#: page-privacy.php:185
+msgid ""
+"When you delete your account, we will delete or anonymize your personal "
+"information, except where we are required to retain it by law."
+msgstr ""
+
+#: page-privacy.php:101
+msgid "With Your Consent"
+msgstr ""
+
+#: page-single-post.php:192
+msgid "Write a comment..."
+msgstr ""
+
+#: page-single-post.php:1818
+msgid "Write a reply..."
+msgstr ""
+
+#: page-live-audio.php:195
+msgid "You are hosting"
+msgstr ""
+
+#: page-privacy.php:153
+msgid ""
+"You can access and download a copy of your personal data through your "
+"account settings."
+msgstr ""
+
+#: page-privacy.php:162
+msgid ""
+"You can opt-out of receiving promotional emails by clicking the unsubscribe "
+"link in any email or updating your preferences in account settings."
+msgstr ""
+
+#: page-privacy.php:159
+msgid ""
+"You can request deletion of your account and personal information by "
+"contacting us or using the account deletion feature in settings."
+msgstr ""
+
+#: page-privacy.php:156
+msgid ""
+"You can update or correct your personal information at any time through your "
+"account settings."
+msgstr ""
+
+#: page-privacy.php:150
+msgid "You have the following rights regarding your personal information:"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:411
+msgid ""
+"You will be able to join the live stream when the scheduled time starts."
+msgstr ""
+
+#: page-profile.php:1122
+msgid "You will be charged per minute for this call. Continue?"
+msgstr ""
+
+#: template-parts/settings-modal.php:290
+msgid "Your account has been deleted successfully."
+msgstr ""
+
+#: template-parts/settings-modal.php:130
+msgid "Your followers and following relationships"
+msgstr ""
+
+#: page-policies.php:27
+msgid ""
+"Your privacy and trust matter to us. Please read our policies carefully."
+msgstr ""
+
+#: page-privacy.php:28
+msgid ""
+"Your privacy and trust matter to us. Please read our privacy policy "
+"carefully."
+msgstr ""
+
+#: template-parts/settings-modal.php:128
+msgid "Your profile and personal information"
+msgstr ""
+
+#: page-profile.php:630
+msgid "Your profile page"
+msgstr ""
+
+#: template-parts/live-booking-modal.php:398
+msgid "Your slot has been booked successfully!"
+msgstr ""
+
+#: admin/general-settings.php:48 admin/zegocloud-settings.php:57
+#: admin/stripe-settings.php:43 admin/social-login-settings.php:64
+#: admin/footer-menu-settings.php:108
+msgid "ZEGO Cloud"
+msgstr ""
+
+#: admin/zegocloud-settings.php:120
+msgid "ZEGO Cloud Documentation"
+msgstr ""
+
+#: admin/zegocloud-settings.php:48
+msgid "ZEGO Cloud Live Stream"
+msgstr ""
+
+#: admin/zegocloud-settings.php:6
+msgid "ZEGO Cloud settings saved."
+msgstr ""
+
+#: page-live-audio.php:414
+msgid "ZEGO SDK not loaded. Please refresh the page."
+msgstr ""
+
+#: template-parts/become-creator-modal.php:175
+msgid "ZIP CODE"
+msgstr ""
+
+#: template-parts/become-creator-modal.php:467
+msgid "ZIP Code"
+msgstr ""
+
+#: page-payment-methods.php:34
+msgid "← Back to Dashboard"
+msgstr ""

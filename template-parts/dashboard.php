@@ -17,7 +17,7 @@
 
 // GET: Dashboard data and filter options
 $dashboard_data = nymia_get_dashboard_data();
-$filter_buttons = array('All', 'Live Audio', 'E-Books', 'Audio Book', 'Audio Creator');
+$filter_buttons = array('All', 'Live Audio', 'E-Books', 'Audio Book', 'Audio Creator', 'Online Now', 'Secret Room');
 ?>
 
 <!-- ======================================== -->
@@ -50,6 +50,18 @@ $filter_buttons = array('All', 'Live Audio', 'E-Books', 'Audio Book', 'Audio Cre
                 <a class="nymia-filter-btn" href="<?php echo esc_url($audio_link); ?>">
                     <?php echo esc_html($filter); ?>
                 </a>
+            <?php elseif ($filter === 'Online Now') : ?>
+                <?php 
+                $online_now_page = get_page_by_path('online-now');
+                $online_now_link = $online_now_page ? get_permalink($online_now_page) : site_url('/online-now/');
+                ?>
+                <a class="nymia-filter-btn" href="<?php echo esc_url($online_now_link); ?>">
+                    <?php echo esc_html($filter); ?>
+                </a>
+            <?php elseif ($filter === 'Secret Room') : ?>
+                <button class="nymia-filter-btn" data-filter="secret-room" id="nymia-secret-room-filter-btn">
+                    <?php echo esc_html($filter); ?>
+                </button>
             <?php else: ?>
                 <button class="nymia-filter-btn <?php echo $filter === 'All' ? 'active' : ''; ?>" data-filter="<?php echo esc_attr(strtolower(str_replace(' ', '-', $filter))); ?>">
                     <?php echo esc_html($filter); ?>
@@ -562,6 +574,8 @@ $filter_buttons = array('All', 'Live Audio', 'E-Books', 'Audio Book', 'Audio Cre
                     const streamPrice = eventPrice > 0 ? eventPrice : basePrice;
                     const perMinutePrice = Number(r.per_minute_price || 0);
 
+                    const isAvailableNow = r.is_available_now === true || r.is_available_now === '1' || r.is_available_now === 1;
+                    
                     const badgeHtml = isScheduled
                         ? `<div class="nymia-live-badge nymia-scheduled-badge">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; margin-right: 4px;">
@@ -570,9 +584,9 @@ $filter_buttons = array('All', 'Live Audio', 'E-Books', 'Audio Book', 'Audio Cre
                                 </svg>
                                 <?php echo esc_js(__('Scheduled', 'nymia')); ?>
                            </div>`
-                        : `<div class="nymia-live-badge">
+                        : `<div class="nymia-live-badge ${isAvailableNow ? 'nymia-online-now-badge' : ''}">
                                 <span class="nymia-live-dot"></span>
-                                LIVE
+                                ${isAvailableNow ? '<?php echo esc_js(__('ONLINE NOW', 'nymia')); ?>' : 'LIVE'}
                            </div>`;
 
                     const viewersHtml = !isScheduled ? `
@@ -620,12 +634,18 @@ $filter_buttons = array('All', 'Live Audio', 'E-Books', 'Audio Book', 'Audio Cre
                         </p>` : '';
 
                     const roomId = r.room_id || r.roomId || '';
+                    const isVirtual = r.is_virtual === true || r.is_virtual === '1' || r.is_virtual === 1;
                     const hasBooking = hasValidBooking(userBookings, roomId);
                     const bookingDetails = getBookingDetails(userBookings, roomId);
                     const canJoin = hasBooking && (!isScheduled || canJoinScheduledBooking(bookingDetails, startTimestamp));
                     
                     let buttonLabel, buttonAction, buttonClass;
-                    if (isFull) {
+                    if (isVirtual) {
+                        // For virtual rooms (creators with "Online Now" enabled but no active room)
+                        buttonLabel = '<?php echo esc_js(__('Call Now', 'nymia')); ?>';
+                        buttonAction = 'call';
+                        buttonClass = 'nymia-live-join-btn nymia-btn-gradient';
+                    } else if (isFull) {
                         buttonLabel = '<?php echo esc_js(__('Event Full', 'nymia')); ?>';
                         buttonAction = '';
                         buttonClass = 'nymia-live-join-btn nymia-live-book-btn nymia-btn-gradient';
@@ -649,8 +669,8 @@ $filter_buttons = array('All', 'Live Audio', 'E-Books', 'Audio Book', 'Audio Cre
                     }
 
                     const priceHtml = hasBooking
-                        ? `<p style="font-size:12px;color:#34d399;margin:4px 0;"><?php echo esc_js(__('Booked', 'nymia')); ?></p>`
-                        : `<p style="font-size:12px;color:rgba(255,255,255,0.8);margin:4px 0;"><?php echo esc_js(__('Price', 'nymia')); ?>: $${(streamPrice || 0).toFixed(2)}</p>`;
+                        ? `<p class="nymia-live-price-text booked"><?php echo esc_js(__('Booked', 'nymia')); ?></p>`
+                        : `<p class="nymia-live-price-text"><?php echo esc_js(__('Price', 'nymia')); ?>: $${(streamPrice || 0).toFixed(2)}</p>`;
 
                     card.innerHTML = `
                         <div class="nymia-card-image aspect-portrait nymia-live-cover" style="${bgStyle}">
@@ -710,6 +730,9 @@ $filter_buttons = array('All', 'Live Audio', 'E-Books', 'Audio Book', 'Audio Cre
                 });
             }
 
+            // Track current filter for live streaming section
+            let currentLiveFilter = 'all';
+
             function fetchRooms(){
                 if (isFetching) {
                     return;
@@ -718,6 +741,12 @@ $filter_buttons = array('All', 'Live Audio', 'E-Books', 'Audio Book', 'Audio Cre
 
                 const fd = new FormData();
                 fd.append('action','nymia_zego_list_rooms');
+                
+                // Add online_now parameter if filter is "online-now"
+                if (currentLiveFilter === 'online-now') {
+                    fd.append('online_now', '1');
+                }
+                
                 fetch((window.nymiaAjax && window.nymiaAjax.ajaxurl) || '/wp-admin/admin-ajax.php', {method:'POST', body: fd})
                     .then(r=>r.json())
                     .then(d=>{ 
@@ -732,6 +761,25 @@ $filter_buttons = array('All', 'Live Audio', 'E-Books', 'Audio Book', 'Audio Cre
                         isFetching = false;
                     });
             }
+            
+            // Listen for filter changes to update live streaming filter
+            document.addEventListener('click', function(e) {
+                const filterBtn = e.target.closest('.nymia-filter-btn[data-filter]');
+                if (filterBtn) {
+                    const filterValue = filterBtn.getAttribute('data-filter');
+                    // Check if this filter affects the live streaming section
+                    if (filterValue === 'online-now' || filterValue === 'all' || filterValue === 'live-audio') {
+                        currentLiveFilter = filterValue;
+                        // Refresh rooms when filter changes
+                        if (fetchInterval) {
+                            clearInterval(fetchInterval);
+                            fetchInterval = null;
+                        }
+                        fetchRooms();
+                        fetchInterval = setInterval(fetchRooms, 30000);
+                    }
+                }
+            });
 
             if (!fetchInterval) {
                 fetchRooms();
@@ -754,18 +802,39 @@ $filter_buttons = array('All', 'Live Audio', 'E-Books', 'Audio Book', 'Audio Cre
                 
                 const action = btn.dataset.action || 'book';
                 const roomId = btn.dataset.roomId || '';
+                const isVirtualRoom = roomId.startsWith('online_now_');
                 
-                // If user has booking, join directly
-                if (action === 'join' && roomId) {
+                // If user has booking, join directly (but not for virtual rooms)
+                if (action === 'join' && roomId && !isVirtualRoom) {
                     window.location.href = '<?php echo esc_url(home_url('/live-audio/')); ?>?room_id=' + encodeURIComponent(roomId);
                     return;
                 }
                 
-                // Otherwise, open booking modal
+                // For virtual rooms or "Call Now" action, open booking modal
                 if (typeof window.nymiaOpenBookingModal !== 'function') {
                     console.warn('Booking modal is not ready');
                     return;
                 }
+                
+                // For virtual rooms, use default values
+                if (action === 'call' || isVirtualRoom) {
+                    window.nymiaOpenBookingModal({
+                        room_id: roomId,
+                        creator_id: btn.dataset.creatorId || '',
+                        stream_title: btn.dataset.streamTitle || '<?php echo esc_js(__('Online Now', 'nymia')); ?>',
+                        stream_price: parseFloat(btn.dataset.streamPrice || '0'),
+                        per_minute_price: parseFloat(btn.dataset.perMinutePrice || '0'),
+                        is_scheduled: false,
+                        start_timestamp: 0,
+                        is_event: false,
+                        event_type: 'single',
+                        max_attendees: 0,
+                        current_attendees: 0
+                    });
+                    return;
+                }
+                
+                // Otherwise, open booking modal with room details
                 window.nymiaOpenBookingModal({
                     room_id: roomId,
                     creator_id: btn.dataset.creatorId || '',

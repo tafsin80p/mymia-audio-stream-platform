@@ -1,9 +1,201 @@
 <?php
 /**
  * Template for displaying Live Audio Streaming page
+ * Automatically joins ZegoCloud room after payment
  */
 
-get_header(); ?>
+if (!is_user_logged_in()) {
+    wp_redirect(home_url('/login'));
+    exit;
+}
+
+get_header();
+
+// Get room_id from URL
+$room_id = isset($_GET['room_id']) ? sanitize_text_field($_GET['room_id']) : '';
+$is_scheduled = isset($_GET['scheduled']) ? true : false;
+$is_instant_call = isset($_GET['instant_call']) ? true : false;
+$booked = isset($_GET['booked']) ? true : false;
+
+$current_user = wp_get_current_user();
+$current_user_id = get_current_user_id();
+
+// Get ZegoCloud settings
+$zego_app_id = get_option('nymia_zego_app_id', '');
+$zego_server_secret = get_option('nymia_zego_server_secret', '');
+$zego_env = get_option('nymia_zego_env', 'production');
+
+// Get user info
+$user_name = $current_user->display_name ?: $current_user->user_login;
+$user_avatar = get_template_directory_uri() . '/assets/images/profile.png';
+$custom_avatar = get_user_meta($current_user_id, 'custom_avatar', true);
+if ($custom_avatar) {
+    $user_avatar = esc_url($custom_avatar);
+} else {
+    $avatar_url = get_avatar_url($current_user_id, array('size' => 150));
+    if ($avatar_url) {
+        $user_avatar = esc_url($avatar_url);
+    }
+}
+
+// Determine user role (Host or Audience)
+$is_host = false;
+$creator_id = 0;
+
+if ($room_id) {
+    // Check if user is the creator of this room
+    if (strpos($room_id, 'scheduled_') === 0) {
+        // Scheduled room format: scheduled_{creator_id}_{schedule_id}
+        $parts = explode('_', $room_id, 3);
+        if (count($parts) >= 3) {
+            $creator_id = intval($parts[1]);
+            $is_host = ($creator_id === $current_user_id);
+        }
+    } elseif (strpos($room_id, 'instant_') === 0) {
+        // Instant call room format: instant_{creator_id}_{timestamp}_{random}
+        $parts = explode('_', $room_id, 4);
+        if (count($parts) >= 2) {
+            $creator_id = intval($parts[1]);
+            $is_host = ($creator_id === $current_user_id);
+        }
+    } else {
+        // Regular room - check from Zego rooms
+        $rooms = get_transient('nymia_zego_rooms');
+        if (is_array($rooms) && isset($rooms[$room_id])) {
+            $room_data = $rooms[$room_id];
+            $creator_id = isset($room_data['creator']) ? intval($room_data['creator']) : (isset($room_data['creator_id']) ? intval($room_data['creator_id']) : 0);
+            $is_host = ($creator_id === $current_user_id);
+        }
+    }
+}
+
+// Verify user has access to this room
+$has_access = false;
+if ($is_host) {
+    $has_access = true; // Creator always has access
+} else {
+    // Check if this is a secret room and if it's free
+    $is_secret_room = false;
+    $room_price = 0;
+    if (!$has_access) {
+        $rooms = get_transient('nymia_zego_rooms');
+        if (is_array($rooms) && isset($rooms[$room_id])) {
+            $room_data = $rooms[$room_id];
+            $is_secret_room = isset($room_data['is_secret']) && ($room_data['is_secret'] === true || $room_data['is_secret'] === '1' || $room_data['is_secret'] === 1);
+            $room_price = isset($room_data['price']) ? floatval($room_data['price']) : 0;
+        }
+        
+        // Allow free secret rooms to be joined without booking
+        if ($is_secret_room && $room_price == 0) {
+            $has_access = true;
+        }
+    }
+    
+    // Check if user has booked this room
+    $booking_session_id = '';
+    $is_per_minute_booking = false;
+    if (!$has_access) {
+        $bookings = get_user_meta($current_user_id, 'nymia_live_bookings', true);
+        if (is_array($bookings)) {
+            foreach ($bookings as $booking) {
+                if (isset($booking['room_id']) && $booking['room_id'] === $room_id) {
+                    // Check if booking is still valid
+                    $payment_type = isset($booking['payment_type']) ? $booking['payment_type'] : 'full';
+                    $expires_at = isset($booking['expires_at']) ? $booking['expires_at'] : '';
+                    
+                    // Full session bookings never expire - always allow access
+                    if ($payment_type === 'full') {
+                        $has_access = true;
+                        $booking_session_id = isset($booking['session_id']) ? $booking['session_id'] : '';
+                        break;
+                    }
+                    
+                    // For per-minute bookings, check remaining minutes based on actual usage
+                    if ($payment_type === 'per_minute') {
+                        $minutes_purchased = isset($booking['minutes_purchased']) ? intval($booking['minutes_purchased']) : (isset($booking['minutes']) ? intval($booking['minutes']) : 0);
+                        $minutes_used = isset($booking['minutes_used']) ? intval($booking['minutes_used']) : 0;
+                        
+                        // Also check if there's an active session that hasn't been closed
+                        if (isset($booking['join_sessions']) && is_array($booking['join_sessions'])) {
+                            $current_time = current_time('timestamp');
+                            foreach ($booking['join_sessions'] as $session) {
+                                if (isset($session['start']) && (!isset($session['end']) || $session['end'] == 0)) {
+                                    // Active session - add current time to used minutes
+                                    $active_session_seconds = $current_time - $session['start'];
+                                    $active_session_minutes = ceil($active_session_seconds / 60);
+                                    $minutes_used += $active_session_minutes;
+                                }
+                            }
+                        }
+                        
+                        // Calculate remaining minutes
+                        $remaining_minutes = $minutes_purchased - $minutes_used;
+                        
+                        // Allow access if there are remaining minutes
+                        if ($remaining_minutes > 0) {
+                            $has_access = true;
+                            $booking_session_id = isset($booking['session_id']) ? $booking['session_id'] : '';
+                            $is_per_minute_booking = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // Also check instant calls
+    $instant_call_session_id = '';
+    if (!$has_access) {
+        $calls = get_user_meta($current_user_id, 'nymia_instant_calls', true);
+        if (is_array($calls)) {
+            foreach ($calls as $call) {
+                if (isset($call['room_id']) && $call['room_id'] === $room_id) {
+                    // Allow access if status is pending_start or active
+                    if (isset($call['status']) && ($call['status'] === 'active' || $call['status'] === 'pending_start')) {
+                        $has_access = true;
+                        $instant_call_session_id = isset($call['session_id']) ? $call['session_id'] : '';
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// If no room_id or no access, redirect
+if (empty($room_id) || !$has_access) {
+    wp_redirect(home_url('/'));
+    exit;
+}
+
+// Get room title
+$room_title = __('Live Audio Stream', 'nymia');
+if ($is_instant_call) {
+    $room_title = __('Instant Call', 'nymia');
+} elseif ($is_scheduled) {
+    $room_title = __('Scheduled Stream', 'nymia');
+}
+
+// Get creator info if not host
+$creator_name = $user_name;
+$creator_avatar = $user_avatar;
+if (!$is_host && $creator_id > 0) {
+    $creator_user = get_user_by('id', $creator_id);
+    if ($creator_user) {
+        $creator_name = $creator_user->display_name ?: $creator_user->user_login;
+        $creator_custom_avatar = get_user_meta($creator_id, 'custom_avatar', true);
+        if ($creator_custom_avatar) {
+            $creator_avatar = esc_url($creator_custom_avatar);
+        } else {
+            $creator_avatar_url = get_avatar_url($creator_id, array('size' => 150));
+            if ($creator_avatar_url) {
+                $creator_avatar = esc_url($creator_avatar_url);
+            }
+        }
+    }
+}
+?>
 
 <div class="nymia-container">
     <?php get_sidebar(); ?>
@@ -14,202 +206,329 @@ get_header(); ?>
         <div class="nymia-live-audio-wrapper">
             <!-- Stream Header -->
             <div class="nymia-stream-header">
-                <!-- Left - Host Info -->
                 <div class="nymia-host-info">
                     <div class="nymia-host-avatar">
-                        <img src="<?php echo get_template_directory_uri(); ?>/nightglow-layout-main/src/assets/host-avatar.jpg" alt="Host Avatar" />
+                        <img src="<?php echo esc_url($creator_avatar); ?>" alt="<?php echo esc_attr($creator_name); ?>" />
                     </div>
                     <div class="nymia-host-details">
-                        <p class="nymia-host-label">Hosted by</p>
-                        <h2 class="nymia-host-name">Jenny Brag</h2>
+                        <p class="nymia-host-label"><?php echo $is_host ? esc_html__('You are hosting', 'nymia') : esc_html__('Hosted by', 'nymia'); ?></p>
+                        <h2 class="nymia-host-name"><?php echo esc_html($creator_name); ?></h2>
                     </div>
-                    <button class="nymia-btn-gradient">Follow</button>
-                </div>
-
-                <!-- Right - Participants -->
-                <div class="nymia-participants">
-                    <div class="nymia-participant-avatars">
-                        <div class="nymia-participant-avatar">
-                            <img src="<?php echo get_template_directory_uri(); ?>/nightglow-layout-main/src/assets/user-avatar-1.jpg" alt="User 1" />
-                        </div>
-                        <div class="nymia-participant-avatar">
-                            <img src="<?php echo get_template_directory_uri(); ?>/nightglow-layout-main/src/assets/user-avatar-1.jpg" alt="User 2" />
-                        </div>
-                        <div class="nymia-participant-count">
-                            <span>24+</span>
-                        </div>
-                    </div>
-                    <button class="nymia-btn-outline">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                            <line x1="18" x2="18" y1="4" y2="6"></line>
-                            <line x1="20" x2="16" y1="5" y2="5"></line>
-                        </svg>
-                        Add User
-                    </button>
                 </div>
             </div>
 
-            <!-- Main Content Area -->
+            <!-- ZegoCloud Container -->
             <div class="nymia-live-content">
-                <!-- Video Display Area -->
                 <div class="nymia-video-area">
-                    <h1 class="nymia-stream-title">Lets Enjoy this Night</h1>
-
-                    <!-- Main Video Area -->
-                    <div class="nymia-main-video">
-                        <img src="<?php echo get_template_directory_uri(); ?>/nightglow-layout-main/src/assets/host-main.jpg" alt="Live stream" />
-                        
-                        <!-- Center Avatar Overlay -->
-                        <div class="nymia-center-avatar">
-                            <img src="<?php echo get_template_directory_uri(); ?>/nightglow-layout-main/src/assets/host-avatar.jpg" alt="Host" />
-                        </div>
-
-                        <!-- Fullscreen Button -->
-                        <button class="nymia-fullscreen-btn">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
-                            </svg>
-                        </button>
+                    <h1 class="nymia-stream-title"><?php echo esc_html($room_title); ?></h1>
+                    
+                    <!-- ZegoCloud will be mounted here -->
+                    <div id="zego-live-container" style="width: 100%; min-height: 600px; background: #000; border-radius: 12px; overflow: hidden;"></div>
+                    
+                    <?php if ($booked): ?>
+                    <div style="margin-top: 16px; padding: 12px; background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 8px; color: #22c55e; text-align: center;">
+                        <?php esc_html_e('Payment successful! Joining the call...', 'nymia'); ?>
                     </div>
-
-                    <!-- Thumbnail Streams -->
-                    <div class="nymia-thumbnail-streams">
-                        <?php for ($i = 1; $i <= 4; $i++): ?>
-                        <div class="nymia-thumbnail-stream">
-                            <img src="<?php echo get_template_directory_uri(); ?>/nightglow-layout-main/src/assets/stream-thumb.jpg" alt="Stream <?php echo $i; ?>" />
-                            
-                            <!-- User Label -->
-                            <div class="nymia-stream-label">
-                                <div class="nymia-stream-indicator"></div>
-                                <span>Jimi Jams</span>
-                            </div>
-
-                            <!-- Audio Icon -->
-                            <button class="nymia-audio-btn">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
-                                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                                </svg>
-                            </button>
-                        </div>
-                        <?php endfor; ?>
-                    </div>
+                    <?php endif; ?>
                 </div>
-
-                <!-- Live Chat -->
-                <div class="nymia-live-chat">
-                    <!-- Chat Header -->
-                    <div class="nymia-chat-header">
-                        <div class="nymia-live-indicator"></div>
-                        <h2 class="nymia-chat-title">Live Chat</h2>
-                        <span class="nymia-message-count">6 messages</span>
-                    </div>
-
-                    <!-- Messages -->
-                    <div class="nymia-chat-messages">
-                        <div class="nymia-chat-message">
-                            <div class="nymia-message-avatar">
-                                <img src="<?php echo get_template_directory_uri(); ?>/nightglow-layout-main/src/assets/user-avatar-1.jpg" alt="User" />
-                            </div>
-                            <div class="nymia-message-content">
-                                <div class="nymia-message-header">
-                                    <span class="nymia-message-user">Aber</span>
-                                    <span class="nymia-message-time">3min</span>
-                                </div>
-                                <div class="nymia-message-bubble">
-                                    <p>I love you</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="nymia-chat-message nymia-message-current">
-                            <div class="nymia-message-avatar">
-                                <img src="<?php echo get_template_directory_uri(); ?>/nightglow-layout-main/src/assets/user-avatar-1.jpg" alt="User" />
-                            </div>
-                            <div class="nymia-message-content">
-                                <div class="nymia-message-header">
-                                    <span class="nymia-message-user">Aber</span>
-                                    <span class="nymia-message-time">3min</span>
-                                </div>
-                                <div class="nymia-message-bubble nymia-message-bubble-current">
-                                    <p>I love you 2 guys</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="nymia-chat-message">
-                            <div class="nymia-message-avatar">
-                                <img src="<?php echo get_template_directory_uri(); ?>/nightglow-layout-main/src/assets/user-avatar-1.jpg" alt="User" />
-                            </div>
-                            <div class="nymia-message-content">
-                                <div class="nymia-message-header">
-                                    <span class="nymia-message-user">Aber</span>
-                                    <span class="nymia-message-time">3min</span>
-                                </div>
-                                <div class="nymia-message-bubble">
-                                    <p>I love you</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Chat Input -->
-                    <div class="nymia-chat-input">
-                        <div class="nymia-input-avatar">
-                            <img src="<?php echo get_template_directory_uri(); ?>/nightglow-layout-main/src/assets/user-avatar-1.jpg" alt="User" />
-                        </div>
-                        <div class="nymia-input-wrapper">
-                            <input type="text" placeholder="Write message here..." class="nymia-chat-input-field" />
-                            <button class="nymia-send-btn">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="m22 2-7 20-4-9-9-4Z"></path>
-                                    <path d="M22 2 11 13"></path>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Stream Controls -->
-            <div class="nymia-stream-controls">
-                <button class="nymia-control-btn" title="Volume">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
-                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                    </svg>
-                </button>
-                
-                <button class="nymia-control-btn" title="Mute">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3Z"></path>
-                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                        <line x1="12" x2="12" y1="19" y2="22"></line>
-                    </svg>
-                </button>
-                
-                <button class="nymia-control-btn" title="Share">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="18" cy="5" r="3"></circle>
-                        <circle cx="6" cy="12" r="3"></circle>
-                        <circle cx="18" cy="19" r="3"></circle>
-                        <line x1="8.59" x2="15.42" y1="13.51" y2="17.49"></line>
-                        <line x1="15.41" x2="8.59" y1="6.51" y2="10.49"></line>
-                    </svg>
-                </button>
-                
-                <button class="nymia-control-btn nymia-control-leave" title="Leave">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16,17 21,12 16,7"></polyline>
-                        <line x1="21" x2="9" y1="12" y2="12"></line>
-                    </svg>
-                </button>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const roomID = '<?php echo esc_js($room_id); ?>';
+    const userID = '<?php echo esc_js((string)$current_user_id); ?>';
+    const userName = '<?php echo esc_js($user_name); ?>';
+    const userAvatar = '<?php echo esc_js($user_avatar); ?>';
+    const isHost = <?php echo $is_host ? 'true' : 'false'; ?>;
+    const zegoAppId = '<?php echo esc_js($zego_app_id); ?>';
+    const zegoEnv = '<?php echo esc_js($zego_env); ?>';
+    const isInstantCall = <?php echo $is_instant_call ? 'true' : 'false'; ?>;
+    const instantCallSessionId = '<?php echo esc_js($instant_call_session_id); ?>';
+    const isPerMinuteBooking = <?php echo $is_per_minute_booking ? 'true' : 'false'; ?>;
+    const bookingSessionId = '<?php echo esc_js($booking_session_id); ?>';
+    let callStartTracked = false;
+    let callEndTracked = false;
+    let perMinuteJoinTracked = false;
+    let perMinuteLeaveTracked = false;
+    
+    if (!roomID) {
+        alert('<?php echo esc_js(__('Room ID is missing.', 'nymia')); ?>');
+        window.location.href = '<?php echo esc_url(home_url('/')); ?>';
+        return;
+    }
+    
+    // Track call start for instant calls
+    function trackCallStart() {
+        if (!isInstantCall || !instantCallSessionId || callStartTracked) {
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('action', 'nymia_track_call_start');
+        formData.append('nonce', (window.nymiaAjax && window.nymiaAjax.trackCallNonce) || '');
+        formData.append('session_id', instantCallSessionId);
+        formData.append('room_id', roomID);
+        
+        fetch((window.nymiaAjax && window.nymiaAjax.ajaxurl) || '/wp-admin/admin-ajax.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data && data.success) {
+                callStartTracked = true;
+                console.log('Call start tracked');
+            } else {
+                console.error('Failed to track call start:', data);
+            }
+        })
+        .catch(err => {
+            console.error('Error tracking call start:', err);
+        });
+    }
+    
+    // Track call end for instant calls
+    function trackCallEnd() {
+        if (!isInstantCall || !instantCallSessionId || callEndTracked) {
+            return;
+        }
+        
+        callEndTracked = true; // Prevent duplicate calls
+        
+        const formData = new FormData();
+        formData.append('action', 'nymia_track_call_end');
+        formData.append('nonce', (window.nymiaAjax && window.nymiaAjax.trackCallNonce) || '');
+        formData.append('session_id', instantCallSessionId);
+        formData.append('room_id', roomID);
+        
+        // Use sendBeacon for reliability on page unload
+        if (navigator.sendBeacon) {
+            const blob = new Blob([new URLSearchParams(formData).toString()], {
+                type: 'application/x-www-form-urlencoded'
+            });
+            navigator.sendBeacon((window.nymiaAjax && window.nymiaAjax.ajaxurl) || '/wp-admin/admin-ajax.php', blob);
+        } else {
+            // Fallback to fetch
+            fetch((window.nymiaAjax && window.nymiaAjax.ajaxurl) || '/wp-admin/admin-ajax.php', {
+                method: 'POST',
+                body: formData,
+                keepalive: true
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data && data.success) {
+                    console.log('Call end tracked. Minutes:', data.data?.minutes_used, 'Amount:', data.data?.final_amount);
+                } else {
+                    console.error('Failed to track call end:', data);
+                }
+            })
+            .catch(err => {
+                console.error('Error tracking call end:', err);
+            });
+        }
+    }
+    
+    // Track per-minute booking join
+    function trackPerMinuteJoin() {
+        if (!isPerMinuteBooking || !bookingSessionId || perMinuteJoinTracked) {
+            return;
+        }
+        
+        perMinuteJoinTracked = true;
+        
+        const formData = new FormData();
+        formData.append('action', 'nymia_track_per_minute_join');
+        formData.append('nonce', (window.nymiaAjax && window.nymiaAjax.trackCallNonce) || '');
+        formData.append('session_id', bookingSessionId);
+        formData.append('room_id', roomID);
+        
+        fetch((window.nymiaAjax && window.nymiaAjax.ajaxurl) || '/wp-admin/admin-ajax.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data && data.success) {
+                console.log('Per-minute join tracked');
+            } else {
+                console.error('Failed to track per-minute join:', data);
+            }
+        })
+        .catch(err => {
+            console.error('Error tracking per-minute join:', err);
+        });
+    }
+    
+    // Track per-minute booking leave
+    function trackPerMinuteLeave() {
+        if (!isPerMinuteBooking || !bookingSessionId || perMinuteLeaveTracked) {
+            return;
+        }
+        
+        perMinuteLeaveTracked = true;
+        
+        const formData = new FormData();
+        formData.append('action', 'nymia_track_per_minute_leave');
+        formData.append('nonce', (window.nymiaAjax && window.nymiaAjax.trackCallNonce) || '');
+        formData.append('session_id', bookingSessionId);
+        formData.append('room_id', roomID);
+        
+        // Use sendBeacon for reliability on page unload
+        if (navigator.sendBeacon) {
+            const blob = new Blob([new URLSearchParams(formData).toString()], {
+                type: 'application/x-www-form-urlencoded'
+            });
+            navigator.sendBeacon((window.nymiaAjax && window.nymiaAjax.ajaxurl) || '/wp-admin/admin-ajax.php', blob);
+        } else {
+            fetch((window.nymiaAjax && window.nymiaAjax.ajaxurl) || '/wp-admin/admin-ajax.php', {
+                method: 'POST',
+                body: formData,
+                keepalive: true
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data && data.success) {
+                    console.log('Per-minute leave tracked. Remaining:', data.data?.remaining_minutes, 'minutes');
+                } else {
+                    console.error('Failed to track per-minute leave:', data);
+                }
+            })
+            .catch(err => {
+                console.error('Error tracking per-minute leave:', err);
+            });
+        }
+    }
+    
+    // Track call end on page unload (backup)
+    window.addEventListener('beforeunload', function() {
+        trackCallEnd();
+        trackPerMinuteLeave();
+    });
+    
+    // Get ZegoCloud token
+    const formData = new FormData();
+    formData.append('action', 'nymia_zego_get_token');
+    formData.append('nonce', (window.nymiaAjax && window.nymiaAjax.zegoNonce) || '');
+    formData.append('roomId', roomID);
+    formData.append('userId', userID);
+    
+    fetch((window.nymiaAjax && window.nymiaAjax.ajaxurl) || '/wp-admin/admin-ajax.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (!data || !data.success) {
+            throw new Error(data?.data?.message || '<?php echo esc_js(__('Failed to get room access.', 'nymia')); ?>');
+        }
+        
+        const appID = data.data.appId;
+        const token = data.data.token;
+        const serverSecret = data.data.serverSecret || '';
+        
+        if (!window.ZegoUIKitPrebuilt) {
+            alert('<?php echo esc_js(__('ZEGO SDK not loaded. Please refresh the page.', 'nymia')); ?>');
+            return;
+        }
+        
+        // Generate kit token
+        const kitToken = (zegoEnv === 'test' && serverSecret)
+            ? window.ZegoUIKitPrebuilt.generateKitTokenForTest(appID, serverSecret, roomID, userID, userName)
+            : window.ZegoUIKitPrebuilt.generateKitTokenForProduction(appID, token, roomID, userID, userName);
+        
+        // Create ZegoUIKit instance
+        const zp = window.ZegoUIKitPrebuilt.create(kitToken);
+        const mount = document.getElementById('zego-live-container');
+        
+        if (!mount) {
+            alert('<?php echo esc_js(__('Container not found.', 'nymia')); ?>');
+            return;
+        }
+        
+        // Set responsive height
+        function setZegoHeight() {
+            const width = window.innerWidth;
+            if (width <= 480) {
+                mount.style.height = '400px';
+            } else if (width <= 768) {
+                mount.style.height = '500px';
+            } else if (width <= 1024) {
+                mount.style.height = '600px';
+            } else {
+                mount.style.height = '700px';
+            }
+        }
+        setZegoHeight();
+        
+        window.addEventListener('resize', function() {
+            setTimeout(setZegoHeight, 150);
+        });
+        
+        // Join room
+        zp.joinRoom({
+            container: mount,
+            scenario: { 
+                mode: window.ZegoUIKitPrebuilt.LiveStreaming, 
+                config: { role: isHost ? 'Host' : 'Audience' } 
+            },
+            showScreenSharingButton: isHost,
+            turnOnCameraWhenJoining: false,
+            turnOnMicrophoneWhenJoining: isHost, // Only host starts with mic on
+            showPreJoinView: false,
+            showTextChat: true,
+            showUserList: true,
+            showLeavingView: true,
+            sharedLinks: [{ 
+                name: '<?php echo esc_js(__('Join Stream', 'nymia')); ?>', 
+                url: window.location.origin + '/live-audio/?room_id=' + roomID 
+            }],
+            onJoinRoom: function() {
+                // Track call start when room is successfully joined
+                if (isInstantCall) {
+                    setTimeout(trackCallStart, 1000); // Small delay to ensure room is fully joined
+                }
+                // Track per-minute booking join
+                if (isPerMinuteBooking) {
+                    setTimeout(trackPerMinuteJoin, 1000);
+                }
+            },
+            onLeaveRoom: function() {
+                // Track call end before redirecting
+                trackCallEnd();
+                // Track per-minute booking leave
+                trackPerMinuteLeave();
+                // Small delay to ensure tracking request is sent
+                setTimeout(function() {
+                    window.location.href = '<?php echo esc_url(home_url('/')); ?>';
+                }, 500);
+            }
+        });
+        
+        // Inject user avatars
+        const observer = new MutationObserver(function() {
+            const avatars = mount.querySelectorAll('[class*="avatar"], [class*="Avatar"] img, [class*="user"] img');
+            avatars.forEach(function(img) {
+                if (!img.src || img.src.includes('default') || img.src === '' || img.src.includes('data:image/svg')) {
+                    img.src = userAvatar;
+                    img.style.objectFit = 'cover';
+                    img.style.borderRadius = '50%';
+                }
+            });
+        });
+        observer.observe(mount, { childList: true, subtree: true });
+        
+    })
+    .catch(err => {
+        console.error('Error joining room:', err);
+        alert(err.message || '<?php echo esc_js(__('Failed to join the call. Please try again.', 'nymia')); ?>');
+        setTimeout(function() {
+            window.location.href = '<?php echo esc_url(home_url('/')); ?>';
+        }, 2000);
+    });
+});
+</script>
 
 <?php get_footer(); ?>

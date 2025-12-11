@@ -1,7 +1,16 @@
 <?php
 /**
- * Template Name: Audio
- * Template for displaying Audio page
+ * ========================================
+ * NYMIA THEME - AUDIO LIBRARY PAGE
+ * ========================================
+ * Displays the audio library with:
+ * - Audio creators with avatars and ratings
+ * - Filter tabs (All, Trending, New Releases, Most Popular)
+ * - Audio file listings for each creator
+ * - Trending sidebar
+ * 
+ * @package Nymia
+ * @version 1.0
  */
 
 get_header(); ?>
@@ -12,8 +21,23 @@ get_header(); ?>
     <div class="nymia-main">
         <?php get_template_part('template-parts/header'); ?>
         
+        <?php get_template_part('template-parts/back-button'); ?>
+        
+        <?php get_template_part('template-parts/filters'); ?>
+        
+        <!-- ======================================== -->
+        <!-- AUDIO PAGE CONTAINER -->
+        <!-- ======================================== -->
         <div class="nymia-audio-page">
-            <!-- Header Section -->
+            <?php if (isset($_GET['restricted'])): ?>
+                <div class="nymia-audio-notice">
+                    <strong><?php esc_html_e('Premium Audio Locked', 'nymia'); ?></strong>
+                    <p><?php esc_html_e('That creator’s track requires a purchase before listening. Explore other tracks or upgrade your plan.', 'nymia'); ?></p>
+                </div>
+            <?php endif; ?>
+            <!-- ======================================== -->
+            <!-- AUDIO HEADER SECTION -->
+            <!-- ======================================== -->
             <div class="nymia-audio-header">
                 <div class="nymia-audio-header-content">
                     <h1 class="nymia-audio-main-title">
@@ -57,71 +81,216 @@ get_header(); ?>
                 </div>
             </div>
 
-            <!-- Content Layout -->
+            <!-- ======================================== -->
+            <!-- AUDIO CONTENT LAYOUT -->
+            <!-- ======================================== -->
             <div class="nymia-audio-layout">
-                <!-- Main Grid Content -->
-                <div class="nymia-audio-grid">
-                    <?php 
-                    // Dummy data for audio posts
-                    $audio_posts = array(
-                        array('name' => 'Kimberly', 'views' => '1.2k', 'image' => 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=500&fit=crop', 'profile_image' => 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop', 'category' => 'trending'),
-                        array('name' => 'Sarah Johnson', 'views' => '2.5k', 'image' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=500&fit=crop', 'profile_image' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop', 'category' => 'trending'),
-                        array('name' => 'Emily Chen', 'views' => '856', 'image' => 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&h=500&fit=crop', 'profile_image' => 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&h=100&fit=crop', 'category' => 'new'),
-                        array('name' => 'Jessica Miller', 'views' => '3.1k', 'image' => 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=500&fit=crop', 'profile_image' => 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100&h=100&fit=crop', 'category' => 'popular'),
-                        array('name' => 'Amanda Davis', 'views' => '1.8k', 'image' => 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=400&h=500&fit=crop', 'profile_image' => 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=100&h=100&fit=crop', 'category' => 'trending'),
-                        array('name' => 'Rachel Green', 'views' => '945', 'image' => 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&h=500&fit=crop', 'profile_image' => 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=100&h=100&fit=crop', 'category' => 'new'),
-                        array('name' => 'Lisa Anderson', 'views' => '2.2k', 'image' => 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=500&fit=crop', 'profile_image' => 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop', 'category' => 'popular'),
-                        array('name' => 'Monica Taylor', 'views' => '1.5k', 'image' => 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&h=500&fit=crop', 'profile_image' => 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=100&h=100&fit=crop', 'category' => 'trending'),
-                        array('name' => 'Sophie Brown', 'views' => '678', 'image' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop', 'profile_image' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop', 'category' => 'new'),
-                        array('name' => 'Emma Wilson', 'views' => '3.4k', 'image' => 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400&h=500&fit=crop', 'profile_image' => 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=100&h=100&fit=crop', 'category' => 'popular'),
-                        array('name' => 'Olivia Moore', 'views' => '1.9k', 'image' => 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=500&fit=crop', 'profile_image' => 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop', 'category' => 'trending'),
-                        array('name' => 'Isabella Martin', 'views' => '2.7k', 'image' => 'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?w=400&h=500&fit=crop', 'profile_image' => 'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?w=100&h=100&fit=crop', 'category' => 'new'),
-                    );
-                    
-                    foreach ($audio_posts as $audio): ?>
-                    <div class="nymia-audio-card" data-category="<?php echo esc_attr($audio['category']); ?>">
-                        
-                        <div class="nymia-audio-thumbnail">
-                            <img src="<?php echo esc_url($audio['image']); ?>" alt="<?php echo esc_attr($audio['name']); ?>" />
-                            
-                            <!-- User Info Overlay -->
-                            <div class="nymia-audio-user">
-                                <div class="nymia-audio-avatar">
-                                    <img src="<?php echo esc_url($audio['profile_image']); ?>" alt="<?php echo esc_attr($audio['name']); ?>" />
-                                    <span class="nymia-audio-name"><?php echo esc_html($audio['name']); ?></span>
+                <!-- ======================================== -->
+                <!-- AUDIO CREATORS GRID -->
+                <!-- ======================================== -->
+                <div class="nymia-grid nymia-grid-4">
+            <?php 
+            // ========================================
+            // GET ALL CREATORS WITH AUDIO
+            // ========================================
+            // Dynamically fetch all creators who have uploaded audio files
+            $creators_data = nymia_get_all_creators_with_audio();
+            // Filter creators to only show users with Author or Administrator roles
+            if (!empty($creators_data)) {
+                $creators_data = array_values(array_filter($creators_data, function($creator){
+                    $uid = isset($creator['user_id']) ? intval($creator['user_id']) : 0;
+                    if (!$uid) return false;
+                    return user_can($uid, 'administrator') || user_can($uid, 'author');
+                }));
+            }
+            
+            // If no creators found, show empty state
+            if (empty($creators_data)):
+            ?>
+                <div class="nymia-empty-state" style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 64px; height: 64px; margin: 0 auto 20px; opacity: 0.5;">
+                        <path d="M9 18V5l12-2v13"></path>
+                        <circle cx="6" cy="18" r="3"></circle>
+                        <circle cx="18" cy="16" r="3"></circle>
+                    </svg>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 12px; color: var(--foreground);">No Audio Content Yet</h3>
+                    <p style="color: var(--muted-foreground); margin-bottom: 24px;">Be the first to upload audio content and share it with the community!</p>
+                    <?php if (is_user_logged_in()): ?>
+                        <a href="<?php echo esc_url(home_url('/create?tab=audio')); ?>" class="nymia-btn-continue" style="display: inline-flex; align-items: center; gap: 8px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            Upload Audio
+                        </a>
+                    <?php endif; ?>
+                </div>
+            <?php 
+            else:
+                foreach ($creators_data as $creator): 
+                    $creator_has_access = nymia_can_user_access_paid_audio($creator['user_id']);
+            ?>
+                <div class="nymia-content-card nymia-creator-card">
+                    <div class="nymia-card-image aspect-portrait">
+                        <img src="<?php echo esc_url($creator['image']); ?>" alt="<?php echo esc_attr($creator['name']); ?>" />
+                        <div class="nymia-card-overlay nymia-creator-overlay">
+                            <div class="nymia-creator-info">
+                                    <div class="nymia-avatar-shell <?php echo nymia_is_creator_verified($creator['user_id']) ? 'has-creator-badge' : ''; ?>">
+                                <img src="<?php echo esc_url($creator['avatar']); ?>" alt="<?php echo esc_attr($creator['name']); ?>" class="nymia-creator-avatar" />
+                                    </div>
+                                <div class="nymia-creator-details">
+                                    <div class="nymia-creator-heading">
+                                    <span class="nymia-creator-name"><?php echo esc_html($creator['name']); ?></span>
+                                        <?php echo wp_kses_post(nymia_get_user_badge_markup($creator['user_id'], null, 'nymia-creator-badge--inline')); ?>
+                                    </div>
+                                    <div class="nymia-creator-rating">
+                                        <div class="nymia-star-rating">
+                                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                                <svg class="nymia-star <?php echo $i <= floor($creator['rating']) ? 'filled' : ''; ?>" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                                </svg>
+                                            <?php endfor; ?>
+                                        </div>
+                                        <span class="nymia-rating-score">(<?php echo $creator['rating']; ?>)</span>
+                                    </div>
+                                    <div class="nymia-creator-category">
+                                        <span class="nymia-category-tag"><?php echo esc_html($creator['category']); ?></span>
+                                        <span class="nymia-subcategory-tag"><?php echo esc_html($creator['subcategory']); ?></span>
+                                    </div>
                                 </div>
                             </div>
-
-                            <!-- Views Counter -->
-                            <div class="nymia-audio-views">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                    <circle cx="12" cy="12" r="3"></circle>
+                            <div class="nymia-creator-views">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
                                 </svg>
-                                <span><?php echo esc_html($audio['views']); ?></span>
+                                <span><?php echo esc_html($creator['views']); ?></span>
                             </div>
                         </div>
                     </div>
-                    <?php endforeach; ?>
+                    
+                    <!-- Audio Files Section -->
+                    <div class="nymia-audio-files">
+                        <h4 class="nymia-audio-files-title">Audio Files</h4>
+                        <?php foreach (array_slice($creator['audio_files'], 0, 3) as $audio): 
+                            $audio_is_paid = !empty($audio['paid_access']) && $audio['paid_access'] === 'yes' && !empty($audio['price']);
+                        ?>
+                            <div class="nymia-audio-file-card" data-audio-url="<?php echo esc_attr(!empty($audio['url']) ? $audio['url'] : ''); ?>" data-paid="<?php echo esc_attr(isset($audio['paid_access']) ? $audio['paid_access'] : 'no'); ?>" data-price="<?php echo esc_attr(isset($audio['price']) ? $audio['price'] : 0); ?>" data-creator-id="<?php echo esc_attr($creator['user_id']); ?>" data-title="<?php echo esc_attr($audio['title']); ?>" data-review-count="<?php echo esc_attr(isset($audio['review_count']) ? intval($audio['review_count']) : 0); ?>" data-rating="<?php echo esc_attr(isset($audio['rating']) ? floatval($audio['rating']) : 0); ?>">
+                                <div class="nymia-audio-cover">
+                                    <?php if (!empty($audio['cover_image'])): ?>
+                                        <img src="<?php echo esc_url($audio['cover_image']); ?>" alt="<?php echo esc_attr($audio['title']); ?>" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;" />
+                                    <?php else: ?>
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M9 18V5l12-2v13"></path>
+                                            <circle cx="6" cy="18" r="3"></circle>
+                                            <circle cx="18" cy="16" r="3"></circle>
+                                        </svg>
+                                    <?php endif; ?>
+                                    <button class="nymia-play-button">
+                                        <svg viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M8 5v14l11-7z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="nymia-audio-info">
+                                    <h5 class="nymia-audio-title"><?php echo esc_html($audio['title']); ?></h5>
+                                    <div class="nymia-audio-rating">
+                                        <div class="nymia-star-rating">
+                                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                                <svg class="nymia-star <?php echo $i <= floor($audio['rating']) ? 'filled' : ''; ?>" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                                </svg>
+                                            <?php endfor; ?>
+                                        </div>
+                                        <span class="nymia-rating-score">(<?php echo esc_html(number_format((float) ($audio['rating'] ?? 0), 1)); ?>)</span>
+                                        <?php
+                                        $audio_review_count = isset($audio['review_count']) ? intval($audio['review_count']) : 0;
+                                        $audio_review_label = sprintf(_n('%d review', '%d reviews', $audio_review_count, 'nymia'), $audio_review_count);
+                                        ?>
+                                        <span class="nymia-review-count"><?php echo esc_html($audio_review_label); ?></span>
+                                    </div>
+                                    <div class="nymia-audio-meta">
+                                        <span class="nymia-audio-duration"><?php echo esc_html($audio['duration']); ?></span>
+                                        <span class="nymia-audio-category"><?php echo esc_html($creator['category']); ?><?php echo !empty($creator['subcategory']) ? ' - ' . esc_html($creator['subcategory']) : ''; ?></span>
+                                        <?php if ($audio_is_paid): ?>
+                                            <span class="nymia-audio-price-badge"><?php echo esc_html('$' . number_format($audio['price'], 2)); ?></span>
+                                            <?php if (!$creator_has_access): ?>
+                                                <button type="button" class="nymia-audio-access-btn" data-price="<?php echo esc_attr(number_format($audio['price'], 2)); ?>" data-title="<?php echo esc_attr($audio['title']); ?>"><?php esc_html_e('Buy', 'nymia'); ?></button>
+                                            <?php else: ?>
+                                                <span class="nymia-audio-unlocked"><?php esc_html_e('Unlocked', 'nymia'); ?></span>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
+            <?php 
+                endforeach; 
+            endif; 
+            ?>
+        </div>
 
-                <!-- Trending Sidebar -->
+                <!-- ======================================== -->
+                <!-- TRENDING SIDEBAR -->
+                <!-- ======================================== -->
                 <aside class="nymia-trending-sidebar">
                     <h2 class="nymia-trending-title">Trending Now</h2>
                     
                     <div class="nymia-trending-list">
                         <?php 
-                        $trending_posts = array(
-                            array('title' => 'Midnight Dreams', 'artist' => 'Sarah Johnson', 'plays' => '12.5k', 'image' => 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=80&h=80&fit=crop'),
-                            array('title' => 'Whispers in the Dark', 'artist' => 'Emily Chen', 'plays' => '8.7k', 'image' => 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=80&h=80&fit=crop'),
-                            array('title' => 'Sensual Stories', 'artist' => 'Jessica Miller', 'plays' => '25.3k', 'image' => 'https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=80&h=80&fit=crop'),
-                            array('title' => 'Moonlight Serenade', 'artist' => 'Amanda Davis', 'plays' => '15.2k', 'image' => 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=80&h=80&fit=crop'),
-                            array('title' => 'Velvet Nights', 'artist' => 'Rachel Green', 'plays' => '9.8k', 'image' => 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=80&h=80&fit=crop'),
-                        );
+                        // Get all audio files from all creators
+                        $all_audio_for_trending = array();
                         
-                        $rank = 1;
-                        foreach ($trending_posts as $trending): ?>
-                        <div class="nymia-trending-item">
+                        // Only process if we have creators
+                        if (!empty($creators_data)) {
+                            foreach ($creators_data as $creator) {
+                                if (!empty($creator['audio_files'])) {
+                                    foreach ($creator['audio_files'] as $audio) {
+                                        $all_audio_for_trending[] = array(
+                                            'title' => $audio['title'],
+                                            'artist' => $creator['name'],
+                                            'plays' => isset($audio['views']) ? intval($audio['views']) : 0,
+                                            'image' => !empty($audio['cover_image']) ? $audio['cover_image'] : $creator['avatar'],
+                                            'url' => isset($audio['url']) ? $audio['url'] : '',
+                                            'paid_access' => isset($audio['paid_access']) ? $audio['paid_access'] : 'no',
+                                            'price' => isset($audio['price']) ? $audio['price'] : 0,
+                                            'rating' => isset($audio['rating']) ? floatval($audio['rating']) : 0,
+                                            'review_count' => isset($audio['review_count']) ? intval($audio['review_count']) : 0,
+                                            'creator_id' => isset($audio['user_id']) ? intval($audio['user_id']) : $creator['user_id']
+                                        );
+                                    }
+                                }
+                            }
+                            
+                            // Sort by plays (most viewed first)
+                            usort($all_audio_for_trending, function($a, $b) {
+                                return $b['plays'] <=> $a['plays'];
+                            });
+                            
+                            // Get top 5 trending
+                            $trending_posts = array_slice($all_audio_for_trending, 0, 5);
+                        } else {
+                            $trending_posts = array();
+                        }
+                        
+                        if (empty($trending_posts)):
+                        ?>
+                            <div class="nymia-empty-state" style="text-align: center; padding: 40px 20px;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 48px; height: 48px; margin: 0 auto 16px; opacity: 0.5;">
+                                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                    <polyline points="17 6 23 6 23 12"></polyline>
+                                </svg>
+                                <p style="color: var(--muted-foreground); font-size: 0.875rem;">No trending audio yet</p>
+                            </div>
+                        <?php
+                        else:
+                            $rank = 1;
+                            foreach ($trending_posts as $trending): 
+                        ?>
+                        <?php $trending_access = nymia_can_user_access_paid_audio(isset($trending['creator_id']) ? $trending['creator_id'] : 0); ?>
+                        <div class="nymia-trending-item" data-audio-url="<?php echo esc_attr(!empty($trending['url']) ? $trending['url'] : ''); ?>" data-paid="<?php echo esc_attr(isset($trending['paid_access']) ? $trending['paid_access'] : 'no'); ?>" data-price="<?php echo esc_attr(isset($trending['price']) ? $trending['price'] : 0); ?>" data-creator-id="<?php echo esc_attr(isset($trending['creator_id']) ? $trending['creator_id'] : 0); ?>" data-title="<?php echo esc_attr($trending['title']); ?>">
                             <span class="nymia-trending-rank"><?php echo $rank++; ?></span>
                             
                             <div class="nymia-trending-cover">
@@ -135,11 +304,41 @@ get_header(); ?>
                             
                             <div class="nymia-trending-info">
                                 <h4 class="nymia-trending-song"><?php echo esc_html($trending['title']); ?></h4>
-                                <p class="nymia-trending-artist"><?php echo esc_html($trending['artist']); ?></p>
-                                <span class="nymia-trending-plays"><?php echo esc_html($trending['plays']); ?> plays</span>
+                                <div class="nymia-trending-artist">
+                                    <span class="nymia-trending-artist-name"><?php echo esc_html($trending['artist']); ?></span>
+                                    <?php echo wp_kses_post(nymia_get_user_badge_markup(isset($trending['creator_id']) ? intval($trending['creator_id']) : 0, null, 'nymia-creator-badge--inline')); ?>
+                                </div>
+                                <span class="nymia-trending-plays"><?php 
+                                    $plays = $trending['plays'];
+                                    $plays_formatted = $plays >= 1000 ? round($plays / 1000, 1) . 'k' : (string)$plays;
+                                    echo esc_html($plays_formatted); 
+                                ?> plays</span>
+                                <div class="nymia-trending-rating">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                    </svg>
+                                    <?php
+                                    $trend_rating = isset($trending['rating']) ? floatval($trending['rating']) : 0;
+                                    $trend_reviews = isset($trending['review_count']) ? intval($trending['review_count']) : 0;
+                                    $trend_review_label = sprintf(_n('%d review', '%d reviews', $trend_reviews, 'nymia'), $trend_reviews);
+                                    ?>
+                                    <span class="nymia-trending-rating-value"><?php echo $trend_rating > 0 ? esc_html(number_format($trend_rating, 1)) : '—'; ?></span>
+                                    <span class="nymia-trending-review-count"><?php echo esc_html($trend_review_label); ?></span>
+                                </div>
+                                <?php if (!empty($trending['paid_access']) && $trending['paid_access'] === 'yes' && !empty($trending['price'])): ?>
+                                    <span class="nymia-trending-price"><?php echo esc_html('$' . number_format($trending['price'], 2)); ?></span>
+                                    <?php if (!$trending_access): ?>
+                                        <button type="button" class="nymia-audio-access-btn" data-price="<?php echo esc_attr(number_format($trending['price'], 2)); ?>" data-title="<?php echo esc_attr($trending['title']); ?>"><?php esc_html_e('Buy', 'nymia'); ?></button>
+                                    <?php else: ?>
+                                        <span class="nymia-audio-unlocked"><?php esc_html_e('Unlocked', 'nymia'); ?></span>
+                                    <?php endif; ?>
+                                <?php endif; ?>
                             </div>
                         </div>
-                        <?php endforeach; ?>
+                        <?php 
+                            endforeach;
+                        endif;
+                        ?>
                     </div>
                 </aside>
             </div>
@@ -149,3 +348,116 @@ get_header(); ?>
 
 <?php get_footer(); ?>
 
+<style>
+.nymia-audio-price-badge,
+.nymia-trending-price {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    background: rgba(230, 116, 68, 0.12);
+    color: #e67444;
+    border: 1px solid rgba(230, 116, 68, 0.25);
+    margin-left: 8px;
+}
+
+.nymia-review-count {
+    margin-left: 8px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.nymia-trending-rating {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.75);
+    margin-top: 6px;
+}
+
+.nymia-trending-rating svg {
+    width: 16px;
+    height: 16px;
+    color: #fbbf24;
+}
+
+.nymia-trending-rating-value {
+    font-weight: 600;
+}
+
+.nymia-trending-review-count {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.nymia-trending-item[data-paid="yes"] .nymia-trending-cover,
+.nymia-audio-file-card[data-paid="yes"] .nymia-audio-cover {
+    position: relative;
+}
+
+.nymia-audio-file-card[data-paid="yes"] .nymia-play-button::after,
+.nymia-trending-item[data-paid="yes"] .nymia-trending-play::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 1px solid rgba(230, 116, 68, 0.35);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.nymia-audio-access-btn {
+    margin-left: 8px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    border: none;
+    background: #e67444;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nymia-audio-access-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(230, 116, 68, 0.35);
+}
+
+.nymia-audio-unlocked {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #34d399;
+    background: rgba(52, 211, 153, 0.16);
+    border: 1px solid rgba(52, 211, 153, 0.32);
+    margin-left: 8px;
+}
+
+.nymia-audio-file-card[data-paid="yes"] .nymia-play-button:hover::after,
+.nymia-trending-item[data-paid="yes"] .nymia-trending-play:hover::after {
+    opacity: 1;
+}
+
+.nymia-audio-notice {
+    margin-bottom: 24px;
+    padding: 18px 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(230, 116, 68, 0.3);
+    background: rgba(230, 116, 68, 0.12);
+    color: #e67444;
+}
+
+.nymia-audio-notice p {
+    margin: 8px 0 0;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 14px;
+}
+</style>

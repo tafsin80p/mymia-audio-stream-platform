@@ -81,7 +81,7 @@ $is_creator_role = current_user_can('edit_posts') || current_user_can('manage_op
     <div class="nymia-header-actions">
         <!-- Language Selector (GTranslate) -->
         <div class="nymia-language-switcher">
-            <?php echo do_shortcode('[gtranslate]'); ?>
+        <?php echo do_shortcode('[gtranslate]'); ?>
         </div>
         
         <!-- Creator CTA: Show Create for approved creators, Become a Creator for users who need to apply, nothing for regular subscribers -->
@@ -230,8 +230,8 @@ $is_creator_role = current_user_can('edit_posts') || current_user_can('manage_op
                     <?php esc_html_e('Sign Up as Creator', 'nymia'); ?>
                 </a>
                 <a href="#" onclick="event.preventDefault(); if(typeof openLoginModal === 'function') { openLoginModal('login'); } else { window.location.href='<?php echo esc_url(home_url('/login/')); ?>'; }" class="nymia-btn-outline" style="text-decoration: none; display: inline-block; padding: 10px 20px; border-radius: 8px; font-weight: 600; border: 1px solid rgba(255, 255, 255, 0.3); background: transparent; color: #fff;">
-                    <?php esc_html_e('Sign In', 'nymia'); ?>
-                </a>
+                <?php esc_html_e('Sign In', 'nymia'); ?>
+            </a>
             </div>
         <?php endif; ?>
     </div>
