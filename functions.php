@@ -32,7 +32,7 @@ function hide_admin_bar_for_all_users($show) {
     // Hide admin bar for all users on frontend (both creators and clients)
     // Only show admin bar in WordPress admin area
     if (!is_admin()) {
-        return false;
+            return false;
     }
     return $show;
 }
@@ -2799,6 +2799,333 @@ function nymia_debug_info() {
 add_action('wp_head', 'nymia_debug_info');
 
 // ==========================================
+// SECRET ROOM VISIBILITY SYSTEM
+// ==========================================
+/**
+ * GET VISIBILITY DESTINATION OPTIONS
+ * -----------------------------------
+ * Returns available destination options for content visibility
+ * 
+ * @return array Array of destination options
+ */
+function nymia_get_visibility_destinations() {
+    return array(
+        'normal' => __('Normal Category', 'nymia'),
+        'secret_room' => __('Secret Room (choose sub-category)', 'nymia'),
+    );
+}
+
+/**
+ * GET SECRET ROOM SUB-CATEGORIES
+ * -------------------------------
+ * Returns available sub-categories for Secret Room content
+ * 
+ * @return array Array of sub-category options
+ */
+function nymia_get_secret_room_subcategories() {
+    return array(
+        'audio_book' => __('Audio Book', 'nymia'),
+        'live_streaming' => __('Live Streaming', 'nymia'),
+        'online_now' => __('Online Now', 'nymia'),
+        'audio_creator' => __('Audio Creator', 'nymia'),
+        'ebook' => __('E-Book', 'nymia'),
+    );
+}
+
+/**
+ * GET CONTENT VISIBILITY META
+ * ----------------------------
+ * Gets visibility settings for a content item
+ * 
+ * @param int $content_id Content ID
+ * @return array Visibility settings (destination, subcategory)
+ */
+function nymia_get_content_visibility($content_id) {
+    $destination = get_post_meta($content_id, '_nymia_content_destination', true);
+    $subcategory = get_post_meta($content_id, '_nymia_secret_room_subcategory', true);
+    
+    // Default to 'normal' if not set
+    if (empty($destination)) {
+        $destination = 'normal';
+    }
+    
+    return array(
+        'destination' => $destination,
+        'subcategory' => $subcategory,
+    );
+}
+
+/**
+ * SAVE CONTENT VISIBILITY META
+ * -----------------------------
+ * Saves visibility settings for a content item
+ * 
+ * @param int $content_id Content ID
+ * @param string $destination 'normal' or 'secret_room'
+ * @param string $subcategory Sub-category (required if destination is 'secret_room')
+ * @return bool Success status
+ */
+function nymia_save_content_visibility($content_id, $destination, $subcategory = '') {
+    $content_id = intval($content_id);
+    if (!$content_id) {
+        return false;
+    }
+    
+    $destination = sanitize_text_field($destination);
+    $subcategory = sanitize_text_field($subcategory);
+    
+    // Validate destination
+    $valid_destinations = array('normal', 'secret_room');
+    if (!in_array($destination, $valid_destinations)) {
+        return false;
+    }
+    
+    // If secret room, validate subcategory
+    if ($destination === 'secret_room') {
+        $valid_subcategories = array_keys(nymia_get_secret_room_subcategories());
+        if (!in_array($subcategory, $valid_subcategories)) {
+            return false;
+        }
+    }
+    
+    // Save meta
+    update_post_meta($content_id, '_nymia_content_destination', $destination);
+    if ($destination === 'secret_room' && !empty($subcategory)) {
+        update_post_meta($content_id, '_nymia_secret_room_subcategory', $subcategory);
+    } else {
+        delete_post_meta($content_id, '_nymia_secret_room_subcategory');
+    }
+    
+    return true;
+}
+
+/**
+ * FILTER CONTENT BY VISIBILITY
+ * -----------------------------
+ * Filters content array based on visibility settings
+ * 
+ * @param array $content_array Array of content items
+ * @param string $context 'normal' or 'secret_room'
+ * @param string $subcategory Optional subcategory filter for secret room
+ * @return array Filtered content array
+ */
+function nymia_filter_content_by_visibility($content_array, $context = 'normal', $subcategory = '') {
+    if (!is_array($content_array)) {
+        return array();
+    }
+    
+    $filtered = array();
+    
+    foreach ($content_array as $item) {
+        $content_id = isset($item['id']) ? $item['id'] : 0;
+        if (!$content_id) {
+            continue;
+        }
+        
+        // Try to get visibility from post meta (for numeric IDs)
+        $visibility = array('destination' => 'normal', 'subcategory' => '');
+        
+        if (is_numeric($content_id)) {
+            $visibility = nymia_get_content_visibility(intval($content_id));
+        } else {
+            // For transient-based IDs (like 'audiobook_xxx'), check if visibility is in the array
+            if (isset($item['visibility_destination'])) {
+                $visibility['destination'] = $item['visibility_destination'];
+                $visibility['subcategory'] = isset($item['visibility_subcategory']) ? $item['visibility_subcategory'] : '';
+            }
+        }
+        
+        // Filter by context
+        if ($context === 'normal' && $visibility['destination'] === 'normal') {
+            $filtered[] = $item;
+        } elseif ($context === 'secret_room' && $visibility['destination'] === 'secret_room') {
+            // If subcategory specified, filter by it
+            if (empty($subcategory) || $visibility['subcategory'] === $subcategory) {
+                $filtered[] = $item;
+            }
+        }
+    }
+    
+    return $filtered;
+}
+
+/**
+ * CHECK IF CONTENT SHOULD BE VISIBLE IN NORMAL CATEGORY
+ * ------------------------------------------------------
+ * Helper function to check if content should appear in normal archive pages
+ * 
+ * @param int|string $content_id Content ID (numeric or string)
+ * @param array $item Optional content item array (for transient-based IDs)
+ * @return bool True if should be visible in normal category
+ */
+function nymia_is_content_visible_in_normal($content_id, $item = array()) {
+    $visibility = array('destination' => 'normal', 'subcategory' => '');
+    
+    if (is_numeric($content_id)) {
+        $visibility = nymia_get_content_visibility(intval($content_id));
+    } elseif (!empty($item)) {
+        if (isset($item['visibility_destination'])) {
+            $visibility['destination'] = $item['visibility_destination'];
+            $visibility['subcategory'] = isset($item['visibility_subcategory']) ? $item['visibility_subcategory'] : '';
+        }
+    }
+    
+    return $visibility['destination'] === 'normal';
+}
+
+/**
+ * GET SECRET ROOM CONTENT BY SUB-CATEGORY
+ * ----------------------------------------
+ * Retrieves all Secret Room content grouped by sub-category
+ * 
+ * @param string $subcategory Optional sub-category filter
+ * @return array Content grouped by sub-category
+ */
+function nymia_get_secret_room_content($subcategory = '') {
+    $secret_content = array(
+        'audio_book' => array(),
+        'live_streaming' => array(),
+        'online_now' => array(),
+        'audio_creator' => array(),
+        'ebook' => array(),
+    );
+    
+    // Get all audio files (including audiobooks)
+    $all_audio = get_transient('nymia_all_audio');
+    if ($all_audio && is_array($all_audio)) {
+        foreach ($all_audio as $audio) {
+            $audio_id = isset($audio['id']) ? $audio['id'] : 0;
+            $visibility = array('destination' => 'normal', 'subcategory' => '');
+            
+            if (is_numeric($audio_id)) {
+                $visibility = nymia_get_content_visibility(intval($audio_id));
+            } elseif (isset($audio['visibility_destination'])) {
+                $visibility['destination'] = $audio['visibility_destination'];
+                $visibility['subcategory'] = isset($audio['visibility_subcategory']) ? $audio['visibility_subcategory'] : '';
+            }
+            
+            if ($visibility['destination'] === 'secret_room') {
+                $cat = $visibility['subcategory'];
+                if (empty($subcategory) || $cat === $subcategory) {
+                    if (isset($audio['type']) && $audio['type'] === 'audiobook') {
+                        if (isset($secret_content[$cat])) {
+                            $secret_content[$cat][] = array_merge($audio, array('content_type' => 'audiobook'));
+                        }
+                    } else {
+                        // Regular audio content goes to audio_creator
+                        if (isset($secret_content['audio_creator'])) {
+                            $secret_content['audio_creator'][] = array_merge($audio, array('content_type' => 'audio'));
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // Get all ebooks
+    $all_ebooks = get_transient('nymia_all_ebooks');
+    if ($all_ebooks && is_array($all_ebooks)) {
+        foreach ($all_ebooks as $ebook) {
+            $ebook_id = isset($ebook['id']) ? $ebook['id'] : 0;
+            $visibility = nymia_get_content_visibility($ebook_id);
+            
+            if ($visibility['destination'] === 'secret_room') {
+                $cat = $visibility['subcategory'];
+                if (empty($subcategory) || $cat === $subcategory) {
+                    if (isset($secret_content[$cat])) {
+                        $secret_content[$cat][] = array_merge($ebook, array('content_type' => 'ebook'));
+                    }
+                }
+            }
+        }
+    }
+    
+    // Get from user transients as well (to catch any that might not be in global)
+    $users = get_users(array('number' => 200));
+    foreach ($users as $user) {
+        // Check user audio
+        $user_audio = get_transient('nymia_user_audio_' . $user->ID);
+        if ($user_audio && is_array($user_audio)) {
+            foreach ($user_audio as $audio) {
+                $audio_id = isset($audio['id']) ? $audio['id'] : 0;
+                $visibility = array('destination' => 'normal', 'subcategory' => '');
+                
+                if (is_numeric($audio_id)) {
+                    $visibility = nymia_get_content_visibility(intval($audio_id));
+                } elseif (isset($audio['visibility_destination'])) {
+                    $visibility['destination'] = $audio['visibility_destination'];
+                    $visibility['subcategory'] = isset($audio['visibility_subcategory']) ? $audio['visibility_subcategory'] : '';
+                }
+                
+                if ($visibility['destination'] === 'secret_room') {
+                    $cat = $visibility['subcategory'];
+                    if (empty($subcategory) || $cat === $subcategory) {
+                        if (isset($audio['type']) && $audio['type'] === 'audiobook') {
+                            if (isset($secret_content[$cat])) {
+                                // Check if not already added
+                                $already_added = false;
+                                foreach ($secret_content[$cat] as $existing) {
+                                    if (isset($existing['id']) && $existing['id'] === $audio_id) {
+                                        $already_added = true;
+                                        break;
+                                    }
+                                }
+                                if (!$already_added) {
+                                    $secret_content[$cat][] = array_merge($audio, array('content_type' => 'audiobook'));
+                                }
+                            }
+                        } else {
+                            if (isset($secret_content['audio_creator'])) {
+                                $already_added = false;
+                                foreach ($secret_content['audio_creator'] as $existing) {
+                                    if (isset($existing['id']) && $existing['id'] === $audio_id) {
+                                        $already_added = true;
+                                        break;
+                                    }
+                                }
+                                if (!$already_added) {
+                                    $secret_content['audio_creator'][] = array_merge($audio, array('content_type' => 'audio'));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Check user ebooks
+        $user_ebooks = get_transient('nymia_user_ebook_' . $user->ID);
+        if ($user_ebooks && is_array($user_ebooks)) {
+            foreach ($user_ebooks as $ebook) {
+                $ebook_id = isset($ebook['id']) ? $ebook['id'] : 0;
+                $visibility = nymia_get_content_visibility($ebook_id);
+                
+                if ($visibility['destination'] === 'secret_room') {
+                    $cat = $visibility['subcategory'];
+                    if (empty($subcategory) || $cat === $subcategory) {
+                        if (isset($secret_content[$cat])) {
+                            // Check if not already added
+                            $already_added = false;
+                            foreach ($secret_content[$cat] as $existing) {
+                                if (isset($existing['id']) && $existing['id'] === $ebook_id) {
+                                    $already_added = true;
+                                    break;
+                                }
+                            }
+                            if (!$already_added) {
+                                $secret_content[$cat][] = array_merge($ebook, array('content_type' => 'ebook'));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    return $secret_content;
+}
+
+// ==========================================
 // AUDIO UPLOAD HANDLER (AJAX)
 // ==========================================
 /**
@@ -2936,6 +3263,11 @@ function nymia_handle_audio_upload() {
     if (!empty($cover_image_url)) {
         update_post_meta($attach_id, '_nymia_audio_cover_image', $cover_image_url);
     }
+    
+    // SAVE: Visibility settings
+    $visibility_destination = isset($_POST['audio_visibility_destination']) ? sanitize_text_field($_POST['audio_visibility_destination']) : 'normal';
+    $visibility_subcategory = isset($_POST['audio_visibility_subcategory']) ? sanitize_text_field($_POST['audio_visibility_subcategory']) : '';
+    nymia_save_content_visibility($attach_id, $visibility_destination, $visibility_subcategory);
     
     // STORE: In user's audio collection (using transients)
     $user_id = get_current_user_id();
@@ -3080,9 +3412,14 @@ function nymia_handle_audiobook_upload() {
         }
     }
     
+    // Get visibility settings
+    $visibility_destination = isset($_POST['audiobook_visibility_destination']) ? sanitize_text_field($_POST['audiobook_visibility_destination']) : 'normal';
+    $visibility_subcategory = isset($_POST['audiobook_visibility_subcategory']) ? sanitize_text_field($_POST['audiobook_visibility_subcategory']) : '';
+    
     // Create new audio book entry
+    $audiobook_id = uniqid('audiobook_');
     $new_audiobook = array(
-        'id' => uniqid('audiobook_'),
+        'id' => $audiobook_id,
         'title' => $title,
         'description' => isset($_POST['audiobook_description']) ? sanitize_textarea_field($_POST['audiobook_description']) : '',
         'category' => $category,
@@ -3096,8 +3433,15 @@ function nymia_handle_audiobook_upload() {
         'created' => current_time('mysql'),
         'date' => current_time('mysql'), // Alias for compatibility
         'user_id' => $user_id,
-        'author' => $author_name
+        'author' => $author_name,
+        'visibility_destination' => $visibility_destination,
+        'visibility_subcategory' => $visibility_subcategory,
     );
+    
+    // Save visibility to post meta if we have a numeric ID (for compatibility)
+    if (is_numeric($audiobook_id)) {
+        nymia_save_content_visibility(intval($audiobook_id), $visibility_destination, $visibility_subcategory);
+    }
     
     // Add to user's audio list
     array_unshift($user_audio, $new_audiobook);
@@ -3125,6 +3469,7 @@ add_action('wp_ajax_nymia_upload_audiobook', 'nymia_handle_audiobook_upload');
  * -------------------
  * Retrieves all audio books from transients
  * Filters audio files by type='audiobook'
+ * Filters out Secret Room content for normal display
  * @return array All audio books
  */
 function nymia_get_all_audiobooks() {
@@ -3139,8 +3484,11 @@ function nymia_get_all_audiobooks() {
             if (isset($audio['type']) && $audio['type'] === 'audiobook') {
                 $audio_id = isset($audio['id']) ? $audio['id'] : '';
                 if ($audio_id && !in_array($audio_id, $seen_ids)) {
-                    $all_audiobooks[] = $audio;
-                    $seen_ids[] = $audio_id;
+                    // Filter out Secret Room content - only show normal category
+                    if (nymia_is_content_visible_in_normal($audio_id, $audio)) {
+                        $all_audiobooks[] = $audio;
+                        $seen_ids[] = $audio_id;
+                    }
                 }
             }
         }
@@ -3156,12 +3504,17 @@ function nymia_get_all_audiobooks() {
                     $audio_id = isset($audio['id']) ? $audio['id'] : '';
                     // Only add if not already in list
                     if ($audio_id && !in_array($audio_id, $seen_ids)) {
-                        // Ensure author field is set
-                        if (empty($audio['author']) && !empty($audio['user_id'])) {
-                            $user_obj = get_user_by('id', intval($audio['user_id']));
-                            if ($user_obj) {
-                                $audio['author'] = $user_obj->display_name ?: $user_obj->user_login;
+                        // Filter out Secret Room content
+                        if (nymia_is_content_visible_in_normal($audio_id, $audio)) {
+                            // Ensure author field is set
+                            if (empty($audio['author']) && !empty($audio['user_id'])) {
+                                $user_obj = get_user_by('id', intval($audio['user_id']));
+                                if ($user_obj) {
+                                    $audio['author'] = $user_obj->display_name ?: $user_obj->user_login;
+                                }
                             }
+                            $all_audiobooks[] = $audio;
+                            $seen_ids[] = $audio_id;
                         }
                         $all_audiobooks[] = $audio;
                         $seen_ids[] = $audio_id;
@@ -4461,6 +4814,12 @@ function nymia_get_all_creators_with_audio() {
             // Format audio files for display
             $formatted_audio_files = array();
             foreach ($audio_posts as $audio) {
+                // Filter out Secret Room content - only show normal category content
+                $audio_id = isset($audio['id']) ? $audio['id'] : 0;
+                if (!nymia_is_content_visible_in_normal($audio_id, $audio)) {
+                    continue; // Skip Secret Room content
+                }
+                
                 $cover_image = isset($audio['cover_image']) ? $audio['cover_image'] : '';
                 $cover_image = nymia_normalize_media_url($cover_image);
                 if (empty($cover_image) && !empty($audio['id'])) {
@@ -8230,6 +8589,10 @@ function nymia_zego_create_room() {
         }
     }
     
+    // Check if this is a secret room
+    $is_secret = isset($_POST['is_secret']) && $_POST['is_secret'] === '1';
+    $price = isset($_POST['price']) ? floatval($_POST['price']) : 0;
+    
     $rooms[$roomId] = array(
         'creator' => $creator_id,
         'title' => sanitize_text_field($_POST['title'] ?? 'Live'),
@@ -8238,7 +8601,9 @@ function nymia_zego_create_room() {
         'creator_avatar' => $avatar,
         'cover_photo' => $cover_photo,
         'viewers' => 0,
-        'viewer_list' => array()
+        'viewer_list' => array(),
+        'is_secret' => $is_secret,
+        'price' => $price
     );
     set_transient('nymia_zego_rooms', $rooms, 6 * HOUR_IN_SECONDS);
     $resp = array('appId' => intval($appId), 'roomId' => $roomId, 'userId' => $userId, 'token' => $token, 'env' => $env);
@@ -8252,8 +8617,32 @@ function nymia_zego_list_rooms() {
     $list = array();
     $now = current_time('timestamp');
     
+    // Check if only secret rooms are requested
+    $secret_only = isset($_POST['secret_only']) && $_POST['secret_only'] === '1';
+    
+    // Check if only online now (available) creators are requested
+    $online_now_only = isset($_POST['online_now']) && $_POST['online_now'] === '1';
+    
     // Process active/live rooms
     foreach ($rooms as $roomId => $r) {
+        // If secret_only is requested, skip non-secret rooms
+        if ($secret_only) {
+            $is_secret = isset($r['is_secret']) && ($r['is_secret'] === true || $r['is_secret'] === '1' || $r['is_secret'] === 1);
+            if (!$is_secret) {
+                continue; // Skip non-secret rooms
+            }
+        }
+        
+        // Get creator ID first for availability check
+        $creator_id = isset($r['creator']) ? intval($r['creator']) : 0;
+        
+        // If online_now_only is requested, filter by availability status
+        if ($online_now_only && $creator_id > 0) {
+            $is_available = get_user_meta($creator_id, 'nymia_available_now', true) === '1';
+            if (!$is_available) {
+                continue; // Skip creators who don't have "Online Now" enabled
+            }
+        }
         $roomData = array(
             'roomId' => $roomId, 
             'title' => $r['title'],
@@ -8302,7 +8691,13 @@ function nymia_zego_list_rooms() {
         
         // Include pricing information
         if ($creator_id > 0) {
-            $stream_price = floatval(get_user_meta($creator_id, 'nymia_stream_full_price', true));
+            // Check if room has custom price set
+            $room_price = isset($r['price']) ? floatval($r['price']) : 0;
+            if ($room_price > 0) {
+                $stream_price = $room_price;
+            } else {
+                $stream_price = floatval(get_user_meta($creator_id, 'nymia_stream_full_price', true));
+            }
             $per_minute_price = floatval(get_user_meta($creator_id, 'nymia_stream_per_minute_price', true));
             
             // Fallback to default pricing if not set
@@ -8318,6 +8713,21 @@ function nymia_zego_list_rooms() {
         } else {
             $roomData['price'] = floatval(get_option('nymia_default_stream_price', 9.99));
             $roomData['per_minute_price'] = floatval(get_option('nymia_default_per_minute_price', 0.99));
+        }
+        
+        // Include is_secret flag if set
+        if (isset($r['is_secret'])) {
+            $roomData['is_secret'] = $r['is_secret'];
+        } else {
+            $roomData['is_secret'] = false;
+        }
+        
+        // Include availability status (Online Now) for dashboard display
+        if ($creator_id > 0) {
+            $is_available = get_user_meta($creator_id, 'nymia_available_now', true) === '1';
+            $roomData['is_available_now'] = $is_available;
+        } else {
+            $roomData['is_available_now'] = false;
         }
         
         $list[] = $roomData;
@@ -8336,6 +8746,15 @@ function nymia_zego_list_rooms() {
         }
         
         $creator_id = $creator->ID;
+        
+        // If online_now_only is requested, filter by availability status
+        if ($online_now_only) {
+            $is_available = get_user_meta($creator_id, 'nymia_available_now', true) === '1';
+            if (!$is_available) {
+                continue; // Skip creators who don't have "Online Now" enabled
+            }
+        }
+        
         // Use nickname or username for anonymity, not display_name
         $nickname = get_user_meta($creator_id, 'nickname', true);
         $creator_name = !empty($nickname) && $nickname !== $creator->user_login ? $nickname : $creator->user_login;
@@ -8361,6 +8780,14 @@ function nymia_zego_list_rooms() {
                 continue;
             }
             
+            // If secret_only is requested, skip non-secret scheduled streams
+            if ($secret_only) {
+                $is_secret = isset($schedule['is_secret']) && ($schedule['is_secret'] === true || $schedule['is_secret'] === '1' || $schedule['is_secret'] === 1);
+                if (!$is_secret) {
+                    continue; // Skip non-secret scheduled streams
+                }
+            }
+            
             // Create a unique room ID for scheduled stream
             $schedule_room_id = 'scheduled_' . $creator_id . '_' . $schedule['id'];
             
@@ -8373,6 +8800,12 @@ function nymia_zego_list_rooms() {
             
             // Respect custom event price for any scheduled session
             $display_price = $event_price > 0 ? $event_price : $stream_price;
+            
+            // Include is_secret flag for scheduled streams
+            $is_secret_scheduled = isset($schedule['is_secret']) && ($schedule['is_secret'] === true || $schedule['is_secret'] === '1' || $schedule['is_secret'] === 1);
+            
+            // Include availability status (Online Now) for scheduled streams
+            $is_available_scheduled = get_user_meta($creator_id, 'nymia_available_now', true) === '1';
             
             $scheduleData = array(
                 'roomId' => $schedule_room_id,
@@ -8394,9 +8827,90 @@ function nymia_zego_list_rooms() {
                 'max_attendees' => $max_attendees,
                 'current_attendees' => $current_attendees,
                 'is_event' => ($event_type === 'group' && $event_price > 0),
+                'is_secret' => $is_secret_scheduled,
+                'is_available_now' => $is_available_scheduled,
             );
             
             $list[] = $scheduleData;
+        }
+    }
+    
+    // If online_now_only is requested, also include creators who have "Online Now" enabled but no active room
+    if ($online_now_only) {
+        // Get all creators who have "Online Now" enabled
+        $available_creators = get_users(array(
+            'meta_key' => 'nymia_available_now',
+            'meta_value' => '1',
+            'meta_compare' => '='
+        ));
+        
+        // Get list of creator IDs who already have rooms
+        $creators_with_rooms = array();
+        foreach ($list as $room) {
+            if (isset($room['creator_id']) && $room['creator_id'] > 0) {
+                $creators_with_rooms[$room['creator_id']] = true;
+            }
+        }
+        
+        // Add virtual room entries for creators with "Online Now" enabled but no active room
+        foreach ($available_creators as $creator) {
+            $creator_id = $creator->ID;
+            
+            // Skip if creator already has a room in the list
+            if (isset($creators_with_rooms[$creator_id])) {
+                continue;
+            }
+            
+            // Get creator info
+            $nickname = get_user_meta($creator_id, 'nickname', true);
+            $creator_name = !empty($nickname) && $nickname !== $creator->user_login ? $nickname : $creator->user_login;
+            $custom_avatar = get_user_meta($creator_id, 'custom_avatar', true);
+            $creator_avatar = $custom_avatar ? $custom_avatar : get_avatar_url($creator_id, array('size' => 150));
+            $cover_photo = get_user_meta($creator_id, 'cover_image', true);
+            if (!$cover_photo) {
+                $cover_photo = '';
+            }
+            
+            // Get online thumbnail if set
+            $online_thumbnail = get_user_meta($creator_id, 'nymia_available_thumbnail', true);
+            if ($online_thumbnail) {
+                $cover_photo = $online_thumbnail;
+            }
+            
+            // Get pricing
+            $per_minute_price = floatval(get_user_meta($creator_id, 'nymia_available_per_minute_price', true));
+            if ($per_minute_price <= 0) {
+                $per_minute_price = floatval(get_user_meta($creator_id, 'nymia_stream_per_minute_price', true));
+            }
+            if ($per_minute_price <= 0) {
+                $per_minute_price = floatval(get_option('nymia_default_per_minute_price', 0.99));
+            }
+            
+            $stream_price = floatval(get_user_meta($creator_id, 'nymia_stream_full_price', true));
+            if ($stream_price <= 0) {
+                $stream_price = floatval(get_option('nymia_default_stream_price', 9.99));
+            }
+            
+            // Create virtual room entry
+            $virtual_room_id = 'online_now_' . $creator_id;
+            $virtual_room = array(
+                'roomId' => $virtual_room_id,
+                'room_id' => $virtual_room_id,
+                'title' => __('Online Now', 'nymia'),
+                'status' => 'live',
+                'creator_id' => $creator_id,
+                'creator_name' => $creator_name,
+                'creator_avatar' => $creator_avatar,
+                'cover_photo' => $cover_photo,
+                'viewers' => 0,
+                'price' => $stream_price,
+                'per_minute_price' => $per_minute_price,
+                'is_secret' => false,
+                'is_available_now' => true,
+                'is_virtual' => true, // Flag to indicate this is a virtual room
+            );
+            
+            $list[] = $virtual_room;
         }
     }
     
@@ -8520,7 +9034,9 @@ function nymia_zego_get_user_history() {
                 'created' => isset($r['created']) ? $r['created'] : time(),
                 'duration' => isset($r['duration']) ? $r['duration'] : 0,
                 'viewers' => isset($r['viewers']) ? $r['viewers'] : 0,
-                'status' => 'completed'
+                'status' => 'completed',
+                'is_secret' => isset($r['is_secret']) ? $r['is_secret'] : false,
+                'price' => isset($r['price']) ? floatval($r['price']) : 0
             );
         }
     }
@@ -12408,9 +12924,9 @@ function nymia_checkout_success_handler() {
             exit;
         }
     } else {
-        if ($session_user_id !== $current_user_id) {
-            wp_redirect(home_url('/login'));
-            exit;
+    if ($session_user_id !== $current_user_id) {
+        wp_redirect(home_url('/login'));
+        exit;
         }
     }
 
@@ -13662,7 +14178,7 @@ function nymia_send_contact_message() {
         
         if ($user_sent) {
             error_log('Contact form: User confirmation email sent successfully to ' . $email);
-        } else {
+    } else {
             error_log('Contact form: User confirmation email failed to send to ' . $email);
         }
         

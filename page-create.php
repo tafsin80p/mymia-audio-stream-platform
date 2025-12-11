@@ -53,8 +53,6 @@ if ($next_schedule) {
         
         <?php get_template_part('template-parts/back-button'); ?>
         
-        <?php get_template_part('template-parts/filters'); ?>
-        
         <div class="nymia-create-container">
             <div class="nymia-create-main">
                 <!-- Content Type Tabs -->
@@ -73,6 +71,9 @@ if ($next_schedule) {
                     </button>
                     <button type="button" class="nymia-create-tab" data-tab="text">
                         <?php esc_html_e('Text', 'nymia'); ?>
+                    </button>
+                    <button type="button" class="nymia-create-tab" data-tab="secret-room">
+                        <?php esc_html_e('Secret Room', 'nymia'); ?>
                     </button>
                 </div>
 
@@ -662,6 +663,27 @@ if ($next_schedule) {
                                 </div>
                             </div>
 
+                            <!-- Visibility Settings -->
+                            <div class="nymia-form-group">
+                                <label for="audio_visibility_destination"><?php esc_html_e('Where do you want to show this content?', 'nymia'); ?></label>
+                                <select id="audio_visibility_destination" name="audio_visibility_destination" class="nymia-select" required>
+                                    <option value="normal"><?php esc_html_e('Normal Category', 'nymia'); ?></option>
+                                    <option value="secret_room"><?php esc_html_e('Secret Room (choose sub-category)', 'nymia'); ?></option>
+                                </select>
+                            </div>
+
+                            <div class="nymia-form-group" id="audio_visibility_subcategory_wrapper" style="display: none;">
+                                <label for="audio_visibility_subcategory"><?php esc_html_e('Secret Room Sub-Category', 'nymia'); ?></label>
+                                <select id="audio_visibility_subcategory" name="audio_visibility_subcategory" class="nymia-select">
+                                    <option value=""><?php esc_html_e('Select Sub-Category', 'nymia'); ?></option>
+                                    <option value="audio_book"><?php esc_html_e('Audio Book', 'nymia'); ?></option>
+                                    <option value="live_streaming"><?php esc_html_e('Live Streaming', 'nymia'); ?></option>
+                                    <option value="online_now"><?php esc_html_e('Online Now', 'nymia'); ?></option>
+                                    <option value="audio_creator"><?php esc_html_e('Audio Creator', 'nymia'); ?></option>
+                                    <option value="ebook"><?php esc_html_e('E-Book', 'nymia'); ?></option>
+                                </select>
+                            </div>
+
                             <!-- Audio Upload Mode Tabs -->
                             <div class="nymia-upload-mode-tabs">
                                 <button type="button" class="nymia-upload-mode-btn active" data-mode="upload">
@@ -858,6 +880,27 @@ if ($next_schedule) {
                                 </div>
                             </div>
 
+                            <!-- Visibility Settings -->
+                            <div class="nymia-form-group">
+                                <label for="ebook_visibility_destination"><?php esc_html_e('Where do you want to show this content?', 'nymia'); ?></label>
+                                <select id="ebook_visibility_destination" name="ebook_visibility_destination" class="nymia-select" required>
+                                    <option value="normal"><?php esc_html_e('Normal Category', 'nymia'); ?></option>
+                                    <option value="secret_room"><?php esc_html_e('Secret Room (choose sub-category)', 'nymia'); ?></option>
+                                </select>
+                            </div>
+
+                            <div class="nymia-form-group" id="ebook_visibility_subcategory_wrapper" style="display: none;">
+                                <label for="ebook_visibility_subcategory"><?php esc_html_e('Secret Room Sub-Category', 'nymia'); ?></label>
+                                <select id="ebook_visibility_subcategory" name="ebook_visibility_subcategory" class="nymia-select">
+                                    <option value=""><?php esc_html_e('Select Sub-Category', 'nymia'); ?></option>
+                                    <option value="audio_book"><?php esc_html_e('Audio Book', 'nymia'); ?></option>
+                                    <option value="live_streaming"><?php esc_html_e('Live Streaming', 'nymia'); ?></option>
+                                    <option value="online_now"><?php esc_html_e('Online Now', 'nymia'); ?></option>
+                                    <option value="audio_creator"><?php esc_html_e('Audio Creator', 'nymia'); ?></option>
+                                    <option value="ebook"><?php esc_html_e('E-Book', 'nymia'); ?></option>
+                                </select>
+                            </div>
+
                             <!-- Ebook File Upload Area -->
                             <div class="nymia-form-group">
                                 <label><?php esc_html_e('Ebook File', 'nymia'); ?></label>
@@ -991,6 +1034,27 @@ if ($next_schedule) {
                                 </div>
                             </div>
 
+                            <!-- Visibility Settings -->
+                            <div class="nymia-form-group">
+                                <label for="audiobook_visibility_destination"><?php esc_html_e('Where do you want to show this content?', 'nymia'); ?></label>
+                                <select id="audiobook_visibility_destination" name="audiobook_visibility_destination" class="nymia-select" required>
+                                    <option value="normal"><?php esc_html_e('Normal Category', 'nymia'); ?></option>
+                                    <option value="secret_room"><?php esc_html_e('Secret Room (choose sub-category)', 'nymia'); ?></option>
+                                </select>
+                            </div>
+
+                            <div class="nymia-form-group" id="audiobook_visibility_subcategory_wrapper" style="display: none;">
+                                <label for="audiobook_visibility_subcategory"><?php esc_html_e('Secret Room Sub-Category', 'nymia'); ?></label>
+                                <select id="audiobook_visibility_subcategory" name="audiobook_visibility_subcategory" class="nymia-select">
+                                    <option value=""><?php esc_html_e('Select Sub-Category', 'nymia'); ?></option>
+                                    <option value="audio_book"><?php esc_html_e('Audio Book', 'nymia'); ?></option>
+                                    <option value="live_streaming"><?php esc_html_e('Live Streaming', 'nymia'); ?></option>
+                                    <option value="online_now"><?php esc_html_e('Online Now', 'nymia'); ?></option>
+                                    <option value="audio_creator"><?php esc_html_e('Audio Creator', 'nymia'); ?></option>
+                                    <option value="ebook"><?php esc_html_e('E-Book', 'nymia'); ?></option>
+                                </select>
+                            </div>
+
                             <!-- Audio Book File Upload Area -->
                             <div class="nymia-form-group">
                                 <label><?php esc_html_e('Audio Book File', 'nymia'); ?></label>
@@ -1103,6 +1167,87 @@ if ($next_schedule) {
                         <?php endif; ?>
                     </div>
                 </div>
+
+                <!-- Secret Room Content -->
+                <div class="nymia-create-content" id="content-secret-room">
+                    <div class="nymia-create-header">
+                        <h1><?php esc_html_e('Secret Room', 'nymia'); ?></h1>
+                        <p class="nymia-create-subtitle"><?php esc_html_e('Create private audio content. Your entry implies consent and discretion.', 'nymia'); ?></p>
+                    </div>
+                    <div class="nymia-secret-room-create-card">
+                        <?php if (is_user_logged_in()):
+                            $current_user = wp_get_current_user();
+                            $current_avatar = get_template_directory_uri() . '/assets/images/profile.png';
+                            if ($current_user && $current_user->ID) {
+                                $custom_avatar = get_user_meta($current_user->ID, 'custom_avatar', true);
+                                $current_avatar = $custom_avatar ?: get_avatar_url($current_user->ID, array('size' => 96));
+                            }
+                        ?>
+                        <form id="nymiaSecretRoomForm" class="nymia-stream-form">
+                            <div class="nymia-form-group">
+                                <label for="secret_room_title"><?php esc_html_e('Room Title', 'nymia'); ?></label>
+                                <input type="text" id="secret_room_title" name="title" placeholder="<?php esc_attr_e('Enter room title', 'nymia'); ?>" required />
+                            </div>
+
+                            <!-- Stream Thumbnail Upload -->
+                            <div class="nymia-form-group">
+                                <label><?php esc_html_e('Room Thumbnail', 'nymia'); ?></label>
+                                <div class="stream-thumbnail-upload">
+                                    <input type="file" id="secret_room_thumbnail" name="thumbnail" accept="image/*" hidden />
+                                    <button type="button" id="secretRoomThumbnailBtn" class="stream-thumbnail-upload-btn">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                            <polyline points="14 2 14 8 20 8"></polyline>
+                                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                                            <polyline points="10 9 9 9 8 9"></polyline>
+                                        </svg>
+                                        <span><?php esc_html_e('Upload Thumbnail', 'nymia'); ?></span>
+                                    </button>
+                                    
+                                    <div id="secretRoomThumbnailPreview" class="stream-thumbnail-preview" style="display: none;">
+                                        <button type="button" id="secretRoomThumbnailRemove" class="stream-thumbnail-remove" title="Remove thumbnail">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                            </svg>
+                                        </button>
+                                        <img id="secretRoomThumbnailImg" src="" alt="Room thumbnail preview" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="nymia-stream-options">
+                                <div class="nymia-paid-access">
+                                    <label class="nymia-toggle-wrapper">
+                                        <input type="checkbox" id="secret_room_paid_access" name="paid_access" />
+                                        <span class="nymia-toggle-slider"></span>
+                                    </label>
+                                    <span class="nymia-toggle-label"><?php esc_html_e('Paid Access', 'nymia'); ?></span>
+                                    <div class="nymia-price-input">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                                        </svg>
+                                        <input type="number" id="secret_room_price" name="price" value="0.00" step="0.01" min="0" disabled />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 10px; align-items: center; margin-top: 24px;">
+                                <button type="submit" class="nymia-btn-continue">
+                                    <?php esc_html_e('Create Secret Room', 'nymia'); ?>
+                                </button>
+                            </div>
+                        </form>
+                        <?php else: ?>
+                            <p class="nymia-text-post-login">
+                                <?php esc_html_e('Please log in to create secret rooms.', 'nymia'); ?>
+                            </p>
+                        <?php endif; ?>
+                    </div>
+                </div>
             </div>
 
             <!-- Sidebar - Dynamic Content -->
@@ -1122,6 +1267,26 @@ if ($next_schedule) {
                                     <polyline points="12 6 12 12 16 14"></polyline>
                                 </svg>
                                 <p><?php esc_html_e('No streams yet', 'nymia'); ?></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Secret Room History (for Secret Room tab) -->
+                <div class="nymia-sidebar-content secret-room-history-content">
+                    <div class="nymia-live-chat-header">
+                        <h3><?php esc_html_e('Secret Room History', 'nymia'); ?></h3>
+                    </div>
+                    
+                    <!-- Secret Room Stream History -->
+                    <div class="nymia-stream-history">
+                        <div class="nymia-stream-history-list" id="nymiaSecretRoomHistoryList">
+                            <div class="nymia-history-empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                                <p><?php esc_html_e('No secret rooms yet', 'nymia'); ?></p>
                             </div>
                         </div>
                     </div>
@@ -1188,11 +1353,11 @@ if ($next_schedule) {
                                     <?php if (!empty($audio['cover_image'])): ?>
                                         <img src="<?php echo esc_url($audio['cover_image']); ?>" alt="<?php echo esc_attr($audio['title']); ?>" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
                                     <?php else: ?>
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M9 18V5l12-2v13"></path>
-                                            <circle cx="6" cy="18" r="3"></circle>
-                                            <circle cx="18" cy="16" r="3"></circle>
-                                        </svg>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 18V5l12-2v13"></path>
+                                        <circle cx="6" cy="18" r="3"></circle>
+                                        <circle cx="18" cy="16" r="3"></circle>
+                                    </svg>
                                     <?php endif; ?>
                                     <button class="nymia-compact-play-btn">
                                         <svg viewBox="0 0 24 24" fill="currentColor">
@@ -1947,6 +2112,113 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error loading stream history:', error);
         });
     }
+
+    // Load Secret Room History (filtered to only show secret rooms)
+    function loadSecretRoomHistory() {
+        const historyList = document.getElementById('nymiaSecretRoomHistoryList');
+        if (!historyList) return;
+        
+        const formData = new FormData();
+        formData.append('action', 'nymia_zego_get_user_history');
+        formData.append('nonce', nymiaAjax.zegoNonce);
+        
+        fetch(nymiaAjax.ajaxurl, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.success && data.data && data.data.streams && data.data.streams.length > 0) {
+                // Filter to only show secret rooms
+                const secretRooms = data.data.streams.filter(stream => {
+                    return stream.is_secret === true || stream.is_secret === '1' || stream.is_secret === 1;
+                });
+                
+                if (secretRooms.length > 0) {
+                    historyList.innerHTML = '';
+                    secretRooms.forEach(stream => {
+                        const historyItem = document.createElement('div');
+                        historyItem.className = 'nymia-history-item';
+                        historyItem.dataset.roomId = stream.roomId;
+                        const date = new Date(stream.created * 1000);
+                        const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                        const formattedTime = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                        const priceDisplay = stream.price && parseFloat(stream.price) > 0 ? `$${parseFloat(stream.price).toFixed(2)}` : '<?php echo esc_js(__('Free', 'nymia')); ?>';
+                        historyItem.innerHTML = `
+                            <div class="nymia-history-content">
+                                <h5>${stream.title || '<?php echo esc_js(__('Secret Room', 'nymia')); ?>'}</h5>
+                                <div class="nymia-history-meta">
+                                    <span>${formattedDate} at ${formattedTime}</span>
+                                    ${stream.viewers > 0 ? `<span>• ${stream.viewers} viewers</span>` : ''}
+                                    <span>• ${priceDisplay}</span>
+                                </div>
+                            </div>
+                            <div class="nymia-history-actions">
+                                <div class="nymia-history-status completed">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                    </svg>
+                                </div>
+                                <button class="nymia-delete-stream-btn" data-room-id="${stream.roomId}" title="Delete Secret Room">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        `;
+                        historyList.appendChild(historyItem);
+                        
+                        // Add delete functionality
+                        const deleteBtn = historyItem.querySelector('.nymia-delete-stream-btn');
+                        if (deleteBtn) {
+                            deleteBtn.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                deleteStream(stream.roomId, historyItem);
+                            });
+                        }
+                    });
+                } else {
+                    historyList.innerHTML = `
+                        <div class="nymia-history-empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                            <p><?php echo esc_js(__('No secret rooms yet', 'nymia')); ?></p>
+                        </div>
+                    `;
+                }
+            } else {
+                historyList.innerHTML = `
+                    <div class="nymia-history-empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <p><?php echo esc_js(__('No secret rooms yet', 'nymia')); ?></p>
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error loading secret room history:', error);
+            const historyList = document.getElementById('nymiaSecretRoomHistoryList');
+            if (historyList) {
+                historyList.innerHTML = `
+                    <div class="nymia-history-empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <p><?php echo esc_js(__('Error loading secret room history', 'nymia')); ?></p>
+                    </div>
+                `;
+            }
+        });
+    }
     
     // Delete Stream Function
     function deleteStream(roomId, historyItem) {
@@ -1981,6 +2253,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     historyItem.remove();
                     // Reload history to check if empty
                     loadStreamHistory();
+                    // Also reload secret room history if secret room tab is active
+                    const secretRoomTab = document.querySelector('.nymia-create-tab[data-tab="secret-room"]');
+                    if (secretRoomTab && secretRoomTab.classList.contains('active')) {
+                        loadSecretRoomHistory();
+                    }
                 }, 200);
             } else {
                 alert('Failed to delete stream: ' + (data.data && data.data.message ? data.data.message : 'Unknown error'));
@@ -2062,13 +2339,36 @@ document.addEventListener('DOMContentLoaded', function() {
             // Immediately show/hide settings UI
             updateAvailabilityUI(isAvailable);
             
-            // If turning ON, show settings and don't save yet (let user set price first)
+            // If turning ON, validate price, save availability, then start live (Zego) like Go Live
             if (isAvailable) {
-                // Focus on price input if it's empty
-                if (perMinuteInput && (!perMinuteInput.value || parseFloat(perMinuteInput.value) <= 0)) {
-                    perMinuteInput.focus();
+                const priceVal = perMinuteInput ? parseFloat(perMinuteInput.value) : 0;
+                if (!priceVal || priceVal <= 0) {
+                    alert('<?php echo esc_js(__('Please set a price per minute (must be greater than 0).', 'nymia')); ?>');
+                    this.checked = false;
+                    updateAvailabilityUI(false);
+                    if (perMinuteInput) perMinuteInput.focus();
+                    return;
                 }
-                return; // Don't save yet, let user set the price first
+                
+                (async () => {
+                    const saved = await saveAvailability();
+                    if (!saved) {
+                        availableToggle.checked = false;
+                        updateAvailabilityUI(false);
+                        return;
+                    }
+                    
+                    // Trigger Go Live flow using the existing form
+                    if (streamForm) {
+                        const titleInput = document.getElementById('stream_title');
+                        if (titleInput && !titleInput.value.trim()) {
+                            titleInput.value = 'Online Now';
+                        }
+                        // Submit the Go Live form to start Zego controls
+                        streamForm.dispatchEvent(new Event('submit', { cancelable: true }));
+                    }
+                })();
+                return;
             }
             
             // If turning OFF, save immediately
@@ -2120,14 +2420,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Function to save availability with price
-        function saveAvailability() {
-            if (!availableToggle.checked) return;
+        async function saveAvailability() {
+            if (!availableToggle.checked) return false;
             
             const price = perMinuteInput ? parseFloat(perMinuteInput.value) || 0 : 0;
             if (price <= 0) {
                 alert('<?php echo esc_js(__('Please set a price per minute (must be greater than 0).', 'nymia')); ?>');
                 if (perMinuteInput) perMinuteInput.focus();
-                return;
+                return false;
             }
             
             const formData = new FormData();
@@ -2143,38 +2443,39 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // Show loading state
+            let originalText = '';
             if (availableStatus) {
-                const originalText = availableStatus.textContent;
+                originalText = availableStatus.textContent;
                 availableStatus.textContent = '<?php echo esc_js(__('Saving...', 'nymia')); ?>';
             }
             
-            fetch(nymiaAjax.ajaxurl, {
-                method: 'POST',
-                body: formData
-            })
-            .then(r => r.json())
-            .then(data => {
+            try {
+                const resp = await fetch(nymiaAjax.ajaxurl, { method: 'POST', body: formData });
+                const data = await resp.json();
                 if (data && data.success) {
                     if (availableStatus) {
                         availableStatus.textContent = '<?php echo esc_js(__('On', 'nymia')); ?>';
                     }
-                    // Show success message
-                    if (data.data.message) {
-                        console.log(data.data.message);
-                    }
+                    return true;
                 } else {
-                    // Revert toggle on error
                     availableToggle.checked = false;
                     updateAvailabilityUI(false);
                     alert(data.data?.message || '<?php echo esc_js(__('Failed to update availability. Please try again.', 'nymia')); ?>');
+                    if (availableStatus && originalText) {
+                        availableStatus.textContent = originalText;
+                    }
+                    return false;
                 }
-            })
-            .catch(err => {
+            } catch (err) {
                 console.error('Error saving availability:', err);
                 availableToggle.checked = false;
                 updateAvailabilityUI(false);
                 alert('<?php echo esc_js(__('An error occurred. Please try again.', 'nymia')); ?>');
-            });
+                if (availableStatus && originalText) {
+                    availableStatus.textContent = originalText;
+                }
+                return false;
+            }
         }
         
         
@@ -2374,13 +2675,18 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (targetTab === 'text') {
             const sidebarContent = document.querySelector('.text-posts-content');
             if (sidebarContent) sidebarContent.classList.add('active');
+        } else if (targetTab === 'secret-room') {
+            const sidebarContent = document.querySelector('.secret-room-history-content');
+            if (sidebarContent) sidebarContent.classList.add('active');
+            // Load secret room history when tab is activated
+            loadSecretRoomHistory();
         }
     }
     
     // Check for tab parameter in URL and switch to it
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
-    if (tabParam && ['live', 'audio', 'ebook', 'audio-book', 'text'].includes(tabParam)) {
+    if (tabParam && ['live', 'audio', 'ebook', 'audio-book', 'text', 'secret-room'].includes(tabParam)) {
         switchTab(tabParam);
     }
     
@@ -2538,6 +2844,339 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Secret Room Thumbnail Upload Handler
+    (function() {
+        const secretRoomThumbnailInput = document.getElementById('secret_room_thumbnail');
+        const secretRoomThumbnailBtn = document.getElementById('secretRoomThumbnailBtn');
+        const secretRoomThumbnailPreview = document.getElementById('secretRoomThumbnailPreview');
+        const secretRoomThumbnailImg = document.getElementById('secretRoomThumbnailImg');
+        const secretRoomThumbnailRemove = document.getElementById('secretRoomThumbnailRemove');
+        
+        if (secretRoomThumbnailBtn && secretRoomThumbnailInput) {
+            secretRoomThumbnailBtn.addEventListener('click', function() {
+                secretRoomThumbnailInput.click();
+            });
+        }
+        
+        if (secretRoomThumbnailInput && secretRoomThumbnailPreview && secretRoomThumbnailImg) {
+            secretRoomThumbnailInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const file = this.files[0];
+                    if (!file.type.startsWith('image/')) {
+                        alert('<?php echo esc_js(__('Please select an image file.', 'nymia')); ?>');
+                        this.value = '';
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        secretRoomThumbnailImg.src = e.target.result;
+                        secretRoomThumbnailPreview.style.display = 'block';
+                        if (secretRoomThumbnailBtn) secretRoomThumbnailBtn.style.display = 'none';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+        
+        if (secretRoomThumbnailRemove && secretRoomThumbnailInput && secretRoomThumbnailPreview && secretRoomThumbnailBtn) {
+            secretRoomThumbnailRemove.addEventListener('click', function() {
+                secretRoomThumbnailInput.value = '';
+                secretRoomThumbnailImg.src = '';
+                secretRoomThumbnailPreview.style.display = 'none';
+                secretRoomThumbnailBtn.style.display = 'flex';
+            });
+        }
+    })();
+
+    // Paid access toggle for secret room
+    const secretRoomPaidAccessToggle = document.getElementById('secret_room_paid_access');
+    const secretRoomPriceInput = document.getElementById('secret_room_price');
+    
+    if (secretRoomPaidAccessToggle && secretRoomPriceInput) {
+        secretRoomPaidAccessToggle.addEventListener('change', function() {
+            secretRoomPriceInput.disabled = !this.checked;
+            if (this.checked) {
+                // Enable price input and focus on it
+                secretRoomPriceInput.disabled = false;
+                secretRoomPriceInput.focus();
+                // Set default value if empty
+                if (!secretRoomPriceInput.value || parseFloat(secretRoomPriceInput.value) <= 0) {
+                    secretRoomPriceInput.value = '9.99';
+                }
+            } else {
+                // Disable and reset price when unchecked
+                secretRoomPriceInput.value = '0.00';
+                secretRoomPriceInput.disabled = true;
+            }
+        });
+        
+        // Format price on blur to ensure proper decimal format
+        secretRoomPriceInput.addEventListener('blur', function() {
+            const value = parseFloat(this.value);
+            if (isNaN(value) || value < 0) {
+                this.value = secretRoomPaidAccessToggle.checked ? '9.99' : '0.00';
+            } else {
+                this.value = value.toFixed(2);
+            }
+        });
+        
+        // Prevent invalid input
+        secretRoomPriceInput.addEventListener('input', function() {
+            const value = parseFloat(this.value);
+            if (isNaN(value) || value < 0) {
+                this.setCustomValidity('<?php echo esc_js(__('Please enter a valid price (0 or greater).', 'nymia')); ?>');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    }
+
+    // Secret Room Form Handler - Creates live stream and embeds ZegoUIKit
+    (function() {
+        const secretRoomForm = document.getElementById('nymiaSecretRoomForm');
+        if (!secretRoomForm) return;
+        const secretRoomSubmitBtn = secretRoomForm.querySelector('button[type="submit"]');
+
+        secretRoomForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const roomTitle = formData.get('title');
+            const roomThumbnail = formData.get('thumbnail');
+            const paidAccess = document.getElementById('secret_room_paid_access')?.checked || false;
+            const priceValue = document.getElementById('secret_room_price')?.value || '0.00';
+            const price = paidAccess ? parseFloat(priceValue).toFixed(2) : '0.00';
+            
+            // Validate price if paid access is enabled
+            if (paidAccess) {
+                const priceNum = parseFloat(priceValue);
+                if (isNaN(priceNum) || priceNum <= 0) {
+                    alert('<?php echo esc_js(__('Please enter a valid price greater than 0 for paid access.', 'nymia')); ?>');
+                    if (secretRoomPriceInput) {
+                        secretRoomPriceInput.focus();
+                    }
+                    return;
+                }
+            }
+            
+            if (secretRoomSubmitBtn) {
+                secretRoomSubmitBtn.disabled = true;
+                secretRoomSubmitBtn.textContent = '<?php echo esc_js(__('Starting...', 'nymia')); ?>';
+            }
+
+            const fd = new FormData();
+            fd.append('action', 'nymia_zego_create_room');
+            fd.append('nonce', (window.nymiaAjax && window.nymiaAjax.zegoNonce) || '');
+            fd.append('title', roomTitle);
+            fd.append('is_secret', '1'); // Mark as secret room
+            
+            // Include thumbnail if uploaded
+            if (roomThumbnail && roomThumbnail.size > 0) {
+                fd.append('stream_thumbnail', roomThumbnail);
+            }
+            
+            // Include price if paid access is enabled
+            if (paidAccess && parseFloat(price) > 0) {
+                fd.append('price', price);
+            }
+
+            try {
+                const response = await fetch((window.nymiaAjax && window.nymiaAjax.ajaxurl) || '/wp-admin/admin-ajax.php', {
+                    method: 'POST',
+                    body: fd
+                });
+                
+                const data = await response.json();
+                
+                if (!data || !data.success) {
+                    throw new Error((data && data.data && data.data.message) ? data.data.message : '<?php echo esc_js(__('Unable to create secret room.', 'nymia')); ?>');
+                }
+                
+                const appID = data.data.appId;
+                const roomID = data.data.roomId;
+                const userID = data.data.userId;
+                const token = data.data.token;
+                const env = data.data.env || 'production';
+                const serverSecret = data.data.serverSecret || '';
+                
+                if (!window.ZegoUIKitPrebuilt) {
+                    alert('<?php echo esc_js(__('ZEGO SDK not loaded.', 'nymia')); ?>');
+                    if (secretRoomSubmitBtn) {
+                        secretRoomSubmitBtn.textContent = '<?php echo esc_js(__('Create Secret Room', 'nymia')); ?>';
+                        secretRoomSubmitBtn.disabled = false;
+                    }
+                    return;
+                }
+                
+                const creatorName = '<?php $cu = wp_get_current_user(); echo esc_js($cu && $cu->ID ? ($cu->display_name ?: $cu->user_login) : 'Host'); ?>';
+                const creatorAvatar = '<?php 
+                    $cu = wp_get_current_user(); 
+                    if ($cu && $cu->ID) {
+                        $custom_avatar = get_user_meta($cu->ID, 'custom_avatar', true);
+                        if ($custom_avatar) {
+                            echo esc_js($custom_avatar);
+                        } else {
+                            echo esc_js(get_avatar_url($cu->ID, array('size' => 150)));
+                        }
+                    } else {
+                        echo esc_js(get_template_directory_uri() . '/assets/images/profile.png');
+                    }
+                ?>';
+                
+                const kitToken = (env === 'test' && serverSecret)
+                    ? window.ZegoUIKitPrebuilt.generateKitTokenForTest(appID, serverSecret, roomID, userID, creatorName)
+                    : window.ZegoUIKitPrebuilt.generateKitTokenForProduction(appID, token, roomID, userID, creatorName);
+                
+                const zp = window.ZegoUIKitPrebuilt.create(kitToken);
+                const mount = document.createElement('div');
+                mount.id = 'zego-secret-room-container';
+                mount.style.width = '100%';
+                mount.style.height = '600px';
+                mount.style.maxWidth = '100%';
+                mount.style.overflow = 'hidden';
+                
+                // Set responsive height
+                function setZegoHeight() {
+                    const width = window.innerWidth;
+                    const isLandscape = window.innerWidth > window.innerHeight;
+                    
+                    if (width <= 480) {
+                        mount.style.height = '250px';
+                    } else if (width <= 768) {
+                        if (isLandscape) {
+                            mount.style.height = '200px';
+                        } else {
+                            mount.style.height = '300px';
+                        }
+                    } else if (width <= 1024) {
+                        mount.style.height = '500px';
+                    } else {
+                        mount.style.height = '600px';
+                    }
+                    
+                    const zegoContainer = document.getElementById('zego-secret-room-container');
+                    if (zegoContainer) {
+                        zegoContainer.style.width = '100%';
+                        zegoContainer.style.maxWidth = '100%';
+                        setTimeout(function() {
+                            const zegoElements = zegoContainer.querySelectorAll('[class*="zego"], [id*="zego"], video, canvas, iframe');
+                            zegoElements.forEach(function(el) {
+                                el.style.maxWidth = '100%';
+                                if (el.tagName === 'VIDEO' || el.tagName === 'CANVAS' || el.tagName === 'IFRAME') {
+                                    el.style.width = '100%';
+                                    el.style.height = 'auto';
+                                    el.style.objectFit = 'contain';
+                                }
+                            });
+                        }, 100);
+                    }
+                }
+                setZegoHeight();
+                
+                let resizeTimeout;
+                window.addEventListener('resize', function() {
+                    clearTimeout(resizeTimeout);
+                    resizeTimeout = setTimeout(setZegoHeight, 150);
+                });
+                
+                window.addEventListener('orientationchange', function() {
+                    setTimeout(setZegoHeight, 200);
+                });
+                
+                // Find the secret room form container and append mount
+                const secretRoomCard = document.querySelector('.nymia-secret-room-create-card');
+                if (secretRoomCard) {
+                    secretRoomCard.appendChild(mount);
+                } else {
+                    secretRoomForm.appendChild(mount);
+                }
+                
+                // Monitor DOM changes and force responsive styles + inject profile images
+                const observer = new MutationObserver(function(mutations) {
+                    const zegoContainer = document.getElementById('zego-secret-room-container');
+                    if (zegoContainer) {
+                        const videos = zegoContainer.querySelectorAll('video');
+                        videos.forEach(function(video) {
+                            video.style.maxWidth = '100%';
+                            video.style.width = '100%';
+                            video.style.height = 'auto';
+                            video.style.objectFit = 'contain';
+                        });
+                        
+                        const containers = zegoContainer.querySelectorAll('[class*="container"], [class*="wrapper"], [class*="layout"]');
+                        containers.forEach(function(container) {
+                            container.style.maxWidth = '100%';
+                        });
+                        
+                        const userElements = zegoContainer.querySelectorAll('[class*="user"], [class*="User"], [class*="name"], [class*="Name"]');
+                        userElements.forEach(function(element) {
+                            const imgs = element.querySelectorAll('img');
+                            if (imgs.length > 0) {
+                                imgs.forEach(function(img) {
+                                    if (!img.src || img.src.includes('data:image') || img.src.includes('placeholder') || img.src === '') {
+                                        img.src = creatorAvatar;
+                                        img.alt = creatorName;
+                                    }
+                                });
+                            }
+                        });
+                        
+                        const zegoAvatars = zegoContainer.querySelectorAll('[class*="avatar"], [class*="Avatar"]');
+                        zegoAvatars.forEach(function(avatar) {
+                            const imgs = avatar.querySelectorAll('img');
+                            imgs.forEach(function(img) {
+                                if (!img.src || img.src.includes('default') || img.src === '') {
+                                    img.src = creatorAvatar;
+                                    img.style.objectFit = 'cover';
+                                    img.style.borderRadius = '50%';
+                                }
+                            });
+                        });
+                    }
+                });
+                
+                observer.observe(mount, {
+                    childList: true,
+                    subtree: true
+                });
+                
+                zp.joinRoom({
+                    container: mount,
+                    scenario: { mode: window.ZegoUIKitPrebuilt.LiveStreaming, config: { role: 'Host' } },
+                    showScreenSharingButton: true,
+                    turnOnCameraWhenJoining: false,
+                    turnOnMicrophoneWhenJoining: true,
+                    showPreJoinView: false,
+                    showTextChat: true,
+                    showUserList: true,
+                    showLeavingView: true,
+                    sharedLinks: [{ name: 'Join Secret Room', url: window.location.origin + '/secret-room/?roomId=' + roomID }],
+                    onLeaveRoom: function() {
+                        observer.disconnect();
+                        mount.remove();
+                        if (secretRoomSubmitBtn) {
+                            secretRoomSubmitBtn.textContent = '<?php echo esc_js(__('Create Secret Room', 'nymia')); ?>';
+                            secretRoomSubmitBtn.disabled = false;
+                        }
+                        window.location.reload();
+                    }
+                });
+                
+                if (secretRoomSubmitBtn) {
+                    secretRoomSubmitBtn.textContent = '<?php echo esc_js(__('Live Running', 'nymia')); ?>';
+                }
+                
+            } catch (error) {
+                alert(error.message || '<?php echo esc_js(__('Unable to create secret room.', 'nymia')); ?>');
+                if (secretRoomSubmitBtn) {
+                    secretRoomSubmitBtn.disabled = false;
+                    secretRoomSubmitBtn.textContent = '<?php echo esc_js(__('Create Secret Room', 'nymia')); ?>';
+                }
+            }
+        });
+    })();
 
     // Live stream scheduling system
     const scheduleConfig = window.nymiaLiveScheduleConfig || {};
@@ -4695,8 +5334,38 @@ function closeEditEbookModal() {
     document.getElementById('editEbookThumbnailPreview').style.display = 'none';
 }
 
+// Handle visibility dropdown changes
+function handleVisibilityDropdown(destinationSelectId, subcategoryWrapperId) {
+    const destinationSelect = document.getElementById(destinationSelectId);
+    const subcategoryWrapper = document.getElementById(subcategoryWrapperId);
+    
+    if (!destinationSelect || !subcategoryWrapper) return;
+    
+    destinationSelect.addEventListener('change', function() {
+        if (this.value === 'secret_room') {
+            subcategoryWrapper.style.display = 'block';
+            const subcategorySelect = subcategoryWrapper.querySelector('select');
+            if (subcategorySelect) {
+                subcategorySelect.setAttribute('required', 'required');
+            }
+        } else {
+            subcategoryWrapper.style.display = 'none';
+            const subcategorySelect = subcategoryWrapper.querySelector('select');
+            if (subcategorySelect) {
+                subcategorySelect.removeAttribute('required');
+                subcategorySelect.value = '';
+            }
+        }
+    });
+}
+
 // Form Submissions
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize visibility dropdown handlers
+    handleVisibilityDropdown('audio_visibility_destination', 'audio_visibility_subcategory_wrapper');
+    handleVisibilityDropdown('ebook_visibility_destination', 'ebook_visibility_subcategory_wrapper');
+    handleVisibilityDropdown('audiobook_visibility_destination', 'audiobook_visibility_subcategory_wrapper');
+    
     // Audio Edit Form
     const editAudioForm = document.getElementById('editAudioForm');
     if (editAudioForm) {

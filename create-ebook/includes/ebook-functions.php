@@ -63,12 +63,21 @@ function nymia_get_all_ebooks() {
         }
     }
     
+    // Filter out Secret Room content - only show normal category content
+    $filtered_ebooks = array();
+    foreach ($all_ebooks as $ebook) {
+        $ebook_id = isset($ebook['id']) ? $ebook['id'] : 0;
+        if (nymia_is_content_visible_in_normal($ebook_id, $ebook)) {
+            $filtered_ebooks[] = $ebook;
+        }
+    }
+    
     // Sort by date (most recent first)
-    usort($all_ebooks, function($a, $b) {
+    usort($filtered_ebooks, function($a, $b) {
         return strtotime($b['date']) - strtotime($a['date']);
     });
     
-    return $all_ebooks;
+    return $filtered_ebooks;
 }
 
 /**
@@ -278,6 +287,13 @@ function nymia_handle_ebook_upload() {
     update_post_meta($attach_id, '_nymia_ebook_subcategory', $subcategory);
     if ($thumb_url) {
         update_post_meta($attach_id, '_nymia_ebook_thumbnail', $thumb_url);
+    }
+    
+    // SAVE: Visibility settings
+    $visibility_destination = isset($_POST['ebook_visibility_destination']) ? sanitize_text_field($_POST['ebook_visibility_destination']) : 'normal';
+    $visibility_subcategory = isset($_POST['ebook_visibility_subcategory']) ? sanitize_text_field($_POST['ebook_visibility_subcategory']) : '';
+    if (function_exists('nymia_save_content_visibility')) {
+        nymia_save_content_visibility($attach_id, $visibility_destination, $visibility_subcategory);
     }
     
     // STORE: In user's ebook collection (using transients)
