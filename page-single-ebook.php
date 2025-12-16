@@ -6,7 +6,12 @@
  */
 
 get_header(); 
-get_sidebar();
+
+// Only show sidebar for logged-in users with edit_posts or manage_options capabilities
+// Subscribers and non-logged-in users don't see the sidebar (full width)
+if (is_user_logged_in() && (current_user_can('edit_posts') || current_user_can('manage_options'))) {
+    get_sidebar();
+}
 
 // Get Ebook ID from URL
 $ebook_id = isset($_GET['ebook']) ? sanitize_text_field($_GET['ebook']) : '';
@@ -69,7 +74,7 @@ $ebook_title_encoded = !empty($ebook['title']) ? urlencode($ebook['title']) : ''
 ?>
 
 <div class="nymia-container">
-    <main class="nymia-main">
+    <main class="nymia-main<?php echo (!is_user_logged_in() || (!current_user_can('edit_posts') && !current_user_can('manage_options'))) ? ' nymia-main-fullwidth' : ''; ?>">
         <?php get_template_part('template-parts/header'); ?>
         
         <div class="nymia-single-ebook-page">

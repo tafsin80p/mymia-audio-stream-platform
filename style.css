@@ -792,6 +792,51 @@ body:not(.logged-in) .nymia-footer {
     box-shadow: 0 8px 24px rgba(191, 76, 26, 0.4);
 }
 
+/* Checkout Page Billing Form Styles */
+.nymia-checkout-page input[type="text"],
+.nymia-checkout-page input[type="email"],
+.nymia-checkout-page input[type="tel"],
+.nymia-checkout-page select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.nymia-checkout-page input[type="text"]:focus,
+.nymia-checkout-page input[type="email"]:focus,
+.nymia-checkout-page input[type="tel"]:focus,
+.nymia-checkout-page select:focus {
+    outline: none;
+    border-color: #BF4C1A;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(191, 76, 26, 0.1);
+}
+
+.nymia-checkout-page input[type="text"]:invalid:not(:focus):not(:placeholder-shown),
+.nymia-checkout-page input[type="email"]:invalid:not(:focus):not(:placeholder-shown),
+.nymia-checkout-page select:invalid:not(:focus) {
+    border-color: rgba(255, 100, 100, 0.5);
+}
+
+.nymia-checkout-page label {
+    display: block;
+    margin-bottom: 8px;
+    color: #bbb;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.nymia-checkout-page select option {
+    background: #1a1a1a;
+    color: #fff;
+}
+
 /* Header Language Selector (Loco Translate) */
 .nymia-language-switcher {
     display: flex;
@@ -3563,6 +3608,12 @@ a.nymia-content-card:hover {
     top: 80px;
     height: auto;
     overflow-y: auto;
+}
+
+/* Keep right sidebar visible for subscribers */
+body.subscriber .nymia-sidebar-right,
+.nymia-main-fullwidth~.nymia-sidebar-right {
+    display: block;
 }
 
 .nymia-sidebar-right h3 {
@@ -11277,6 +11328,19 @@ body>div[style*="fixed"][style*="inset: 0"] canvas {
     gap: 40px;
 }
 
+/* Keep right sidebar visible for subscribers (full width main content, right sidebar) */
+body.subscriber .nymia-audio-layout,
+.nymia-main-fullwidth .nymia-audio-layout {
+    grid-template-columns: 1fr 360px;
+    max-width: 100%;
+}
+
+/* Keep trending sidebar visible on right for subscribers */
+body.subscriber .nymia-trending-sidebar,
+.nymia-main-fullwidth .nymia-trending-sidebar {
+    display: block;
+}
+
 /* Prevent overflow in grid children */
 .nymia-audio-layout>* {
     min-width: 0;
@@ -11739,15 +11803,26 @@ body:not(.logged-in) .nymia-ebook-page,
 }
 
 /* Full width ebook layout for non-logged-in users (no sidebar) */
-body:not(.logged-in) .nymia-ebook-layout,
-.nymia-main-fullwidth .nymia-ebook-layout {
+body:not(.logged-in) .nymia-ebook-layout {
     grid-template-columns: 1fr !important;
 }
 
 /* Hide ebook sidebar for non-logged-in users */
-body:not(.logged-in) .nymia-ebook-sidebar,
-.nymia-main-fullwidth .nymia-ebook-sidebar {
+body:not(.logged-in) .nymia-ebook-sidebar {
     display: none;
+}
+
+/* Keep right sidebar visible for subscribers (full width main content, right sidebar) */
+body.subscriber .nymia-ebook-layout,
+.nymia-main-fullwidth .nymia-ebook-layout {
+    grid-template-columns: 1fr 320px;
+    max-width: 100%;
+}
+
+/* Keep ebook sidebar visible on right for subscribers */
+body.subscriber .nymia-ebook-sidebar,
+.nymia-main-fullwidth .nymia-ebook-sidebar {
+    display: block;
 }
 
 /* Ebook Grid */
@@ -12396,6 +12471,19 @@ body:not(.logged-in) .nymia-ebook-sidebar,
     display: grid;
     grid-template-columns: 1fr 320px;
     gap: 24px;
+}
+
+/* Full width ebook reader layout for subscribers (with right sidebar) */
+body.subscriber .nymia-ebook-reader-layout,
+.nymia-main-fullwidth .nymia-ebook-reader-layout {
+    grid-template-columns: 1fr 320px;
+    max-width: 100%;
+}
+
+/* Keep ebook info sidebar visible on right for subscribers */
+body.subscriber .nymia-ebook-info-sidebar,
+.nymia-main-fullwidth .nymia-ebook-info-sidebar {
+    display: block;
 }
 
 /* Ebook Viewer */

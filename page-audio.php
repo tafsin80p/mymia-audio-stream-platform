@@ -16,9 +16,15 @@
 get_header(); ?>
 
 <div class="nymia-container">
-    <?php get_sidebar(); ?>
+    <?php 
+    // Only show sidebar for logged-in users with edit_posts or manage_options capabilities
+    // Subscribers and non-logged-in users don't see the sidebar (full width)
+    if (is_user_logged_in() && (current_user_can('edit_posts') || current_user_can('manage_options'))) {
+        get_sidebar();
+    }
+    ?>
     
-    <div class="nymia-main">
+    <div class="nymia-main<?php echo (!is_user_logged_in() || (!current_user_can('edit_posts') && !current_user_can('manage_options'))) ? ' nymia-main-fullwidth' : ''; ?>">
         <?php get_template_part('template-parts/header'); ?>
         
         <?php get_template_part('template-parts/back-button'); ?>
@@ -174,8 +180,29 @@ get_header(); ?>
                         <h4 class="nymia-audio-files-title">Audio Files</h4>
                         <?php foreach (array_slice($creator['audio_files'], 0, 3) as $audio): 
                             $audio_is_paid = !empty($audio['paid_access']) && $audio['paid_access'] === 'yes' && !empty($audio['price']);
+                            // Get audio ID - try multiple sources
+                            $audio_id = '';
+                            if (isset($audio['id']) && !empty($audio['id'])) {
+                                $audio_id = (string)$audio['id'];
+                            } elseif (isset($audio['post_id']) && !empty($audio['post_id'])) {
+                                $audio_id = (string)$audio['post_id'];
+                            } elseif (!empty($audio['url'])) {
+                                // Try to extract ID from URL or use URL as fallback identifier
+                                // For now, we'll need to search for the audio by URL in the transient
+                                $all_audio = get_transient('nymia_all_audio');
+                                if ($all_audio && is_array($all_audio)) {
+                                    foreach ($all_audio as $audio_item) {
+                                        if (isset($audio_item['url']) && $audio_item['url'] === $audio['url']) {
+                                            if (isset($audio_item['id']) && !empty($audio_item['id'])) {
+                                                $audio_id = (string)$audio_item['id'];
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         ?>
-                            <div class="nymia-audio-file-card" data-audio-url="<?php echo esc_attr(!empty($audio['url']) ? $audio['url'] : ''); ?>" data-paid="<?php echo esc_attr(isset($audio['paid_access']) ? $audio['paid_access'] : 'no'); ?>" data-price="<?php echo esc_attr(isset($audio['price']) ? $audio['price'] : 0); ?>" data-creator-id="<?php echo esc_attr($creator['user_id']); ?>" data-title="<?php echo esc_attr($audio['title']); ?>" data-review-count="<?php echo esc_attr(isset($audio['review_count']) ? intval($audio['review_count']) : 0); ?>" data-rating="<?php echo esc_attr(isset($audio['rating']) ? floatval($audio['rating']) : 0); ?>">
+                            <div class="nymia-audio-file-card" data-audio-url="<?php echo esc_attr(!empty($audio['url']) ? $audio['url'] : ''); ?>" data-paid="<?php echo esc_attr(isset($audio['paid_access']) ? $audio['paid_access'] : 'no'); ?>" data-price="<?php echo esc_attr(isset($audio['price']) ? $audio['price'] : 0); ?>" data-creator-id="<?php echo esc_attr($creator['user_id']); ?>" data-title="<?php echo esc_attr($audio['title']); ?>" data-review-count="<?php echo esc_attr(isset($audio['review_count']) ? intval($audio['review_count']) : 0); ?>" data-rating="<?php echo esc_attr(isset($audio['rating']) ? floatval($audio['rating']) : 0); ?>" data-audio-id="<?php echo esc_attr($audio_id); ?>">
                                 <div class="nymia-audio-cover">
                                     <?php if (!empty($audio['cover_image'])): ?>
                                         <img src="<?php echo esc_url($audio['cover_image']); ?>" alt="<?php echo esc_attr($audio['title']); ?>" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;" />
@@ -215,7 +242,14 @@ get_header(); ?>
                                         <?php if ($audio_is_paid): ?>
                                             <span class="nymia-audio-price-badge"><?php echo esc_html('$' . number_format($audio['price'], 2)); ?></span>
                                             <?php if (!$creator_has_access): ?>
-                                                <button type="button" class="nymia-audio-access-btn" data-price="<?php echo esc_attr(number_format($audio['price'], 2)); ?>" data-title="<?php echo esc_attr($audio['title']); ?>"><?php esc_html_e('Buy', 'nymia'); ?></button>
+                                                <button type="button" class="nymia-add-to-cart-btn" data-item-type="audio" data-item-id="<?php echo esc_attr($audio_id); ?>" style="background: linear-gradient(135deg, #BF4C1A, #9F2B1A); border: none; color: #fff; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s ease;">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
+                                                        <circle cx="9" cy="21" r="1"></circle>
+                                                        <circle cx="20" cy="21" r="1"></circle>
+                                                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                                    </svg>
+                                                    <span><?php esc_html_e('Add to Cart', 'nymia'); ?></span>
+                                                </button>
                                             <?php else: ?>
                                                 <span class="nymia-audio-unlocked"><?php esc_html_e('Unlocked', 'nymia'); ?></span>
                                             <?php endif; ?>
@@ -258,7 +292,8 @@ get_header(); ?>
                                             'price' => isset($audio['price']) ? $audio['price'] : 0,
                                             'rating' => isset($audio['rating']) ? floatval($audio['rating']) : 0,
                                             'review_count' => isset($audio['review_count']) ? intval($audio['review_count']) : 0,
-                                            'creator_id' => isset($audio['user_id']) ? intval($audio['user_id']) : $creator['user_id']
+                                            'creator_id' => isset($audio['user_id']) ? intval($audio['user_id']) : $creator['user_id'],
+                                            'id' => isset($audio['id']) ? (string)$audio['id'] : ''
                                         );
                                     }
                                 }
@@ -328,7 +363,15 @@ get_header(); ?>
                                 <?php if (!empty($trending['paid_access']) && $trending['paid_access'] === 'yes' && !empty($trending['price'])): ?>
                                     <span class="nymia-trending-price"><?php echo esc_html('$' . number_format($trending['price'], 2)); ?></span>
                                     <?php if (!$trending_access): ?>
-                                        <button type="button" class="nymia-audio-access-btn" data-price="<?php echo esc_attr(number_format($trending['price'], 2)); ?>" data-title="<?php echo esc_attr($trending['title']); ?>"><?php esc_html_e('Buy', 'nymia'); ?></button>
+                                        <?php $trending_audio_id = isset($trending['id']) ? (string)$trending['id'] : ''; ?>
+                                        <button type="button" class="nymia-add-to-cart-btn" data-item-type="audio" data-item-id="<?php echo esc_attr($trending_audio_id); ?>" style="background: linear-gradient(135deg, #BF4C1A, #9F2B1A); border: none; color: #fff; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s ease; margin-left: 12px;">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
+                                                <circle cx="9" cy="21" r="1"></circle>
+                                                <circle cx="20" cy="21" r="1"></circle>
+                                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                            </svg>
+                                            <span><?php esc_html_e('Add to Cart', 'nymia'); ?></span>
+                                        </button>
                                     <?php else: ?>
                                         <span class="nymia-audio-unlocked"><?php esc_html_e('Unlocked', 'nymia'); ?></span>
                                     <?php endif; ?>
@@ -346,11 +389,231 @@ get_header(); ?>
     </div>
 </div>
 
+<script>
+// Add to Cart Handler for Audio Page
+(function() {
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.nymia-add-to-cart-btn');
+        if (!btn) return;
+        
+        e.preventDefault();
+        const itemType = btn.getAttribute('data-item-type');
+        const itemId = btn.getAttribute('data-item-id');
+        
+        if (!itemType || !itemId) {
+            console.error('Missing item type or ID:', { itemType, itemId, button: btn });
+            alert('<?php echo esc_js(__('Error: Missing item information. Please refresh the page and try again.', 'nymia')); ?>');
+            return;
+        }
+        
+        // Disable button
+        const originalText = btn.querySelector('span') ? btn.querySelector('span').textContent : btn.textContent;
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+        if (btn.querySelector('span')) {
+            btn.querySelector('span').textContent = '<?php echo esc_js(__('Adding...', 'nymia')); ?>';
+        } else {
+            btn.textContent = '<?php echo esc_js(__('Adding...', 'nymia')); ?>';
+        }
+        
+        // Debug logging
+        console.log('Adding to cart:', { itemType, itemId });
+        
+        // AJAX request
+        const formData = new FormData();
+        formData.append('action', 'nymia_add_to_cart');
+        formData.append('item_type', itemType);
+        formData.append('item_id', itemId);
+        formData.append('nonce', '<?php echo wp_create_nonce('nymia_cart'); ?>');
+        
+        const ajaxUrl = '<?php echo admin_url('admin-ajax.php'); ?>';
+        
+        fetch(ajaxUrl, {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    console.error('Server response (not OK):', text);
+                    try {
+                        const json = JSON.parse(text);
+                        if (json.data && json.data.message) {
+                            throw new Error(json.data.message);
+                        }
+                        throw new Error('Server error: ' + response.status);
+                    } catch (parseError) {
+                        if (text.includes('<html') || text.includes('<!DOCTYPE')) {
+                            throw new Error('Server returned an error page. Status: ' + response.status + '. Please check if you are logged in and try again.');
+                        }
+                        throw new Error('Network response was not ok. Status: ' + response.status);
+                    }
+                });
+            }
+            
+            const contentType = response.headers.get('content-type');
+            if (contentType && !contentType.includes('application/json')) {
+                return response.text().then(text => {
+                    console.error('Unexpected content type:', contentType);
+                    throw new Error('Server returned unexpected response format. Please refresh the page and try again.');
+                });
+            }
+            
+            return response.json();
+        })
+        .then(data => {
+            console.log('Add to cart response:', data);
+            if (data.success) {
+                // Show success message
+                const message = document.createElement('div');
+                message.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #4CAF50; color: #fff; padding: 16px 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 10000; display: flex; align-items: center; gap: 12px; font-weight: 600;';
+                message.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px;"><polyline points="20 6 9 17 4 12"></polyline></svg><span>' + (data.data && data.data.message ? data.data.message : '<?php echo esc_js(__('Item added to cart!', 'nymia')); ?>') + '</span>';
+                document.body.appendChild(message);
+                
+                setTimeout(() => {
+                    message.style.transition = 'opacity 0.3s, transform 0.3s';
+                    message.style.opacity = '0';
+                    message.style.transform = 'translateX(20px)';
+                    setTimeout(() => message.remove(), 300);
+                }, 2000);
+                
+                // Update cart dropdown instead of redirecting
+                refreshCartDropdown(data.data);
+                
+                // Open cart dropdown to show the new item
+                const cartDropdown = document.getElementById('nymiaCartDropdown');
+                const cartBtn = document.getElementById('nymiaCartBtn');
+                if (cartDropdown && cartBtn) {
+                    cartDropdown.classList.add('active');
+                }
+            } else {
+                const errorMessage = data.data && data.data.message ? data.data.message : '<?php echo esc_js(__('Failed to add item to cart.', 'nymia')); ?>';
+                console.error('Add to Cart failed:', errorMessage, data);
+                alert(errorMessage);
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                if (btn.querySelector('span')) {
+                    btn.querySelector('span').textContent = originalText;
+                } else {
+                    btn.textContent = originalText;
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Add to Cart fetch error:', error);
+            alert('<?php echo esc_js(__('An error occurred.', 'nymia')); ?> ' + error.message + '. <?php echo esc_js(__('Please try again.', 'nymia')); ?>');
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            if (btn.querySelector('span')) {
+                btn.querySelector('span').textContent = originalText;
+            } else {
+                btn.textContent = originalText;
+            }
+        });
+    });
+    
+    // Function to refresh cart dropdown
+    function refreshCartDropdown(cartData) {
+        if (!cartData) return;
+        
+        const cartBody = document.getElementById('nymiaCartBody');
+        const cartCountSpan = document.getElementById('nymiaCartCount');
+        const cartTotalAmount = document.querySelector('.nymia-cart-total-amount');
+        const cartFooter = document.querySelector('.nymia-cart-footer');
+        const cartPage = <?php 
+            $cart_page_obj = get_page_by_path('cart');
+            echo $cart_page_obj ? 'true' : 'false';
+        ?>;
+        const cartLink = '<?php 
+            $cart_page_obj = get_page_by_path('cart');
+            echo esc_url($cart_page_obj ? get_permalink($cart_page_obj) : home_url('/cart/'));
+        ?>';
+        const currency = '<?php echo esc_js(strtoupper(get_option('nymia_stripe_currency', 'USD'))); ?>';
+        
+        // Update cart count badge
+        if (cartCountSpan) {
+            const count = cartData.cart_count || 0;
+            if (count > 0) {
+                cartCountSpan.textContent = count > 99 ? '99+' : count;
+                cartCountSpan.style.display = 'flex';
+            } else {
+                cartCountSpan.style.display = 'none';
+            }
+        } else if (cartData.cart_count > 0) {
+            // Create cart count badge if it doesn't exist
+            const cartBtn = document.getElementById('nymiaCartBtn');
+            if (cartBtn) {
+                const countSpan = document.createElement('span');
+                countSpan.id = 'nymiaCartCount';
+                countSpan.className = 'nymia-cart-count';
+                countSpan.textContent = cartData.cart_count > 99 ? '99+' : cartData.cart_count;
+                cartBtn.appendChild(countSpan);
+            }
+        }
+        
+        // Update cart items
+        if (cartBody && cartData.cart && Array.isArray(cartData.cart)) {
+            if (cartData.cart.length === 0) {
+                cartBody.innerHTML = '<p class="nymia-cart-empty-message"><?php esc_html_e('Your cart is empty.', 'nymia'); ?></p>';
+                if (cartFooter) cartFooter.style.display = 'none';
+            } else {
+                let cartHTML = '';
+                cartData.cart.forEach(function(item) {
+                    const itemTitle = item.title || 'Unknown Item';
+                    const itemAuthor = item.author || 'Unknown Author';
+                    const itemPrice = parseFloat(item.price || 0);
+                    const itemImage = item.image || '';
+                    const itemType = item.type || '';
+                    const itemId = item.id || '';
+                    const formattedPrice = currency === 'USD' ? '$' + itemPrice.toFixed(2) : itemPrice.toFixed(2) + ' ' + currency;
+                    
+                    cartHTML += '<div class="nymia-cart-item" data-item-type="' + itemType + '" data-item-id="' + itemId + '">';
+                    if (itemImage) {
+                        cartHTML += '<img src="' + itemImage + '" alt="' + itemTitle + '" class="nymia-cart-item-image">';
+                    } else {
+                        cartHTML += '<div class="nymia-cart-item-image-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 24px; height: 24px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></div>';
+                    }
+                    cartHTML += '<div class="nymia-cart-item-details">';
+                    cartHTML += '<h4 class="nymia-cart-item-title">' + itemTitle + '</h4>';
+                    cartHTML += '<p class="nymia-cart-item-author">' + itemAuthor + '</p>';
+                    cartHTML += '<div class="nymia-cart-item-price">' + formattedPrice + '</div>';
+                    cartHTML += '</div>';
+                    cartHTML += '<button type="button" class="nymia-cart-item-remove" data-item-type="' + itemType + '" data-item-id="' + itemId + '" aria-label="<?php esc_attr_e('Remove item', 'nymia'); ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>';
+                    cartHTML += '</div>';
+                });
+                cartBody.innerHTML = cartHTML;
+                
+                // Update total
+                if (cartTotalAmount) {
+                    const total = parseFloat(cartData.cart_total || 0);
+                    const formattedTotal = currency === 'USD' ? '$' + total.toFixed(2) : total.toFixed(2) + ' ' + currency;
+                    cartTotalAmount.textContent = formattedTotal;
+                }
+                
+                // Show footer
+                if (cartFooter) {
+                    cartFooter.style.display = 'block';
+                    const checkoutBtn = cartFooter.querySelector('.nymia-cart-checkout-btn');
+                    if (checkoutBtn) {
+                        checkoutBtn.href = cartLink;
+                    }
+                }
+            }
+        }
+    }
+})();
+</script>
+
 <?php get_footer(); ?>
 
 <style>
 .nymia-audio-price-badge,
 .nymia-trending-price {
+    margin-right: 12px;
     display: inline-flex;
     align-items: center;
     gap: 4px;

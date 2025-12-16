@@ -13,9 +13,15 @@
 get_header(); ?>
 
 <div class="nymia-container">
-    <?php get_sidebar(); ?>
+    <?php 
+    // Only show sidebar for logged-in users with edit_posts or manage_options capabilities
+    // Subscribers and non-logged-in users don't see the sidebar (full width)
+    if (is_user_logged_in() && (current_user_can('edit_posts') || current_user_can('manage_options'))) {
+        get_sidebar();
+    }
+    ?>
     
-    <div class="nymia-main">
+    <div class="nymia-main<?php echo (!is_user_logged_in() || (!current_user_can('edit_posts') && !current_user_can('manage_options'))) ? ' nymia-main-fullwidth' : ''; ?>">
         <?php get_template_part('template-parts/header'); ?>
         
         <?php get_template_part('template-parts/back-button'); ?>
@@ -49,7 +55,7 @@ get_header(); ?>
                 <?php
                 // Get Secret Room content grouped by sub-category
                 $secret_content = function_exists('nymia_get_secret_room_content') ? nymia_get_secret_room_content() : array();
-                $subcategories = nymia_get_secret_room_subcategories();
+                $subcategories = function_exists('nymia_get_secret_room_subcategories') ? nymia_get_secret_room_subcategories() : array();
                 
                 $has_content = false;
                 foreach ($secret_content as $cat => $items) {
