@@ -71,6 +71,18 @@ get_sidebar();
 // Get Stripe publishable key
 $stripe_publishable_key = get_option('nymia_stripe_publishable_key', '');
 $stripe_mode = get_option('nymia_stripe_mode', 'test');
+
+// Get current user billing information
+$current_user = wp_get_current_user();
+$billing_first_name = get_user_meta($current_user_id, 'first_name', true) ?: $current_user->first_name;
+$billing_last_name = get_user_meta($current_user_id, 'last_name', true) ?: $current_user->last_name;
+$billing_email = $current_user->user_email;
+$billing_phone = get_user_meta($current_user_id, 'phone', true);
+$billing_street = get_user_meta($current_user_id, 'street', true);
+$billing_city = get_user_meta($current_user_id, 'city', true);
+$billing_state = get_user_meta($current_user_id, 'state', true);
+$billing_postcode = get_user_meta($current_user_id, 'postcode', true);
+$billing_country = get_user_meta($current_user_id, 'country', true);
 ?>
 
 <div class="nymia-container">
@@ -96,9 +108,11 @@ $stripe_mode = get_option('nymia_stripe_mode', 'test');
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 400px; gap: 30px; align-items: start;">
-                <!-- Order Items -->
+                <!-- Left Column: Order Items and Billing -->
                 <div>
-                    <h2 style="margin:0 0 20px 0; font-size:1.5rem; color:#fff; font-weight:600;">Order Items</h2>
+                    <!-- Order Items -->
+                    <div style="margin-bottom: 30px;">
+                        <h2 style="margin:0 0 20px 0; font-size:1.5rem; color:#fff; font-weight:600;">Order Items</h2>
                     <div style="display: flex; flex-direction: column; gap: 16px;">
                         <?php foreach ($valid_cart as $item): ?>
                             <div style="background:#1a1a1a; border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:20px; display:flex; gap:16px; align-items:center;">
@@ -145,6 +159,131 @@ $stripe_mode = get_option('nymia_stripe_mode', 'test');
                                 </div>
                             </div>
                         <?php endforeach; ?>
+                    </div>
+                    </div>
+                    
+                    <!-- Billing Information -->
+                    <div style="background:#1a1a1a; border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:24px;">
+                        <h2 style="margin:0 0 20px 0; font-size:1.5rem; color:#fff; font-weight:600;">Billing Information</h2>
+                        
+                        <form id="checkoutBillingForm" style="display: flex; flex-direction: column; gap: 16px;">
+                            <!-- Name Fields -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <div>
+                                    <label for="billing_first_name" style="display: block; margin-bottom: 8px; color: #bbb; font-size: 0.9rem; font-weight: 500;">First Name *</label>
+                                    <input type="text" id="billing_first_name" name="billing_first_name" value="<?php echo esc_attr($billing_first_name); ?>" required style="width: 100%; padding: 12px 14px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-size: 1rem; transition: border-color 0.2s;" onfocus="this.style.borderColor='#BF4C1A';" onblur="this.style.borderColor='rgba(255,255,255,0.1)';">
+                                </div>
+                                <div>
+                                    <label for="billing_last_name" style="display: block; margin-bottom: 8px; color: #bbb; font-size: 0.9rem; font-weight: 500;">Last Name *</label>
+                                    <input type="text" id="billing_last_name" name="billing_last_name" value="<?php echo esc_attr($billing_last_name); ?>" required style="width: 100%; padding: 12px 14px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-size: 1rem; transition: border-color 0.2s;" onfocus="this.style.borderColor='#BF4C1A';" onblur="this.style.borderColor='rgba(255,255,255,0.1)';">
+                                </div>
+                            </div>
+                            
+                            <!-- Email -->
+                            <div>
+                                <label for="billing_email" style="display: block; margin-bottom: 8px; color: #bbb; font-size: 0.9rem; font-weight: 500;">Email Address *</label>
+                                <input type="email" id="billing_email" name="billing_email" value="<?php echo esc_attr($billing_email); ?>" required style="width: 100%; padding: 12px 14px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-size: 1rem; transition: border-color 0.2s;" onfocus="this.style.borderColor='#BF4C1A';" onblur="this.style.borderColor='rgba(255,255,255,0.1)';">
+                            </div>
+                            
+                            <!-- Phone -->
+                            <div>
+                                <label for="billing_phone" style="display: block; margin-bottom: 8px; color: #bbb; font-size: 0.9rem; font-weight: 500;">Phone Number</label>
+                                <input type="tel" id="billing_phone" name="billing_phone" value="<?php echo esc_attr($billing_phone); ?>" style="width: 100%; padding: 12px 14px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-size: 1rem; transition: border-color 0.2s;" onfocus="this.style.borderColor='#BF4C1A';" onblur="this.style.borderColor='rgba(255,255,255,0.1)';">
+                            </div>
+                            
+                            <!-- Street Address -->
+                            <div>
+                                <label for="billing_street" style="display: block; margin-bottom: 8px; color: #bbb; font-size: 0.9rem; font-weight: 500;">Street Address *</label>
+                                <input type="text" id="billing_street" name="billing_street" value="<?php echo esc_attr($billing_street); ?>" required style="width: 100%; padding: 12px 14px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-size: 1rem; transition: border-color 0.2s;" onfocus="this.style.borderColor='#BF4C1A';" onblur="this.style.borderColor='rgba(255,255,255,0.1)';">
+                            </div>
+                            
+                            <!-- City and State -->
+                            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px;">
+                                <div>
+                                    <label for="billing_city" style="display: block; margin-bottom: 8px; color: #bbb; font-size: 0.9rem; font-weight: 500;">City *</label>
+                                    <input type="text" id="billing_city" name="billing_city" value="<?php echo esc_attr($billing_city); ?>" required style="width: 100%; padding: 12px 14px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-size: 1rem; transition: border-color 0.2s;" onfocus="this.style.borderColor='#BF4C1A';" onblur="this.style.borderColor='rgba(255,255,255,0.1)';">
+                                </div>
+                                <div>
+                                    <label for="billing_state" style="display: block; margin-bottom: 8px; color: #bbb; font-size: 0.9rem; font-weight: 500;">State/Province</label>
+                                    <input type="text" id="billing_state" name="billing_state" value="<?php echo esc_attr($billing_state); ?>" style="width: 100%; padding: 12px 14px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-size: 1rem; transition: border-color 0.2s;" onfocus="this.style.borderColor='#BF4C1A';" onblur="this.style.borderColor='rgba(255,255,255,0.1)';">
+                                </div>
+                            </div>
+                            
+                            <!-- Postcode and Country -->
+                            <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 16px;">
+                                <div>
+                                    <label for="billing_postcode" style="display: block; margin-bottom: 8px; color: #bbb; font-size: 0.9rem; font-weight: 500;">ZIP/Postal Code *</label>
+                                    <input type="text" id="billing_postcode" name="billing_postcode" value="<?php echo esc_attr($billing_postcode); ?>" required style="width: 100%; padding: 12px 14px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-size: 1rem; transition: border-color 0.2s;" onfocus="this.style.borderColor='#BF4C1A';" onblur="this.style.borderColor='rgba(255,255,255,0.1)';">
+                                </div>
+                                <div>
+                                    <label for="billing_country" style="display: block; margin-bottom: 8px; color: #bbb; font-size: 0.9rem; font-weight: 500;">Country *</label>
+                                    <select id="billing_country" name="billing_country" required style="width: 100%; padding: 12px 14px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-size: 1rem; cursor: pointer; appearance: none; background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\'><path fill=\'%23ffffff\' d=\'M6 9L1 4h10z\'/></svg>'); background-repeat: no-repeat; background-position: right 12px center; padding-right: 40px; transition: border-color 0.2s;" onfocus="this.style.borderColor='#BF4C1A';" onblur="this.style.borderColor='rgba(255,255,255,0.1)';">
+                                        <option value="">Select Country</option>
+                                        <option value="US" <?php selected($billing_country, 'US'); ?>>United States</option>
+                                        <option value="CA" <?php selected($billing_country, 'CA'); ?>>Canada</option>
+                                        <option value="GB" <?php selected($billing_country, 'GB'); ?>>United Kingdom</option>
+                                        <option value="AU" <?php selected($billing_country, 'AU'); ?>>Australia</option>
+                                        <option value="DE" <?php selected($billing_country, 'DE'); ?>>Germany</option>
+                                        <option value="FR" <?php selected($billing_country, 'FR'); ?>>France</option>
+                                        <option value="IT" <?php selected($billing_country, 'IT'); ?>>Italy</option>
+                                        <option value="ES" <?php selected($billing_country, 'ES'); ?>>Spain</option>
+                                        <option value="NL" <?php selected($billing_country, 'NL'); ?>>Netherlands</option>
+                                        <option value="BE" <?php selected($billing_country, 'BE'); ?>>Belgium</option>
+                                        <option value="CH" <?php selected($billing_country, 'CH'); ?>>Switzerland</option>
+                                        <option value="AT" <?php selected($billing_country, 'AT'); ?>>Austria</option>
+                                        <option value="SE" <?php selected($billing_country, 'SE'); ?>>Sweden</option>
+                                        <option value="NO" <?php selected($billing_country, 'NO'); ?>>Norway</option>
+                                        <option value="DK" <?php selected($billing_country, 'DK'); ?>>Denmark</option>
+                                        <option value="FI" <?php selected($billing_country, 'FI'); ?>>Finland</option>
+                                        <option value="IE" <?php selected($billing_country, 'IE'); ?>>Ireland</option>
+                                        <option value="PT" <?php selected($billing_country, 'PT'); ?>>Portugal</option>
+                                        <option value="GR" <?php selected($billing_country, 'GR'); ?>>Greece</option>
+                                        <option value="PL" <?php selected($billing_country, 'PL'); ?>>Poland</option>
+                                        <option value="CZ" <?php selected($billing_country, 'CZ'); ?>>Czech Republic</option>
+                                        <option value="HU" <?php selected($billing_country, 'HU'); ?>>Hungary</option>
+                                        <option value="RO" <?php selected($billing_country, 'RO'); ?>>Romania</option>
+                                        <option value="BG" <?php selected($billing_country, 'BG'); ?>>Bulgaria</option>
+                                        <option value="HR" <?php selected($billing_country, 'HR'); ?>>Croatia</option>
+                                        <option value="SK" <?php selected($billing_country, 'SK'); ?>>Slovakia</option>
+                                        <option value="SI" <?php selected($billing_country, 'SI'); ?>>Slovenia</option>
+                                        <option value="EE" <?php selected($billing_country, 'EE'); ?>>Estonia</option>
+                                        <option value="LV" <?php selected($billing_country, 'LV'); ?>>Latvia</option>
+                                        <option value="LT" <?php selected($billing_country, 'LT'); ?>>Lithuania</option>
+                                        <option value="LU" <?php selected($billing_country, 'LU'); ?>>Luxembourg</option>
+                                        <option value="MT" <?php selected($billing_country, 'MT'); ?>>Malta</option>
+                                        <option value="CY" <?php selected($billing_country, 'CY'); ?>>Cyprus</option>
+                                        <option value="JP" <?php selected($billing_country, 'JP'); ?>>Japan</option>
+                                        <option value="CN" <?php selected($billing_country, 'CN'); ?>>China</option>
+                                        <option value="IN" <?php selected($billing_country, 'IN'); ?>>India</option>
+                                        <option value="BR" <?php selected($billing_country, 'BR'); ?>>Brazil</option>
+                                        <option value="MX" <?php selected($billing_country, 'MX'); ?>>Mexico</option>
+                                        <option value="AR" <?php selected($billing_country, 'AR'); ?>>Argentina</option>
+                                        <option value="ZA" <?php selected($billing_country, 'ZA'); ?>>South Africa</option>
+                                        <option value="NZ" <?php selected($billing_country, 'NZ'); ?>>New Zealand</option>
+                                        <option value="SG" <?php selected($billing_country, 'SG'); ?>>Singapore</option>
+                                        <option value="HK" <?php selected($billing_country, 'HK'); ?>>Hong Kong</option>
+                                        <option value="KR" <?php selected($billing_country, 'KR'); ?>>South Korea</option>
+                                        <option value="TW" <?php selected($billing_country, 'TW'); ?>>Taiwan</option>
+                                        <option value="TH" <?php selected($billing_country, 'TH'); ?>>Thailand</option>
+                                        <option value="MY" <?php selected($billing_country, 'MY'); ?>>Malaysia</option>
+                                        <option value="ID" <?php selected($billing_country, 'ID'); ?>>Indonesia</option>
+                                        <option value="PH" <?php selected($billing_country, 'PH'); ?>>Philippines</option>
+                                        <option value="VN" <?php selected($billing_country, 'VN'); ?>>Vietnam</option>
+                                        <option value="AE" <?php selected($billing_country, 'AE'); ?>>United Arab Emirates</option>
+                                        <option value="SA" <?php selected($billing_country, 'SA'); ?>>Saudi Arabia</option>
+                                        <option value="IL" <?php selected($billing_country, 'IL'); ?>>Israel</option>
+                                        <option value="TR" <?php selected($billing_country, 'TR'); ?>>Turkey</option>
+                                        <option value="RU" <?php selected($billing_country, 'RU'); ?>>Russia</option>
+                                        <option value="UA" <?php selected($billing_country, 'UA'); ?>>Ukraine</option>
+                                        <option value="EG" <?php selected($billing_country, 'EG'); ?>>Egypt</option>
+                                        <option value="NG" <?php selected($billing_country, 'NG'); ?>>Nigeria</option>
+                                        <option value="KE" <?php selected($billing_country, 'KE'); ?>>Kenya</option>
+                                        <option value="GH" <?php selected($billing_country, 'GH'); ?>>Ghana</option>
+                                        <option value="OTHER" <?php selected($billing_country, 'OTHER'); ?>>Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
                 

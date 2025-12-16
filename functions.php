@@ -11580,6 +11580,44 @@ function nymia_create_checkout_session() {
     $current_user_id = get_current_user_id();
     $cart_checkout = isset($_POST['cart_checkout']) && $_POST['cart_checkout'] === '1';
     
+    // Save billing information if provided
+    if (isset($_POST['billing_data'])) {
+        $billing_data = json_decode(stripslashes($_POST['billing_data']), true);
+        if (is_array($billing_data)) {
+            // Save billing information to user meta
+            if (isset($billing_data['first_name'])) {
+                update_user_meta($current_user_id, 'first_name', sanitize_text_field($billing_data['first_name']));
+            }
+            if (isset($billing_data['last_name'])) {
+                update_user_meta($current_user_id, 'last_name', sanitize_text_field($billing_data['last_name']));
+            }
+            if (isset($billing_data['email'])) {
+                $email = sanitize_email($billing_data['email']);
+                if (is_email($email)) {
+                    wp_update_user(array('ID' => $current_user_id, 'user_email' => $email));
+                }
+            }
+            if (isset($billing_data['phone'])) {
+                update_user_meta($current_user_id, 'phone', sanitize_text_field($billing_data['phone']));
+            }
+            if (isset($billing_data['street'])) {
+                update_user_meta($current_user_id, 'street', sanitize_text_field($billing_data['street']));
+            }
+            if (isset($billing_data['city'])) {
+                update_user_meta($current_user_id, 'city', sanitize_text_field($billing_data['city']));
+            }
+            if (isset($billing_data['state'])) {
+                update_user_meta($current_user_id, 'state', sanitize_text_field($billing_data['state']));
+            }
+            if (isset($billing_data['postcode'])) {
+                update_user_meta($current_user_id, 'postcode', sanitize_text_field($billing_data['postcode']));
+            }
+            if (isset($billing_data['country'])) {
+                update_user_meta($current_user_id, 'country', sanitize_text_field($billing_data['country']));
+            }
+        }
+    }
+    
     // Handle cart checkout
     if ($cart_checkout) {
         $cart = function_exists('nymia_get_cart') ? nymia_get_cart() : array();
@@ -11693,6 +11731,7 @@ function nymia_create_checkout_session() {
                 'setup_future_usage' => 'on_session',
             ),
             'line_items' => $line_items,
+            'billing_address_collection' => 'required', // Require billing address in Stripe Checkout
             'metadata' => array_merge(array(
                 'cart_checkout' => '1',
                 'user_id' => $current_user->ID,
