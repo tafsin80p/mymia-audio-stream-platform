@@ -120,6 +120,128 @@ $is_creator_role = current_user_can('edit_posts') || current_user_can('manage_op
         <?php get_template_part('notifications/templates/notification-panel'); ?>
         <?php endif; ?>
         
+        <!-- Shopping Cart Icon (only for logged-in users) -->
+        <?php if (is_user_logged_in()): 
+            // Get cart data
+            $cart_count = 0;
+            $cart_items = array();
+            $cart_total = 0;
+            if (function_exists('nymia_get_cart')) {
+                $cart_items = nymia_get_cart();
+                $cart_count = is_array($cart_items) ? count($cart_items) : 0;
+            }
+            if (function_exists('nymia_get_cart_total')) {
+                $cart_total = nymia_get_cart_total();
+            }
+            $cart_page = get_page_by_path('cart');
+            $cart_link = $cart_page ? get_permalink($cart_page) : home_url('/cart/');
+            $currency = strtoupper(get_option('nymia_stripe_currency', 'USD'));
+        ?>
+            <div class="nymia-cart-wrapper">
+                <button type="button" class="nymia-cart-btn" id="nymiaCartBtn" aria-label="<?php esc_attr_e('Shopping Cart', 'nymia'); ?>" title="<?php esc_attr_e('Shopping Cart', 'nymia'); ?>">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                    <?php if ($cart_count > 0): ?>
+                        <span class="nymia-cart-count"><?php echo esc_html($cart_count > 99 ? '99+' : $cart_count); ?></span>
+                    <?php endif; ?>
+                </button>
+                
+                <!-- Cart Dropdown -->
+                <div class="nymia-cart-dropdown" id="nymiaCartDropdown">
+                    <div class="nymia-cart-header">
+                        <h3><?php esc_html_e('Shopping Cart', 'nymia'); ?></h3>
+                        <button type="button" class="nymia-cart-close" id="nymiaCartClose">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="nymia-cart-body" id="nymiaCartBody">
+                        <?php if (empty($cart_items)): ?>
+                            <div class="nymia-cart-empty">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 48px; height: 48px; color: #666; margin: 0 auto 16px;">
+                                    <circle cx="9" cy="21" r="1"></circle>
+                                    <circle cx="20" cy="21" r="1"></circle>
+                                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                </svg>
+                                <p style="margin: 0; color: #bbb; text-align: center;"><?php esc_html_e('Your cart is empty', 'nymia'); ?></p>
+                            </div>
+                        <?php else: ?>
+                            <?php foreach ($cart_items as $item): 
+                                $item_title = esc_html($item['title'] ?? 'Unknown Item');
+                                $item_author = esc_html($item['author'] ?? 'Unknown Author');
+                                $item_price = (float)($item['price'] ?? 0);
+                                $item_image = esc_url($item['image'] ?? '');
+                                $item_type = esc_attr($item['type'] ?? '');
+                                $item_id = esc_attr($item['id'] ?? '');
+                            ?>
+                                <div class="nymia-cart-item" data-item-type="<?php echo $item_type; ?>" data-item-id="<?php echo $item_id; ?>">
+                                    <?php if (!empty($item_image)): ?>
+                                        <img src="<?php echo $item_image; ?>" alt="<?php echo $item_title; ?>" class="nymia-cart-item-image">
+                                    <?php else: ?>
+                                        <div class="nymia-cart-item-image-placeholder">
+                                            <?php if ($item_type === 'ebook'): ?>
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 24px; height: 24px;">
+                                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                                </svg>
+                                            <?php else: ?>
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 24px; height: 24px;">
+                                                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"></path>
+                                                </svg>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endif; ?>
+                                    <div class="nymia-cart-item-details">
+                                        <h4 class="nymia-cart-item-title"><?php echo $item_title; ?></h4>
+                                        <p class="nymia-cart-item-author"><?php echo $item_author; ?></p>
+                                        <div class="nymia-cart-item-price">
+                                            <?php 
+                                            if (function_exists('nymia_format_currency_for_display')) {
+                                                echo esc_html(nymia_format_currency_for_display($item_price, $currency));
+                                            } else {
+                                                echo esc_html('$' . number_format($item_price, 2));
+                                            }
+                                            ?>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="nymia-cart-item-remove" data-item-type="<?php echo $item_type; ?>" data-item-id="<?php echo $item_id; ?>" aria-label="<?php esc_attr_e('Remove item', 'nymia'); ?>">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                    <?php if (!empty($cart_items)): ?>
+                        <div class="nymia-cart-footer">
+                            <div class="nymia-cart-total">
+                                <span><?php esc_html_e('Total:', 'nymia'); ?></span>
+                                <span class="nymia-cart-total-amount">
+                                    <?php 
+                                    if (function_exists('nymia_format_currency_for_display')) {
+                                        echo esc_html(nymia_format_currency_for_display($cart_total, $currency));
+                                    } else {
+                                        echo esc_html('$' . number_format($cart_total, 2));
+                                    }
+                                    ?>
+                                </span>
+                            </div>
+                            <a href="<?php echo esc_url($cart_link); ?>" class="nymia-cart-checkout-btn">
+                                <?php esc_html_e('View Cart', 'nymia'); ?>
+                            </a>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endif; ?>
+        
         <!-- Profile / Login -->
         <?php if (is_user_logged_in()): 
             // Check if user is a creator (has approved KYC or creator capabilities)
@@ -221,6 +343,148 @@ $is_creator_role = current_user_can('edit_posts') || current_user_can('manage_op
                         }
                     });
                 }
+            });
+            </script>
+            
+            <!-- Cart Dropdown JavaScript -->
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var cartBtn = document.getElementById('nymiaCartBtn');
+                var cartDropdown = document.getElementById('nymiaCartDropdown');
+                var cartClose = document.getElementById('nymiaCartClose');
+                var cartWrapper = document.querySelector('.nymia-cart-wrapper');
+                
+                if (!cartBtn || !cartDropdown || !cartWrapper) return;
+                
+                var hoverTimeout;
+                
+                // Show cart on hover
+                cartWrapper.addEventListener('mouseenter', function() {
+                    clearTimeout(hoverTimeout);
+                    cartDropdown.classList.add('active');
+                });
+                
+                // Hide cart when mouse leaves
+                cartWrapper.addEventListener('mouseleave', function() {
+                    hoverTimeout = setTimeout(function() {
+                        cartDropdown.classList.remove('active');
+                    }, 200);
+                });
+                
+                // Toggle cart dropdown on click
+                cartBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    cartDropdown.classList.toggle('active');
+                });
+                
+                // Close cart dropdown
+                if (cartClose) {
+                    cartClose.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        cartDropdown.classList.remove('active');
+                    });
+                }
+                
+                // Close cart when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (cartDropdown.classList.contains('active') && 
+                        !cartBtn.contains(e.target) && 
+                        !cartDropdown.contains(e.target)) {
+                        cartDropdown.classList.remove('active');
+                    }
+                });
+                
+                // Handle remove item from cart
+                document.addEventListener('click', function(e) {
+                    var removeBtn = e.target.closest('.nymia-cart-item-remove');
+                    if (!removeBtn) return;
+                    
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    var itemType = removeBtn.getAttribute('data-item-type');
+                    var itemId = removeBtn.getAttribute('data-item-id');
+                    var cartItem = removeBtn.closest('.nymia-cart-item');
+                    
+                    if (!itemType || !itemId) return;
+                    
+                    // Disable button
+                    removeBtn.disabled = true;
+                    removeBtn.style.opacity = '0.5';
+                    
+                    // AJAX request
+                    var formData = new FormData();
+                    formData.append('action', 'nymia_remove_from_cart');
+                    formData.append('item_type', itemType);
+                    formData.append('item_id', itemId);
+                    formData.append('nonce', '<?php echo wp_create_nonce('nymia_cart'); ?>');
+                    
+                    fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Remove item from DOM
+                            if (cartItem) {
+                                cartItem.style.transition = 'opacity 0.3s, transform 0.3s';
+                                cartItem.style.opacity = '0';
+                                cartItem.style.transform = 'translateX(-20px)';
+                                setTimeout(function() {
+                                    cartItem.remove();
+                                    
+                                    // Check if cart is empty
+                                    var cartBody = document.getElementById('nymiaCartBody');
+                                    var cartItems = cartBody.querySelectorAll('.nymia-cart-item');
+                                    
+                                    if (cartItems.length === 0) {
+                                        location.reload();
+                                    } else {
+                                        // Update cart count badge
+                                        if (data.data && data.data.cart_count !== undefined) {
+                                            var cartCount = document.querySelector('.nymia-cart-count');
+                                            if (data.data.cart_count === 0) {
+                                                if (cartCount) cartCount.remove();
+                                            } else {
+                                                if (!cartCount) {
+                                                    var countSpan = document.createElement('span');
+                                                    countSpan.className = 'nymia-cart-count';
+                                                    cartBtn.appendChild(countSpan);
+                                                }
+                                                var countEl = document.querySelector('.nymia-cart-count');
+                                                if (countEl) {
+                                                    countEl.textContent = data.data.cart_count > 99 ? '99+' : data.data.cart_count;
+                                                }
+                                            }
+                                        }
+                                        
+                                        // Update total
+                                        if (data.data && data.data.cart_total !== undefined) {
+                                            var totalEl = document.querySelector('.nymia-cart-total-amount');
+                                            if (totalEl) {
+                                                var total = parseFloat(data.data.cart_total);
+                                                var currency = '<?php echo esc_js($currency); ?>';
+                                                var formatted = currency === 'USD' ? '$' + total.toFixed(2) : total.toFixed(2) + ' ' + currency;
+                                                totalEl.textContent = formatted;
+                                            }
+                                        }
+                                    }
+                                }, 300);
+                            }
+                        } else {
+                            alert(data.data && data.data.message ? data.data.message : 'Failed to remove item');
+                            removeBtn.disabled = false;
+                            removeBtn.style.opacity = '1';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred. Please try again.');
+                        removeBtn.disabled = false;
+                        removeBtn.style.opacity = '1';
+                    });
+                });
             });
             </script>
         <?php else: ?>

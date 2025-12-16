@@ -15,11 +15,13 @@
 
 $incoming_user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : 0;
 $incoming_creator_name = isset($_GET['creator_name']) ? sanitize_text_field($_GET['creator_name']) : '';
-$incoming_track_id = isset($_GET['track_id']) ? intval($_GET['track_id']) : 0; // Specific track to auto-play
+// Handle track_id - can be large timestamp-based IDs, use string comparison
+$incoming_track_id_raw = isset($_GET['track_id']) ? sanitize_text_field($_GET['track_id']) : '';
+$incoming_track_id = !empty($incoming_track_id_raw) && is_numeric($incoming_track_id_raw) ? $incoming_track_id_raw : 0; // Keep as string for large numbers
 
 // IMPORTANT: Check for redirect BEFORE any WordPress functions that might send headers
 // This must be the very first check after getting GET parameters
-if (!is_page('single-audio') && empty($incoming_user_id) && empty($incoming_creator_name) && empty($incoming_track_id)) {
+if (!is_page('single-audio') && empty($incoming_user_id) && empty($incoming_creator_name) && (empty($incoming_track_id) || $incoming_track_id === '0' || $incoming_track_id === 0)) {
     // No valid parameters, redirect to home
     wp_redirect(home_url('/'));
     exit;
@@ -28,17 +30,28 @@ if (!is_page('single-audio') && empty($incoming_user_id) && empty($incoming_crea
 $creator_user = null;
 
 // If track_id is provided, find the creator from the track
-if ($incoming_track_id > 0) {
+if (!empty($incoming_track_id)) {
+    // Normalize track_id for comparison (handle both strings and numbers)
+    $track_id_normalized = is_numeric($incoming_track_id) ? (string)$incoming_track_id : $incoming_track_id;
+    
     // Search for the track in all audio transients to find the creator
     $all_audio = get_transient('nymia_all_audio');
     if ($all_audio && is_array($all_audio)) {
         foreach ($all_audio as $audio_item) {
-            if (isset($audio_item['id']) && intval($audio_item['id']) === $incoming_track_id) {
-                $track_creator_id = isset($audio_item['user_id']) ? intval($audio_item['user_id']) : 0;
-                if ($track_creator_id > 0) {
-                    $creator_user = get_user_by('id', $track_creator_id);
-                    $incoming_user_id = $track_creator_id; // Update user_id from track
-                    break;
+            if (isset($audio_item['id'])) {
+                // Normalize stored ID for comparison (handle large numbers stored as strings)
+                $stored_id_normalized = is_numeric($audio_item['id']) ? (string)$audio_item['id'] : (string)$audio_item['id'];
+                
+                // Use string comparison to handle large numbers properly
+                if ($stored_id_normalized === $track_id_normalized) {
+                    $track_creator_id = isset($audio_item['user_id']) ? intval($audio_item['user_id']) : 0;
+                    if ($track_creator_id > 0) {
+                        $creator_user = get_user_by('id', $track_creator_id);
+                        if ($creator_user) {
+                            $incoming_user_id = $track_creator_id; // Update user_id from track
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -49,9 +62,17 @@ if ($incoming_track_id > 0) {
         $user_audio = get_transient('nymia_user_audio_' . $incoming_user_id);
         if ($user_audio && is_array($user_audio)) {
             foreach ($user_audio as $audio_item) {
-                if (isset($audio_item['id']) && intval($audio_item['id']) === $incoming_track_id) {
-                    $creator_user = get_user_by('id', $incoming_user_id);
-                    break;
+                if (isset($audio_item['id'])) {
+                    // Normalize stored ID for comparison
+                    $stored_id_normalized = is_numeric($audio_item['id']) ? (string)$audio_item['id'] : (string)$audio_item['id'];
+                    
+                    // Use string comparison to handle large numbers properly
+                    if ($stored_id_normalized === $track_id_normalized) {
+                        $creator_user = get_user_by('id', $incoming_user_id);
+                        if ($creator_user) {
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -59,24 +80,34 @@ if ($incoming_track_id > 0) {
 }
 
 // Fallback: use user_id if track_id didn't find creator
-if (!$creator_user && $incoming_user_id) {
+if (!$creator_user && $incoming_user_id > 0) {
     $creator_user = get_user_by('id', $incoming_user_id);
+    // If user not found, reset to null
+    if (!$creator_user) {
+        $incoming_user_id = 0;
+    }
 }
 
 if (!$creator_user && !empty($incoming_creator_name)) {
-                            $user_query = new WP_User_Query(array(
+    // Safely query for user by name
+    $user_query = new WP_User_Query(array(
         'search' => $incoming_creator_name,
-                                'search_columns' => array('display_name', 'user_nicename', 'user_login'),
-                                'number' => 1,
-                            ));
-                            $users_found = $user_query->get_results();
-                            if (!empty($users_found)) {
-                                $creator_user = $users_found[0];
-                            }
-                        }
+        'search_columns' => array('display_name', 'user_nicename', 'user_login'),
+        'number' => 1,
+    ));
+    $users_found = $user_query->get_results();
+    if (!empty($users_found) && is_array($users_found) && isset($users_found[0])) {
+        $creator_user = $users_found[0];
+    }
+}
 
-$creator_id = $creator_user ? intval($creator_user->ID) : 0;
-$creator_display_name = $creator_user ? ($creator_user->display_name ?: $creator_user->user_login) : __('Creator', 'nymia');
+$creator_id = ($creator_user && isset($creator_user->ID)) ? intval($creator_user->ID) : 0;
+$creator_display_name = __('Creator', 'nymia');
+if ($creator_user && isset($creator_user->display_name) && !empty($creator_user->display_name)) {
+    $creator_display_name = $creator_user->display_name;
+} elseif ($creator_user && isset($creator_user->user_login) && !empty($creator_user->user_login)) {
+    $creator_display_name = $creator_user->user_login;
+}
 
 // If no valid creator found but user_id was provided, show error instead of redirect
 if ($creator_id <= 0 && !empty($incoming_user_id)) {
@@ -95,7 +126,7 @@ if ($creator_id) {
     $creator_profile_image = $custom_avatar ?: get_avatar_url($creator_id, array('size' => 300));
 }
 $hero_cover_image = '';
-if (!empty($creator_audio_posts) && !empty($creator_audio_posts[0]['cover_image'])) {
+if (!empty($creator_audio_posts) && isset($creator_audio_posts[0]) && !empty($creator_audio_posts[0]['cover_image'])) {
     $hero_cover_image = $creator_audio_posts[0]['cover_image'];
 }
 $hero_default_cover = $creator_profile_image ?: get_template_directory_uri() . '/assets/images/audio-placeholder.jpg';
@@ -130,19 +161,42 @@ foreach ($creator_audio_posts as $post) {
     $is_paid_track = ($paid_access_flag === 'yes' && $price_value > 0);
     $rating_value = isset($post['rating']) ? floatval($post['rating']) : 0;
     $review_count_value = isset($post['review_count']) ? intval($post['review_count']) : 0;
-    if (!empty($post['id'])) {
-        $stored_count = intval(get_post_meta($post['id'], '_nymia_audio_rating_count', true));
-        $stored_sum = intval(get_post_meta($post['id'], '_nymia_audio_rating_sum', true));
-        if (!$review_count_value && $stored_count) {
-            $review_count_value = $stored_count;
+    if (!empty($post['id']) && is_numeric($post['id'])) {
+        $audio_post_id_raw = $post['id'];
+        // Only treat as WordPress post ID if it's within reasonable range (not timestamp-based)
+        // WordPress post IDs are typically under 2^31 (2,147,483,647)
+        // Large IDs (like timestamps) should be handled differently
+        $max_valid_post_id = 2147483647; // Maximum 32-bit signed integer
+        
+        if ($audio_post_id_raw <= $max_valid_post_id) {
+            $audio_post_id = intval($audio_post_id_raw);
+            if ($audio_post_id > 0) {
+                // Safely check if post exists before getting meta
+                $audio_post = get_post($audio_post_id);
+                if ($audio_post && is_a($audio_post, 'WP_Post')) {
+                    $stored_count = intval(get_post_meta($audio_post_id, '_nymia_audio_rating_count', true));
+                    $stored_sum = intval(get_post_meta($audio_post_id, '_nymia_audio_rating_sum', true));
+                    if (!$review_count_value && $stored_count) {
+                        $review_count_value = $stored_count;
+                    }
+                    if ((!$rating_value || $rating_value <= 0) && $stored_count > 0) {
+                        $rating_value = $stored_count ? round($stored_sum / $stored_count, 1) : 0;
+                    }
+                }
+            }
         }
-        if ((!$rating_value || $rating_value <= 0) && $stored_count > 0) {
-            $rating_value = $stored_count ? round($stored_sum / $stored_count, 1) : 0;
-        }
+        // If ID is too large (timestamp-based), skip post meta lookup - use data from transient only
     }
 
+    // Preserve ID as-is (can be large timestamp-based IDs, not just WordPress post IDs)
+    $track_id_value = !empty($post['id']) ? $post['id'] : 0;
+    // Convert to string for large numbers to prevent precision loss
+    if (is_numeric($track_id_value) && $track_id_value > 2147483647) {
+        $track_id_value = (string)$track_id_value;
+    }
+    
     $audio_tracks[] = array(
-        'id' => !empty($post['id']) ? intval($post['id']) : 0,
+        'id' => $track_id_value,
         'number' => $track_index++,
         'title' => isset($post['title']) ? $post['title'] : __('Untitled Track', 'nymia'),
         'artist' => $creator_display_name,
@@ -173,7 +227,7 @@ if (empty($audio_tracks)) {
     );
 }
 
-$primary_title = !empty($creator_audio_posts) ? $creator_audio_posts[0]['title'] : __('Audio Collection', 'nymia');
+$primary_title = (!empty($creator_audio_posts) && isset($creator_audio_posts[0]['title'])) ? $creator_audio_posts[0]['title'] : __('Audio Collection', 'nymia');
 $audio_review_ajax = array(
     'url' => admin_url('admin-ajax.php'),
     'nonce' => wp_create_nonce('nymia_audio_review_nonce')
@@ -218,7 +272,7 @@ get_header(); ?>
                 
                 <div class="nymia-audio-player-content">
                     <!-- Creator Profile Image -->
-                    <div class="nymia-audio-creator-image <?php echo nymia_is_creator_verified($creator_id) ? 'has-creator-badge' : ''; ?>" data-default-cover="<?php echo esc_attr($hero_default_cover); ?>">
+                    <div class="nymia-audio-creator-image <?php echo (function_exists('nymia_is_creator_verified') && nymia_is_creator_verified($creator_id)) ? 'has-creator-badge' : ''; ?>" data-default-cover="<?php echo esc_attr($hero_default_cover); ?>">
                         <img src="<?php echo esc_url($hero_cover_image); ?>" alt="<?php echo esc_attr($creator_display_name); ?>" />
                     </div>
                     
@@ -227,7 +281,7 @@ get_header(); ?>
                         <h1 class="nymia-audio-title"><?php echo esc_html($primary_title); ?></h1>
                         <div class="nymia-creator-heading">
                         <p class="nymia-audio-creator-name"><?php echo esc_html($creator_display_name); ?></p>
-                            <?php echo wp_kses_post(nymia_get_user_badge_markup($creator_id, null, 'nymia-creator-badge--inline')); ?>
+                            <?php echo wp_kses_post(function_exists('nymia_get_user_badge_markup') ? nymia_get_user_badge_markup($creator_id, null, 'nymia-creator-badge--inline') : ''); ?>
                         </div>
                         <?php if ($show_follow_button): ?>
                             <button class="nymia-follow-btn" id="singleFollowBtn" data-creator-id="<?php echo esc_attr($creator_id); ?>"><?php esc_html_e('Follow', 'nymia'); ?></button>
@@ -311,26 +365,61 @@ get_header(); ?>
                 foreach ($creator_audio_posts as $post) {
                     $date_formatted = !empty($post['date']) ? date_i18n('M j, Y', strtotime($post['date'])) : '';
                     $cover_image_value = !empty($post['cover_image']) ? $post['cover_image'] : '';
-                    if (empty($cover_image_value) && !empty($post['id'])) {
-                        $meta_cover = get_post_meta($post['id'], '_nymia_audio_cover_image', true);
-                        if (!empty($meta_cover)) {
-                            $cover_image_value = $meta_cover;
+                    if (empty($cover_image_value) && !empty($post['id']) && is_numeric($post['id'])) {
+                        $audio_post_id_raw = $post['id'];
+                        // Only treat as WordPress post ID if it's within reasonable range
+                        $max_valid_post_id = 2147483647; // Maximum 32-bit signed integer
+                        
+                        if ($audio_post_id_raw <= $max_valid_post_id) {
+                            $audio_post_id = intval($audio_post_id_raw);
+                            if ($audio_post_id > 0) {
+                                // Safely check if post exists before getting meta
+                                $audio_post = get_post($audio_post_id);
+                                if ($audio_post && is_a($audio_post, 'WP_Post')) {
+                                    $meta_cover = get_post_meta($audio_post_id, '_nymia_audio_cover_image', true);
+                                    if (!empty($meta_cover)) {
+                                        $cover_image_value = $meta_cover;
+                                    }
+                                }
+                            }
                         }
+                        // If ID is too large (timestamp-based), skip post meta lookup
                     }
                     $rating_value = isset($post['rating']) ? floatval($post['rating']) : 0;
                     $review_count_value = isset($post['review_count']) ? intval($post['review_count']) : 0;
-                    if (!empty($post['id'])) {
-                        $stored_count = intval(get_post_meta($post['id'], '_nymia_audio_rating_count', true));
-                        $stored_sum = intval(get_post_meta($post['id'], '_nymia_audio_rating_sum', true));
-                        if (!$review_count_value && $stored_count) {
-                            $review_count_value = $stored_count;
+                    if (!empty($post['id']) && is_numeric($post['id'])) {
+                        $audio_post_id_raw = $post['id'];
+                        // Only treat as WordPress post ID if it's within reasonable range
+                        $max_valid_post_id = 2147483647; // Maximum 32-bit signed integer
+                        
+                        if ($audio_post_id_raw <= $max_valid_post_id) {
+                            $audio_post_id = intval($audio_post_id_raw);
+                            if ($audio_post_id > 0) {
+                                // Safely check if post exists before getting meta
+                                $audio_post = get_post($audio_post_id);
+                                if ($audio_post && is_a($audio_post, 'WP_Post')) {
+                                    $stored_count = intval(get_post_meta($audio_post_id, '_nymia_audio_rating_count', true));
+                                    $stored_sum = intval(get_post_meta($audio_post_id, '_nymia_audio_rating_sum', true));
+                                    if (!$review_count_value && $stored_count) {
+                                        $review_count_value = $stored_count;
+                                    }
+                                    if ((!$rating_value || $rating_value <= 0) && $stored_count > 0) {
+                                        $rating_value = $stored_count ? round($stored_sum / $stored_count, 1) : 0;
+                                    }
+                                }
+                            }
                         }
-                        if ((!$rating_value || $rating_value <= 0) && $stored_count > 0) {
-                            $rating_value = $stored_count ? round($stored_sum / $stored_count, 1) : 0;
-                        }
+                        // If ID is too large (timestamp-based), skip post meta lookup - use data from transient only
                     }
+                // Preserve ID as-is (can be large timestamp-based IDs, not just WordPress post IDs)
+                $track_id_value = !empty($post['id']) ? $post['id'] : 0;
+                // Convert to string for large numbers to prevent precision loss
+                if (is_numeric($track_id_value) && $track_id_value > 2147483647) {
+                    $track_id_value = (string)$track_id_value;
+                }
+                
                 $audio_tracks[] = array(
-                    'id' => !empty($post['id']) ? intval($post['id']) : 0,
+                    'id' => $track_id_value,
                     'number' => $index++,
                     'title' => $post['title'],
                     'artist' => $creator_display_name,
@@ -1073,7 +1162,7 @@ get_header(); ?>
         
         // Auto-play specific track if track_id is in URL (only if track has access or is free)
         var incomingTrackId = <?php echo json_encode($incoming_track_id); ?>;
-        if (incomingTrackId > 0) {
+        if (incomingTrackId && incomingTrackId !== '0' && incomingTrackId !== 0) {
             // Wait for tracks to be rendered, then find and play the track
             setTimeout(function() {
                 var trackElement = document.querySelector('.nymia-audio-track-item[data-audio-id="' + incomingTrackId + '"]');
@@ -2441,13 +2530,14 @@ get_header(); ?>
             modalHTML += '<label for="audioCheckoutAgree" style="margin:0; color:#bbb; font-size:0.9rem; cursor:pointer; line-height:1.5;">';
             modalHTML += 'I agree to the <a href="<?php echo esc_url(home_url('/policies')); ?>" target="_blank" style="color:#BF4C1A; text-decoration:underline;">Terms and Privacy Policy</a>';
             modalHTML += '</label></div>';
-            modalHTML += '<button type="button" id="nymiaAudioCheckoutBtn" class="nymia-btn-gradient" style="width:100%; padding:16px; border-radius:12px; border:none; background:linear-gradient(135deg,#BF4C1A,#9F2B1A); color:#fff; font-weight:700; font-size:1rem; cursor:pointer; transition:all 0.3s ease; display:flex; align-items:center; justify-content:center; gap:10px;">';
-            modalHTML += '<span id="audioCheckoutBtnText">Pay with Stripe</span>';
-            modalHTML += '<span id="audioCheckoutBtnLoading" style="display:none;">';
+            modalHTML += '<button type="button" id="nymiaAudioAddToCartBtn" class="nymia-btn-gradient" style="width:100%; padding:16px; border-radius:12px; border:none; background:linear-gradient(135deg,#BF4C1A,#9F2B1A); color:#fff; font-weight:700; font-size:1rem; cursor:pointer; transition:all 0.3s ease; display:flex; align-items:center; justify-content:center; gap:10px;">';
+            modalHTML += '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>';
+            modalHTML += '<span id="audioAddToCartBtnText">Add to Cart</span>';
+            modalHTML += '<span id="audioAddToCartBtnLoading" style="display:none;">';
             modalHTML += '<svg style="width:20px; height:20px; animation:spin 1s linear infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">';
             modalHTML += '<circle cx="12" cy="12" r="10"></circle>';
             modalHTML += '<path d="M12 6v6l4 2"></path>';
-            modalHTML += '</svg> Processing...</span>';
+            modalHTML += '</svg> Adding...</span>';
             modalHTML += '</button>';
         }
         
@@ -2457,87 +2547,71 @@ get_header(); ?>
         audioCheckoutModal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
         
-        // Setup Stripe checkout button
-        if (stripePublishableKey && stripePublishableKey !== '') {
-            var checkoutBtn = document.getElementById('nymiaAudioCheckoutBtn');
-            var checkoutBtnText = document.getElementById('audioCheckoutBtnText');
-            var checkoutBtnLoading = document.getElementById('audioCheckoutBtnLoading');
-            var agreeCheckbox = document.getElementById('audioCheckoutAgree');
-            
-            if (checkoutBtn) {
-                checkoutBtn.addEventListener('click', function(e){
-                    e.preventDefault();
-                    
-                    if (!agreeCheckbox || !agreeCheckbox.checked) {
-                        alert('Please agree to the Terms and Privacy Policy to continue.');
-                        return;
-                    }
-                    
-                    checkoutBtn.disabled = true;
-                    if (checkoutBtnText) checkoutBtnText.style.display = 'none';
-                    if (checkoutBtnLoading) checkoutBtnLoading.style.display = 'inline';
-                    
-                    var formData = new FormData();
-                    formData.append('action', 'nymia_create_checkout_session');
-                    formData.append('item_type', 'audio');
-                    formData.append('item_id', audioId);
-                    
-                    if (typeof nymiaAjax !== 'undefined' && nymiaAjax.checkoutNonce) {
-                        formData.append('nonce', nymiaAjax.checkoutNonce);
-                    }
-                    
-                    var ajaxUrl = (typeof nymiaAjax !== 'undefined' && nymiaAjax.ajaxurl) ? nymiaAjax.ajaxurl : '<?php echo admin_url('admin-ajax.php'); ?>';
-                    
-                    fetch(ajaxUrl, { method: 'POST', body: formData })
-                        .then(function(res){ return res.json(); })
-                        .then(function(data){
-                            if (data && data.success && data.data && data.data.sessionId) {
-                                // Load Stripe.js if not loaded
-                                if (typeof Stripe === 'undefined') {
-                                    var script = document.createElement('script');
-                                    script.src = 'https://js.stripe.com/v3/';
-                                    script.onload = function(){
-                                        var stripe = Stripe(stripePublishableKey);
-                                        stripe.redirectToCheckout({ sessionId: data.data.sessionId })
-                                            .then(function(result){
-                                                if (result.error) {
-                                                    alert(result.error.message);
-                                                    checkoutBtn.disabled = false;
-                                                    if (checkoutBtnText) checkoutBtnText.style.display = 'inline';
-                                                    if (checkoutBtnLoading) checkoutBtnLoading.style.display = 'none';
-                                                }
-                                            });
-                                    };
-                                    document.head.appendChild(script);
-                                } else {
-                                    var stripe = Stripe(stripePublishableKey);
-                                    stripe.redirectToCheckout({ sessionId: data.data.sessionId })
-                                        .then(function(result){
-                                            if (result.error) {
-                                                alert(result.error.message);
-                                                checkoutBtn.disabled = false;
-                                                if (checkoutBtnText) checkoutBtnText.style.display = 'inline';
-                                                if (checkoutBtnLoading) checkoutBtnLoading.style.display = 'none';
-                                            }
-                                        });
-                                }
-                            } else {
-                                checkoutBtn.disabled = false;
-                                if (checkoutBtnText) checkoutBtnText.style.display = 'inline';
-                                if (checkoutBtnLoading) checkoutBtnLoading.style.display = 'none';
-                                var errorMsg = (data && data.data && data.data.message) ? data.data.message : 'Failed to initiate checkout. Please try again.';
-                                alert(errorMsg);
-                            }
-                        })
-                        .catch(function(error){
-                            checkoutBtn.disabled = false;
-                            if (checkoutBtnText) checkoutBtnText.style.display = 'inline';
-                            if (checkoutBtnLoading) checkoutBtnLoading.style.display = 'none';
-                            console.error('Checkout session creation error:', error);
-                            alert('Network error. Please check your connection and try again.');
-                        });
-                });
-            }
+        // Setup Add to Cart button
+        var addToCartBtn = document.getElementById('nymiaAudioAddToCartBtn');
+        var addToCartBtnText = document.getElementById('audioAddToCartBtnText');
+        var addToCartBtnLoading = document.getElementById('audioAddToCartBtnLoading');
+        var agreeCheckbox = document.getElementById('audioCheckoutAgree');
+        
+        if (addToCartBtn) {
+            addToCartBtn.addEventListener('click', function(e){
+                e.preventDefault();
+                
+                if (!agreeCheckbox || !agreeCheckbox.checked) {
+                    alert('Please agree to the Terms and Privacy Policy to continue.');
+                    return;
+                }
+                
+                addToCartBtn.disabled = true;
+                if (addToCartBtnText) addToCartBtnText.style.display = 'none';
+                if (addToCartBtnLoading) addToCartBtnLoading.style.display = 'inline';
+                
+                var formData = new FormData();
+                formData.append('action', 'nymia_add_to_cart');
+                formData.append('item_type', 'audio');
+                formData.append('item_id', audioId);
+                formData.append('nonce', '<?php echo wp_create_nonce('nymia_cart'); ?>');
+                
+                var ajaxUrl = '<?php echo admin_url('admin-ajax.php'); ?>';
+                
+                fetch(ajaxUrl, { method: 'POST', body: formData })
+                    .then(function(res){ return res.json(); })
+                    .then(function(data){
+                        if (data && data.success) {
+                            // Show success message
+                            var message = document.createElement('div');
+                            message.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #4CAF50; color: #fff; padding: 16px 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 10000; display: flex; align-items: center; gap: 12px; font-weight: 600;';
+                            message.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px;"><polyline points="20 6 9 17 4 12"></polyline></svg><span>' + (data.data && data.data.message ? data.data.message : 'Item added to cart!') + '</span>';
+                            document.body.appendChild(message);
+                            
+                            setTimeout(function(){
+                                message.style.transition = 'opacity 0.3s, transform 0.3s';
+                                message.style.opacity = '0';
+                                message.style.transform = 'translateX(20px)';
+                                setTimeout(function(){ message.remove(); }, 300);
+                            }, 2000);
+                            
+                            // Close modal and redirect to cart
+                            closeAudioCheckoutModal();
+                            setTimeout(function(){
+                                window.location.href = '<?php echo esc_url(home_url('/cart')); ?>';
+                            }, 500);
+                        } else {
+                            addToCartBtn.disabled = false;
+                            if (addToCartBtnText) addToCartBtnText.style.display = 'inline';
+                            if (addToCartBtnLoading) addToCartBtnLoading.style.display = 'none';
+                            var errorMsg = (data && data.data && data.data.message) ? data.data.message : 'Failed to add item to cart. Please try again.';
+                            alert(errorMsg);
+                        }
+                    })
+                    .catch(function(error){
+                        addToCartBtn.disabled = false;
+                        if (addToCartBtnText) addToCartBtnText.style.display = 'inline';
+                        if (addToCartBtnLoading) addToCartBtnLoading.style.display = 'none';
+                        console.error('Add to cart error:', error);
+                        alert('Network error. Please check your connection and try again.');
+                    });
+            });
         }
     }
     

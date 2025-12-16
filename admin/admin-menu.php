@@ -68,11 +68,29 @@ function nymia_add_admin_menu() {
 
     add_submenu_page(
         'nymia-theme-settings',
+        'Email Templates Settings',
+        'Email Templates',
+        'manage_options',
+        'nymia-email-templates-settings',
+        'nymia_email_templates_settings_page'
+    );
+
+    add_submenu_page(
+        'nymia-theme-settings',
         'Footer Menu Settings',
         'Footer Menu',
         'manage_options',
         'nymia-footer-menu-settings',
         'nymia_footer_menu_settings_page'
+    );
+
+    add_submenu_page(
+        'nymia-theme-settings',
+        'User Management',
+        'User Management',
+        'manage_options',
+        'nymia-user-management',
+        'nymia_user_management_page'
     );
 
 }
@@ -179,7 +197,9 @@ if (!function_exists('nymia_render_admin_settings_styles')) {
             }
 
             .wrap.nymia-stripe-wrap.nymia-general-settings .button.button-primary,
-            .wrap.nymia-stripe-wrap.nymia-general-settings .button.button-primary:visited {
+            .wrap.nymia-stripe-wrap.nymia-general-settings .button.button-primary:visited,
+            .wrap.nymia-stripe-wrap.nymia-email-templates-settings .button.button-primary,
+            .wrap.nymia-stripe-wrap.nymia-email-templates-settings .button.button-primary:visited {
                 padding: 10px 18px;
                 height: 45px;
                 font-size: 0.8125rem;
