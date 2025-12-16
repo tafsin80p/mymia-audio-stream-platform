@@ -732,6 +732,36 @@ function nymia_create_dashboard_page() {
     }
     
     // ========================================
+    // CREATE CART PAGE
+    // ========================================
+    $cart_page = get_page_by_path('cart');
+    
+    if (!$cart_page) {
+        $cart_data = array(
+            'post_title'    => 'Cart',
+            'post_content'  => 'Shopping cart page for managing items before checkout.',
+            'post_status'   => 'publish',
+            'post_type'     => 'page',
+            'post_name'     => 'cart',
+            'post_author'   => 1,
+            'page_template' => 'page-cart.php',
+        );
+        
+        $cart_id = wp_insert_post($cart_data);
+        
+        // Set the template for the cart page
+        if ($cart_id) {
+            update_post_meta($cart_id, '_wp_page_template', 'page-cart.php');
+        }
+    } else {
+        // Update template if page exists but doesn't have the template assigned
+        $template = get_post_meta($cart_page->ID, '_wp_page_template', true);
+        if (empty($template) || $template === 'default') {
+            update_post_meta($cart_page->ID, '_wp_page_template', 'page-cart.php');
+        }
+    }
+    
+    // ========================================
     // CREATE CHECKOUT PAGE
     // ========================================
     $checkout_page = get_page_by_path('checkout');
@@ -2837,22 +2867,50 @@ function nymia_get_secret_room_subcategories() {
  * ----------------------------
  * Gets visibility settings for a content item
  * 
- * @param int $content_id Content ID
+ * @param int|string $content_id Content ID
  * @return array Visibility settings (destination, subcategory)
  */
 function nymia_get_content_visibility($content_id) {
+    // Default return value
+    $visibility = array(
+        'destination' => 'normal',
+        'subcategory' => '',
+    );
+    
+    // Only proceed if content_id is numeric and greater than 0
+    if (!is_numeric($content_id)) {
+        return $visibility;
+    }
+    
+    $content_id = intval($content_id);
+    
+    // Skip if ID is 0 or negative
+    if ($content_id <= 0) {
+        return $visibility;
+    }
+    
+    // Check if post exists before trying to get meta
+    // get_post can return null, false, or WP_Post object - never WP_Error
+    $post = get_post($content_id);
+    if (!$post || !is_a($post, 'WP_Post')) {
+        return $visibility;
+    }
+    
+    // Get meta safely - get_post_meta works even if post doesn't exist, but we check anyway
     $destination = get_post_meta($content_id, '_nymia_content_destination', true);
     $subcategory = get_post_meta($content_id, '_nymia_secret_room_subcategory', true);
     
-    // Default to 'normal' if not set
-    if (empty($destination)) {
-        $destination = 'normal';
+    // Validate and set destination
+    if (!empty($destination) && in_array($destination, array('normal', 'secret_room'))) {
+        $visibility['destination'] = $destination;
     }
     
-    return array(
-        'destination' => $destination,
-        'subcategory' => $subcategory,
-    );
+    // Set subcategory if destination is secret_room
+    if ($visibility['destination'] === 'secret_room' && !empty($subcategory)) {
+        $visibility['subcategory'] = sanitize_text_field($subcategory);
+    }
+    
+    return $visibility;
 }
 
 /**
@@ -2959,18 +3017,32 @@ function nymia_filter_content_by_visibility($content_array, $context = 'normal',
  * @return bool True if should be visible in normal category
  */
 function nymia_is_content_visible_in_normal($content_id, $item = array()) {
+    // Default to visible in normal category for safety (backward compatibility)
     $visibility = array('destination' => 'normal', 'subcategory' => '');
     
-    if (is_numeric($content_id)) {
-        $visibility = nymia_get_content_visibility(intval($content_id));
-    } elseif (!empty($item)) {
+    // First check if visibility is in the item array (for transient-based content)
+    if (!empty($item) && is_array($item)) {
         if (isset($item['visibility_destination'])) {
             $visibility['destination'] = $item['visibility_destination'];
             $visibility['subcategory'] = isset($item['visibility_subcategory']) ? $item['visibility_subcategory'] : '';
         }
     }
     
-    return $visibility['destination'] === 'normal';
+    // If visibility not found in item array and content_id is numeric and > 0, try to get from post meta
+    if ($visibility['destination'] === 'normal' && is_numeric($content_id)) {
+        $content_id_int = intval($content_id);
+        if ($content_id_int > 0 && function_exists('nymia_get_content_visibility')) {
+            // Safely get visibility from post meta
+            $meta_visibility = nymia_get_content_visibility($content_id_int);
+            // Only use meta visibility if it's actually set (not default)
+            if (!empty($meta_visibility['destination']) && $meta_visibility['destination'] !== 'normal') {
+                $visibility = $meta_visibility;
+            }
+        }
+    }
+    
+    // Return true if destination is 'normal' or empty (default to normal for backward compatibility)
+    return (empty($visibility['destination']) || $visibility['destination'] === 'normal');
 }
 
 /**
@@ -2997,8 +3069,10 @@ function nymia_get_secret_room_content($subcategory = '') {
             $audio_id = isset($audio['id']) ? $audio['id'] : 0;
             $visibility = array('destination' => 'normal', 'subcategory' => '');
             
-            if (is_numeric($audio_id)) {
-                $visibility = nymia_get_content_visibility(intval($audio_id));
+            if (is_numeric($audio_id) && intval($audio_id) > 0) {
+                if (function_exists('nymia_get_content_visibility')) {
+                    $visibility = nymia_get_content_visibility(intval($audio_id));
+                }
             } elseif (isset($audio['visibility_destination'])) {
                 $visibility['destination'] = $audio['visibility_destination'];
                 $visibility['subcategory'] = isset($audio['visibility_subcategory']) ? $audio['visibility_subcategory'] : '';
@@ -3027,7 +3101,13 @@ function nymia_get_secret_room_content($subcategory = '') {
     if ($all_ebooks && is_array($all_ebooks)) {
         foreach ($all_ebooks as $ebook) {
             $ebook_id = isset($ebook['id']) ? $ebook['id'] : 0;
-            $visibility = nymia_get_content_visibility($ebook_id);
+            $visibility = array('destination' => 'normal', 'subcategory' => '');
+            if (function_exists('nymia_get_content_visibility') && is_numeric($ebook_id) && intval($ebook_id) > 0) {
+                $visibility = nymia_get_content_visibility(intval($ebook_id));
+            } elseif (isset($ebook['visibility_destination'])) {
+                $visibility['destination'] = $ebook['visibility_destination'];
+                $visibility['subcategory'] = isset($ebook['visibility_subcategory']) ? $ebook['visibility_subcategory'] : '';
+            }
             
             if ($visibility['destination'] === 'secret_room') {
                 $cat = $visibility['subcategory'];
@@ -3041,79 +3121,94 @@ function nymia_get_secret_room_content($subcategory = '') {
     }
     
     // Get from user transients as well (to catch any that might not be in global)
-    $users = get_users(array('number' => 200));
-    foreach ($users as $user) {
-        // Check user audio
-        $user_audio = get_transient('nymia_user_audio_' . $user->ID);
-        if ($user_audio && is_array($user_audio)) {
-            foreach ($user_audio as $audio) {
-                $audio_id = isset($audio['id']) ? $audio['id'] : 0;
-                $visibility = array('destination' => 'normal', 'subcategory' => '');
-                
-                if (is_numeric($audio_id)) {
-                    $visibility = nymia_get_content_visibility(intval($audio_id));
-                } elseif (isset($audio['visibility_destination'])) {
-                    $visibility['destination'] = $audio['visibility_destination'];
-                    $visibility['subcategory'] = isset($audio['visibility_subcategory']) ? $audio['visibility_subcategory'] : '';
-                }
-                
-                if ($visibility['destination'] === 'secret_room') {
-                    $cat = $visibility['subcategory'];
-                    if (empty($subcategory) || $cat === $subcategory) {
-                        if (isset($audio['type']) && $audio['type'] === 'audiobook') {
-                            if (isset($secret_content[$cat])) {
-                                // Check if not already added
-                                $already_added = false;
-                                foreach ($secret_content[$cat] as $existing) {
-                                    if (isset($existing['id']) && $existing['id'] === $audio_id) {
-                                        $already_added = true;
-                                        break;
+    // Limit users to prevent performance issues
+    $users = get_users(array('number' => 100));
+    if (is_array($users)) {
+        foreach ($users as $user) {
+            if (!isset($user->ID)) {
+                continue;
+            }
+            
+            // Check user audio
+            $user_audio = get_transient('nymia_user_audio_' . $user->ID);
+            if ($user_audio && is_array($user_audio)) {
+                foreach ($user_audio as $audio) {
+                    $audio_id = isset($audio['id']) ? $audio['id'] : 0;
+                    $visibility = array('destination' => 'normal', 'subcategory' => '');
+                    
+                    if (is_numeric($audio_id) && intval($audio_id) > 0) {
+                        if (function_exists('nymia_get_content_visibility')) {
+                            $visibility = nymia_get_content_visibility(intval($audio_id));
+                        }
+                    } elseif (isset($audio['visibility_destination'])) {
+                        $visibility['destination'] = $audio['visibility_destination'];
+                        $visibility['subcategory'] = isset($audio['visibility_subcategory']) ? $audio['visibility_subcategory'] : '';
+                    }
+                    
+                    if ($visibility['destination'] === 'secret_room') {
+                        $cat = $visibility['subcategory'];
+                        if (empty($subcategory) || $cat === $subcategory) {
+                            if (isset($audio['type']) && $audio['type'] === 'audiobook') {
+                                if (isset($secret_content[$cat])) {
+                                    // Check if not already added
+                                    $already_added = false;
+                                    foreach ($secret_content[$cat] as $existing) {
+                                        if (isset($existing['id']) && $existing['id'] === $audio_id) {
+                                            $already_added = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!$already_added) {
+                                        $secret_content[$cat][] = array_merge($audio, array('content_type' => 'audiobook'));
                                     }
                                 }
-                                if (!$already_added) {
-                                    $secret_content[$cat][] = array_merge($audio, array('content_type' => 'audiobook'));
-                                }
-                            }
-                        } else {
-                            if (isset($secret_content['audio_creator'])) {
-                                $already_added = false;
-                                foreach ($secret_content['audio_creator'] as $existing) {
-                                    if (isset($existing['id']) && $existing['id'] === $audio_id) {
-                                        $already_added = true;
-                                        break;
+                            } else {
+                                if (isset($secret_content['audio_creator'])) {
+                                    $already_added = false;
+                                    foreach ($secret_content['audio_creator'] as $existing) {
+                                        if (isset($existing['id']) && $existing['id'] === $audio_id) {
+                                            $already_added = true;
+                                            break;
+                                        }
                                     }
-                                }
-                                if (!$already_added) {
-                                    $secret_content['audio_creator'][] = array_merge($audio, array('content_type' => 'audio'));
+                                    if (!$already_added) {
+                                        $secret_content['audio_creator'][] = array_merge($audio, array('content_type' => 'audio'));
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-        }
-        
-        // Check user ebooks
-        $user_ebooks = get_transient('nymia_user_ebook_' . $user->ID);
-        if ($user_ebooks && is_array($user_ebooks)) {
-            foreach ($user_ebooks as $ebook) {
-                $ebook_id = isset($ebook['id']) ? $ebook['id'] : 0;
-                $visibility = nymia_get_content_visibility($ebook_id);
-                
-                if ($visibility['destination'] === 'secret_room') {
-                    $cat = $visibility['subcategory'];
-                    if (empty($subcategory) || $cat === $subcategory) {
-                        if (isset($secret_content[$cat])) {
-                            // Check if not already added
-                            $already_added = false;
-                            foreach ($secret_content[$cat] as $existing) {
-                                if (isset($existing['id']) && $existing['id'] === $ebook_id) {
-                                    $already_added = true;
-                                    break;
+            
+            // Check user ebooks
+            $user_ebooks = get_transient('nymia_user_ebook_' . $user->ID);
+            if ($user_ebooks && is_array($user_ebooks)) {
+                foreach ($user_ebooks as $ebook) {
+                    $ebook_id = isset($ebook['id']) ? $ebook['id'] : 0;
+                    $visibility = array('destination' => 'normal', 'subcategory' => '');
+                    if (function_exists('nymia_get_content_visibility') && is_numeric($ebook_id) && intval($ebook_id) > 0) {
+                        $visibility = nymia_get_content_visibility(intval($ebook_id));
+                    } elseif (isset($ebook['visibility_destination'])) {
+                        $visibility['destination'] = $ebook['visibility_destination'];
+                        $visibility['subcategory'] = isset($ebook['visibility_subcategory']) ? $ebook['visibility_subcategory'] : '';
+                    }
+                    
+                    if ($visibility['destination'] === 'secret_room') {
+                        $cat = $visibility['subcategory'];
+                        if (empty($subcategory) || $cat === $subcategory) {
+                            if (isset($secret_content[$cat])) {
+                                // Check if not already added
+                                $already_added = false;
+                                foreach ($secret_content[$cat] as $existing) {
+                                    if (isset($existing['id']) && $existing['id'] === $ebook_id) {
+                                        $already_added = true;
+                                        break;
+                                    }
                                 }
-                            }
-                            if (!$already_added) {
-                                $secret_content[$cat][] = array_merge($ebook, array('content_type' => 'ebook'));
+                                if (!$already_added) {
+                                    $secret_content[$cat][] = array_merge($ebook, array('content_type' => 'ebook'));
+                                }
                             }
                         }
                     }
@@ -3485,10 +3580,13 @@ function nymia_get_all_audiobooks() {
                 $audio_id = isset($audio['id']) ? $audio['id'] : '';
                 if ($audio_id && !in_array($audio_id, $seen_ids)) {
                     // Filter out Secret Room content - only show normal category
-                    if (nymia_is_content_visible_in_normal($audio_id, $audio)) {
-                        $all_audiobooks[] = $audio;
-                        $seen_ids[] = $audio_id;
+                    if (function_exists('nymia_is_content_visible_in_normal')) {
+                        if (!nymia_is_content_visible_in_normal($audio_id, $audio)) {
+                            continue; // Skip Secret Room content
+                        }
                     }
+                    $all_audiobooks[] = $audio;
+                    $seen_ids[] = $audio_id;
                 }
             }
         }
@@ -3505,16 +3603,18 @@ function nymia_get_all_audiobooks() {
                     // Only add if not already in list
                     if ($audio_id && !in_array($audio_id, $seen_ids)) {
                         // Filter out Secret Room content
-                        if (nymia_is_content_visible_in_normal($audio_id, $audio)) {
-                            // Ensure author field is set
-                            if (empty($audio['author']) && !empty($audio['user_id'])) {
-                                $user_obj = get_user_by('id', intval($audio['user_id']));
-                                if ($user_obj) {
-                                    $audio['author'] = $user_obj->display_name ?: $user_obj->user_login;
-                                }
+                        if (function_exists('nymia_is_content_visible_in_normal')) {
+                            if (!nymia_is_content_visible_in_normal($audio_id, $audio)) {
+                                continue; // Skip Secret Room content
                             }
-                            $all_audiobooks[] = $audio;
-                            $seen_ids[] = $audio_id;
+                        }
+                        
+                        // Ensure author field is set
+                        if (empty($audio['author']) && !empty($audio['user_id'])) {
+                            $user_obj = get_user_by('id', intval($audio['user_id']));
+                            if ($user_obj) {
+                                $audio['author'] = $user_obj->display_name ?: $user_obj->user_login;
+                            }
                         }
                         $all_audiobooks[] = $audio;
                         $seen_ids[] = $audio_id;
@@ -4816,8 +4916,12 @@ function nymia_get_all_creators_with_audio() {
             foreach ($audio_posts as $audio) {
                 // Filter out Secret Room content - only show normal category content
                 $audio_id = isset($audio['id']) ? $audio['id'] : 0;
-                if (!nymia_is_content_visible_in_normal($audio_id, $audio)) {
-                    continue; // Skip Secret Room content
+                
+                // Only filter if we have a valid function and valid ID
+                if (function_exists('nymia_is_content_visible_in_normal')) {
+                    if (!nymia_is_content_visible_in_normal($audio_id, $audio)) {
+                        continue; // Skip Secret Room content
+                    }
                 }
                 
                 $cover_image = isset($audio['cover_image']) ? $audio['cover_image'] : '';
@@ -5159,13 +5263,25 @@ function nymia_generate_verification_code() {
  * @return bool True on success, false on failure
  */
 function nymia_send_verification_email($email, $verification_code) {
-    $subject = 'Verify Your Email - Nymia';
-    $message = "Hello!\n\n";
-    $message .= "Thank you for signing up with Nymia!\n\n";
-    $message .= "Your verification code is: " . $verification_code . "\n\n";
-    $message .= "Please enter this code on the verification page to complete your registration.\n\n";
-    $message .= "If you did not request this, please ignore this email.\n\n";
-    $message .= "Best regards,\nThe Nymia Team";
+    $site_name = get_bloginfo('name');
+    $site_url = home_url();
+    
+    // Get template from settings or use default
+    $subject_template = get_option('nymia_otp_email_subject', 'Verify Your Email - {site_name}');
+    $message_template = get_option('nymia_otp_email_message', "Hello!\n\nThank you for signing up with {site_name}!\n\nYour verification code is: {verification_code}\n\nPlease enter this code on the verification page to complete your registration.\n\nIf you did not request this, please ignore this email.\n\nBest regards,\nThe {site_name} Team");
+    
+    // Replace variables
+    $subject = str_replace(
+        array('{site_name}', '{verification_code}'),
+        array($site_name, $verification_code),
+        $subject_template
+    );
+    
+    $message = str_replace(
+        array('{site_name}', '{verification_code}', '{site_url}'),
+        array($site_name, $verification_code, $site_url),
+        $message_template
+    );
     
     $headers = array('Content-Type: text/plain; charset=UTF-8');
     
@@ -5290,6 +5406,97 @@ function nymia_send_admin_new_creator_notification($user_id, $username, $email, 
     
     return wp_mail($admin_email, $subject, $message, $headers);
 } // END: nymia_send_admin_new_creator_notification()
+
+/**
+ * SEND NEW USER WELCOME EMAIL
+ * ----------------------------
+ * Sends welcome email to new users after successful registration
+ * @param int $user_id The newly created user ID
+ * @param string $username User's username
+ * @param string $email User's email address
+ * @param string $first_name User's first name (optional)
+ * @param string $last_name User's last name (optional)
+ * @return bool True on success, false on failure
+ */
+function nymia_send_new_user_welcome_email($user_id, $username, $email, $first_name = '', $last_name = '') {
+    $site_name = get_bloginfo('name');
+    $site_url = home_url();
+    
+    // Build user display name
+    $display_name = trim($first_name . ' ' . $last_name);
+    if (empty($display_name)) {
+        $display_name = $username;
+    }
+    
+    // Get template from settings or use default
+    $subject_template = get_option('nymia_new_user_email_subject', 'Welcome to {site_name}!');
+    $message_template = get_option('nymia_new_user_email_message', "Hello {display_name}!\n\nWelcome to {site_name}! We're excited to have you join our community.\n\nYour account has been successfully created:\nUsername: {username}\nEmail: {email}\n\nYou can now start exploring all the features we have to offer.\n\nIf you have any questions, feel free to reach out to our support team.\n\nBest regards,\nThe {site_name} Team");
+    
+    // Replace variables
+    $subject = str_replace(
+        array('{site_name}', '{display_name}', '{username}'),
+        array($site_name, $display_name, $username),
+        $subject_template
+    );
+    
+    $message = str_replace(
+        array('{site_name}', '{display_name}', '{username}', '{email}', '{site_url}'),
+        array($site_name, $display_name, $username, $email, $site_url),
+        $message_template
+    );
+    
+    $headers = array('Content-Type: text/plain; charset=UTF-8');
+    
+    return wp_mail($email, $subject, $message, $headers);
+} // END: nymia_send_new_user_welcome_email()
+
+/**
+ * SEND NEW CREATOR WELCOME EMAIL
+ * -------------------------------
+ * Sends welcome email to users when they become creators
+ * @param int $user_id The user ID who became a creator
+ * @param string $username User's username
+ * @param string $email User's email address
+ * @return bool True on success, false on failure
+ */
+function nymia_send_new_creator_welcome_email($user_id, $username, $email) {
+    $site_name = get_bloginfo('name');
+    $site_url = home_url();
+    
+    $user = get_userdata($user_id);
+    if (!$user) {
+        return false;
+    }
+    
+    // Build user display name
+    $display_name = $user->display_name ?: $username;
+    $first_name = get_user_meta($user_id, 'first_name', true);
+    $last_name = get_user_meta($user_id, 'last_name', true);
+    if (!empty($first_name) || !empty($last_name)) {
+        $display_name = trim($first_name . ' ' . $last_name);
+    }
+    
+    // Get template from settings or use default
+    $subject_template = get_option('nymia_new_creator_email_subject', 'Welcome Creator - {site_name}');
+    $message_template = get_option('nymia_new_creator_email_message', "Hello {display_name}!\n\nCongratulations! Your creator account has been successfully created on {site_name}.\n\nAs a creator, you now have access to:\n- Upload and share your content\n- Connect with your audience\n- Earn from your creations\n\nYour account details:\nUsername: {username}\nEmail: {email}\n\nWe're reviewing your application and will notify you once it's approved.\n\nIf you have any questions, feel free to reach out to our support team.\n\nBest regards,\nThe {site_name} Team");
+    
+    // Replace variables
+    $subject = str_replace(
+        array('{site_name}', '{display_name}', '{username}'),
+        array($site_name, $display_name, $username),
+        $subject_template
+    );
+    
+    $message = str_replace(
+        array('{site_name}', '{display_name}', '{username}', '{email}', '{site_url}'),
+        array($site_name, $display_name, $username, $email, $site_url),
+        $message_template
+    );
+    
+    $headers = array('Content-Type: text/plain; charset=UTF-8');
+    
+    return wp_mail($email, $subject, $message, $headers);
+} // END: nymia_send_new_creator_welcome_email()
 
 /**
  * USER REGISTRATION HANDLER (With Email Verification)
@@ -5603,12 +5810,15 @@ function nymia_user_register_handler() {
         update_user_meta($user_id, 'email_verified', '1');
     
         // AUTO-LOGIN: Only if verification is disabled
-    wp_set_current_user($user_id);
-    wp_set_auth_cookie($user_id, true);
+        wp_set_current_user($user_id);
+        wp_set_auth_cookie($user_id, true);
+        
+        // SEND: Welcome email to new user
+        nymia_send_new_user_welcome_email($user_id, $username, $email, $first_name, $last_name);
     
-    // REDIRECT: To profile page with success message
-    wp_redirect(home_url('/?registration=success'));
-    exit;
+        // REDIRECT: To profile page with success message
+        wp_redirect(home_url('/?registration=success'));
+        exit;
     }
 } // END: nymia_user_register_handler()
 add_action('admin_post_nymia_user_register', 'nymia_user_register_handler');
@@ -5682,6 +5892,15 @@ function nymia_verify_email_handler() {
         // DELETE: Verification code and expiry
         delete_user_meta($user_id, 'verification_code');
         delete_user_meta($user_id, 'verification_expiry');
+        
+        // GET: User data for welcome email
+        $user = get_userdata($user_id);
+        if ($user) {
+            $first_name = get_user_meta($user_id, 'first_name', true);
+            $last_name = get_user_meta($user_id, 'last_name', true);
+            // SEND: Welcome email to new user after verification
+            nymia_send_new_user_welcome_email($user_id, $user->user_login, $user->user_email, $first_name, $last_name);
+        }
         
         // AUTO-LOGIN: Automatically log in the verified user
         wp_set_current_user($user_id);
@@ -7376,6 +7595,9 @@ function nymia_process_creator_request($user_id, $kyc_data = array()) {
 
     // SEND: Admin notification email about new creator registration
     nymia_send_admin_new_creator_notification($user_id, $user->user_login, $user->user_email, $kyc_data);
+    
+    // SEND: Welcome email to new creator
+    nymia_send_new_creator_welcome_email($user_id, $user->user_login, $user->user_email);
 
     return true;
 }
@@ -8058,6 +8280,7 @@ add_action('wp_ajax_nymia_admin_search_users', 'nymia_admin_search_users');
 // INCLUDE ADMIN FILES
 // ==========================================
 require_once get_template_directory() . '/admin/admin-menu.php';
+require_once get_template_directory() . '/admin/email-templates-settings.php';
 require_once get_template_directory() . '/admin/dashboard-settings.php';
 require_once get_template_directory() . '/admin/general-settings.php';
 require_once get_template_directory() . '/admin/social-login-settings.php';
@@ -8065,7 +8288,9 @@ require_once get_template_directory() . '/admin/zegocloud-settings.php';
 require_once get_template_directory() . '/admin/stream-settings.php';
 require_once get_template_directory() . '/admin/stripe-settings.php';
 require_once get_template_directory() . '/admin/payout-requests.php';
+require_once get_template_directory() . '/admin/email-templates-settings.php';
 require_once get_template_directory() . '/admin/footer-menu-settings.php';
+require_once get_template_directory() . '/admin/user-management.php';
 
 // ==========================================
 // DELETE ACCOUNT AJAX HANDLER
@@ -11352,6 +11577,203 @@ function nymia_create_checkout_session() {
 
     check_ajax_referer('nymia_checkout', 'nonce');
 
+    $current_user_id = get_current_user_id();
+    $cart_checkout = isset($_POST['cart_checkout']) && $_POST['cart_checkout'] === '1';
+    
+    // Save billing information if provided
+    if (isset($_POST['billing_data'])) {
+        $billing_data = json_decode(stripslashes($_POST['billing_data']), true);
+        if (is_array($billing_data)) {
+            // Save billing information to user meta
+            if (isset($billing_data['first_name'])) {
+                update_user_meta($current_user_id, 'first_name', sanitize_text_field($billing_data['first_name']));
+            }
+            if (isset($billing_data['last_name'])) {
+                update_user_meta($current_user_id, 'last_name', sanitize_text_field($billing_data['last_name']));
+            }
+            if (isset($billing_data['email'])) {
+                $email = sanitize_email($billing_data['email']);
+                if (is_email($email)) {
+                    wp_update_user(array('ID' => $current_user_id, 'user_email' => $email));
+                }
+            }
+            if (isset($billing_data['phone'])) {
+                update_user_meta($current_user_id, 'phone', sanitize_text_field($billing_data['phone']));
+            }
+            if (isset($billing_data['street'])) {
+                update_user_meta($current_user_id, 'street', sanitize_text_field($billing_data['street']));
+            }
+            if (isset($billing_data['city'])) {
+                update_user_meta($current_user_id, 'city', sanitize_text_field($billing_data['city']));
+            }
+            if (isset($billing_data['state'])) {
+                update_user_meta($current_user_id, 'state', sanitize_text_field($billing_data['state']));
+            }
+            if (isset($billing_data['postcode'])) {
+                update_user_meta($current_user_id, 'postcode', sanitize_text_field($billing_data['postcode']));
+            }
+            if (isset($billing_data['country'])) {
+                update_user_meta($current_user_id, 'country', sanitize_text_field($billing_data['country']));
+            }
+        }
+    }
+    
+    // Handle cart checkout
+    if ($cart_checkout) {
+        $cart = function_exists('nymia_get_cart') ? nymia_get_cart() : array();
+        
+        if (empty($cart)) {
+            wp_send_json_error(array('message' => __('Your cart is empty.', 'nymia')));
+            return;
+        }
+        
+        // Validate cart items
+        $valid_cart = array();
+        foreach ($cart as $item) {
+            $item_type = $item['type'] ?? '';
+            $item_id = $item['id'] ?? '';
+            
+            if (empty($item_type) || empty($item_id)) {
+                continue;
+            }
+            
+            // Check if already purchased
+            $has_access = false;
+            if ($item_type === 'ebook' && function_exists('nymia_user_has_ebook_access')) {
+                $has_access = nymia_user_has_ebook_access($current_user_id, $item_id);
+            } elseif ($item_type === 'audio' && function_exists('nymia_user_has_audio_access')) {
+                $has_access = nymia_user_has_audio_access($current_user_id, $item_id);
+            }
+            
+            if (!$has_access) {
+                $valid_cart[] = $item;
+            }
+        }
+        
+        if (empty($valid_cart)) {
+            wp_send_json_error(array('message' => __('All items in your cart are already purchased.', 'nymia')));
+            return;
+        }
+        
+        // Get Stripe keys
+        $stripe_secret_key = get_option('nymia_stripe_secret_key', '');
+        $stripe_mode = get_option('nymia_stripe_mode', 'test');
+        $currency = strtoupper(get_option('nymia_stripe_currency', 'USD'));
+        
+        if (empty($stripe_secret_key)) {
+            wp_send_json_error(array('message' => __('Stripe is not configured. Please contact the administrator.', 'nymia')));
+            return;
+        }
+        
+        // Build line items for cart
+        $line_items = array();
+        $total_amount = 0;
+        $cart_metadata = array();
+        
+        foreach ($valid_cart as $index => $item) {
+            $item_type = $item['type'] ?? '';
+            $item_id = $item['id'] ?? '';
+            $item_title = $item['title'] ?? ($item_type === 'ebook' ? 'Ebook' : 'Audio Track');
+            $item_price = (float)($item['price'] ?? 0);
+            $item_image = $item['image'] ?? '';
+            
+            if ($item_price <= 0) {
+                continue;
+            }
+            
+            $line_items[] = array(
+                'price_data' => array(
+                    'currency' => strtolower($currency),
+                    'product_data' => array(
+                        'name' => $item_title,
+                        'images' => !empty($item_image) ? array($item_image) : array(),
+                    ),
+                    'unit_amount' => round($item_price * 100), // Convert to cents
+                ),
+                'quantity' => 1,
+            );
+            
+            $total_amount += $item_price;
+            $cart_metadata['item_' . $index . '_type'] = $item_type;
+            $cart_metadata['item_' . $index . '_id'] = $item_id;
+        }
+        
+        if (empty($line_items)) {
+            wp_send_json_error(array('message' => __('No valid items to purchase.', 'nymia')));
+            return;
+        }
+        
+        // Get current user
+        $current_user = wp_get_current_user();
+        $customer_email = $current_user->user_email;
+        
+        // Get or create Stripe Customer
+        $stripe_customer_id = nymia_get_or_create_stripe_customer($current_user_id);
+        if (is_wp_error($stripe_customer_id)) {
+            $stripe_customer_id = null;
+        }
+        
+        // Create Stripe Checkout Session for cart
+        $success_url = add_query_arg(array(
+            'payment' => 'success',
+            'session_id' => '{CHECKOUT_SESSION_ID}',
+            'cart' => '1'
+        ), home_url('/checkout'));
+        $success_url = str_replace(array('%7B', '%7D'), array('{', '}'), $success_url);
+        $cancel_url = home_url('/cart');
+        
+        $session_data = array(
+            'payment_method_types' => array('card'),
+            'mode' => 'payment',
+            'success_url' => $success_url,
+            'cancel_url' => $cancel_url,
+            'payment_intent_data' => array(
+                'setup_future_usage' => 'on_session',
+            ),
+            'line_items' => $line_items,
+            'billing_address_collection' => 'required', // Require billing address in Stripe Checkout
+            'metadata' => array_merge(array(
+                'cart_checkout' => '1',
+                'user_id' => $current_user->ID,
+                'item_count' => count($valid_cart),
+                'wp_site_url' => home_url(),
+            ), $cart_metadata),
+        );
+        
+        if ($stripe_customer_id) {
+            $session_data['customer'] = $stripe_customer_id;
+        } else {
+            $session_data['customer_email'] = $customer_email;
+        }
+        
+        // Create session via Stripe API
+        $response = wp_remote_post('https://api.stripe.com/v1/checkout/sessions', array(
+            'headers' => array(
+                'Authorization' => 'Bearer ' . $stripe_secret_key,
+                'Content-Type' => 'application/x-www-form-urlencoded',
+            ),
+            'body' => http_build_query($session_data),
+            'timeout' => 30,
+        ));
+        
+        if (is_wp_error($response)) {
+            wp_send_json_error(array('message' => __('Failed to create checkout session. Please try again.', 'nymia')));
+            return;
+        }
+        
+        $response_body = json_decode(wp_remote_retrieve_body($response), true);
+        
+        if (isset($response_body['id'])) {
+            wp_send_json_success(array('sessionId' => $response_body['id']));
+        } else {
+            $error_message = isset($response_body['error']['message']) ? $response_body['error']['message'] : __('Failed to create checkout session.', 'nymia');
+            wp_send_json_error(array('message' => $error_message));
+        }
+        
+        return; // Exit early for cart checkout
+    }
+    
+    // Original single item checkout logic (for backward compatibility)
     $item_type = isset($_POST['item_type']) ? sanitize_text_field($_POST['item_type']) : '';
     $item_id = isset($_POST['item_id']) ? sanitize_text_field($_POST['item_id']) : '';
 
@@ -12824,9 +13246,10 @@ function nymia_checkout_success_handler() {
     $item_type = isset($_GET['type']) ? sanitize_text_field($_GET['type']) : '';
     $item_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
     $room_id = isset($_GET['room_id']) ? sanitize_text_field($_GET['room_id']) : '';
+    $is_cart = isset($_GET['cart']) && $_GET['cart'] === '1';
 
     // Debug logging
-    error_log('NYMIA_CHECKOUT_SUCCESS: session_id=' . $session_id . ', type=' . $item_type . ', id=' . $item_id);
+    error_log('NYMIA_CHECKOUT_SUCCESS: session_id=' . $session_id . ', type=' . $item_type . ', id=' . $item_id . ', cart=' . ($is_cart ? '1' : '0'));
 
     // For live streams, room_id is required instead of item_id
     // For tips, creator_id is required instead of item_id
@@ -12841,6 +13264,13 @@ function nymia_checkout_success_handler() {
         if (empty($session_id) || empty($item_type) || empty($creator_id)) {
             error_log('NYMIA_CHECKOUT_SUCCESS: Missing required parameters for tip');
             wp_redirect(home_url('/'));
+            exit;
+        }
+    } elseif ($is_cart) {
+        // Cart checkout - only session_id is required
+        if (empty($session_id)) {
+            error_log('NYMIA_CHECKOUT_SUCCESS: Missing session_id for cart checkout');
+            wp_redirect(home_url('/cart'));
             exit;
         }
     } else {
@@ -12889,6 +13319,89 @@ function nymia_checkout_success_handler() {
         exit;
     }
 
+    // Check if this is a cart checkout
+    $is_cart_checkout = isset($session['metadata']['cart_checkout']) && $session['metadata']['cart_checkout'] === '1';
+    
+    if ($is_cart_checkout) {
+        // Process cart checkout
+        $item_count = isset($session['metadata']['item_count']) ? intval($session['metadata']['item_count']) : 0;
+        $purchased_items = array();
+        
+        // Extract all items from metadata
+        for ($i = 0; $i < $item_count; $i++) {
+            $item_type_key = 'item_' . $i . '_type';
+            $item_id_key = 'item_' . $i . '_id';
+            
+            if (isset($session['metadata'][$item_type_key]) && isset($session['metadata'][$item_id_key])) {
+                $purchased_items[] = array(
+                    'type' => $session['metadata'][$item_type_key],
+                    'id' => $session['metadata'][$item_id_key]
+                );
+            }
+        }
+        
+        // Grant access to all items
+        foreach ($purchased_items as $item) {
+            $item_type = $item['type'];
+            $item_id = $item['id'];
+            
+            if ($item_type === 'ebook') {
+                $unlocked = get_user_meta($current_user_id, 'nymia_ebooks_unlocked', true);
+                if (!is_array($unlocked)) {
+                    $unlocked = array();
+                }
+                $ebook_id_str = (string)$item_id;
+                if (!in_array($ebook_id_str, $unlocked)) {
+                    $unlocked[] = $ebook_id_str;
+                    update_user_meta($current_user_id, 'nymia_ebooks_unlocked', array_values($unlocked));
+                }
+            } elseif ($item_type === 'audio') {
+                $unlocked = get_user_meta($current_user_id, 'nymia_audio_unlocked', true);
+                if (!is_array($unlocked)) {
+                    $unlocked = array();
+                }
+                $audio_id_str = (string)$item_id;
+                if (!in_array($audio_id_str, $unlocked)) {
+                    $unlocked[] = $audio_id_str;
+                    update_user_meta($current_user_id, 'nymia_audio_unlocked', array_values($unlocked));
+                }
+            }
+        }
+        
+        // Store purchase record
+        $purchases = get_user_meta($current_user_id, 'nymia_purchases', true);
+        if (!is_array($purchases)) {
+            $purchases = array();
+        }
+        $purchase_exists = false;
+        foreach ($purchases as $purchase) {
+            if (isset($purchase['session_id']) && $purchase['session_id'] === $session_id) {
+                $purchase_exists = true;
+                break;
+            }
+        }
+        if (!$purchase_exists) {
+            $purchases[] = array(
+                'type' => 'cart',
+                'items' => $purchased_items,
+                'session_id' => $session_id,
+                'amount' => isset($session['amount_total']) ? ($session['amount_total'] / 100) : 0,
+                'currency' => isset($session['currency']) ? strtoupper($session['currency']) : 'USD',
+                'date' => current_time('mysql'),
+            );
+            update_user_meta($current_user_id, 'nymia_purchases', $purchases);
+        }
+        
+        // Clear cart
+        if (function_exists('nymia_clear_cart')) {
+            nymia_clear_cart();
+        }
+        
+        // Redirect to dashboard with success message
+        wp_redirect(home_url('/dashboard?purchased=1'));
+        exit;
+    }
+    
     // Verify metadata matches
     $session_item_type = isset($session['metadata']['item_type']) ? $session['metadata']['item_type'] : '';
     
@@ -14248,4 +14761,348 @@ add_action('template_redirect', function() {
         nymia_checkout_success_handler();
     }
 });
+
+// ==========================================
+// CART MANAGEMENT FUNCTIONS
+// ==========================================
+
+/**
+ * Get user's cart
+ */
+function nymia_get_cart() {
+    if (!is_user_logged_in()) {
+        // For guests, use session/cookie
+        if (isset($_COOKIE['nymia_cart'])) {
+            $cart = json_decode(stripslashes($_COOKIE['nymia_cart']), true);
+            return is_array($cart) ? $cart : array();
+        }
+        return array();
+    }
+    
+    $user_id = get_current_user_id();
+    $cart = get_user_meta($user_id, 'nymia_cart', true);
+    $cart_array = is_array($cart) ? $cart : array();
+    
+    // Debug logging
+    error_log('NYMIA_CART_GET: User ID: ' . $user_id . ', Cart items: ' . count($cart_array));
+    
+    return $cart_array;
+}
+
+/**
+ * Add item to cart
+ * @return array|bool Returns array with 'success' and 'message' keys, or false on critical error
+ */
+function nymia_add_to_cart($item_type, $item_id) {
+    if (!in_array($item_type, array('ebook', 'audio', 'audio_book'))) {
+        return array('success' => false, 'message' => __('Invalid item type.', 'nymia'));
+    }
+    
+    $cart = nymia_get_cart();
+    
+    // Check if item already in cart
+    foreach ($cart as $key => $item) {
+        if ($item['type'] === $item_type && (string)$item['id'] === (string)$item_id) {
+            return array('success' => true, 'message' => __('Item is already in your cart.', 'nymia'));
+        }
+    }
+    
+    // Get item details
+    $item_data = null;
+    if ($item_type === 'ebook') {
+        $all_ebooks = function_exists('nymia_get_all_ebooks') ? nymia_get_all_ebooks() : array();
+        if (empty($all_ebooks)) {
+            return array('success' => false, 'message' => __('Ebook library is empty or not loaded. Please refresh the page.', 'nymia'));
+        }
+        foreach ($all_ebooks as $ebook) {
+            // Try multiple ID comparison methods
+            $ebook_id = isset($ebook['id']) ? $ebook['id'] : '';
+            if (empty($ebook_id)) {
+                continue;
+            }
+            // Compare as strings and integers
+            if ((string)$ebook_id === (string)$item_id || (int)$ebook_id === (int)$item_id) {
+                $item_data = $ebook;
+                break;
+            }
+        }
+    } elseif ($item_type === 'audio') {
+        $all_audio = get_transient('nymia_all_audio');
+        if (!$all_audio || !is_array($all_audio)) {
+            return array('success' => false, 'message' => __('Audio library is empty or not loaded. Please refresh the page.', 'nymia'));
+        }
+        foreach ($all_audio as $audio) {
+            // Try multiple ID comparison methods
+            $audio_id = isset($audio['id']) ? $audio['id'] : '';
+            if (empty($audio_id)) {
+                continue;
+            }
+            // Compare as strings and integers
+            if ((string)$audio_id === (string)$item_id || (int)$audio_id === (int)$item_id) {
+                $item_data = $audio;
+                break;
+            }
+        }
+    }
+    
+    if (!$item_data) {
+        return array('success' => false, 'message' => sprintf(__('Item not found. Item ID: %s, Type: %s', 'nymia'), esc_html($item_id), esc_html($item_type)));
+    }
+    
+    // Check if already purchased
+    if (is_user_logged_in()) {
+        $user_id = get_current_user_id();
+        if ($item_type === 'ebook' && function_exists('nymia_user_has_ebook_access')) {
+            if (nymia_user_has_ebook_access($user_id, $item_id)) {
+                return array('success' => false, 'message' => __('You already have access to this item.', 'nymia'));
+            }
+        } elseif ($item_type === 'audio' && function_exists('nymia_user_has_audio_access')) {
+            if (nymia_user_has_audio_access($user_id, $item_id)) {
+                return array('success' => false, 'message' => __('You already have access to this item.', 'nymia'));
+            }
+        }
+    }
+    
+    // Check if item is paid
+    $paid_access = $item_data['paid_access'] ?? '';
+    $price = (float)($item_data['price'] ?? 0);
+    $is_paid = (!empty($paid_access) && $paid_access === 'yes' && $price > 0);
+    
+    if (!$is_paid) {
+        if (empty($paid_access) || $paid_access !== 'yes') {
+            return array('success' => false, 'message' => __('This item is not set as a paid item.', 'nymia'));
+        }
+        if ($price <= 0) {
+            return array('success' => false, 'message' => __('This item has no price set.', 'nymia'));
+        }
+        return array('success' => false, 'message' => __('This item is free and does not require purchase.', 'nymia'));
+    }
+    
+    // Add to cart
+    $cart[] = array(
+        'type' => $item_type,
+        'id' => (string)$item_id,
+        'title' => $item_data['title'] ?? ($item_type === 'ebook' ? 'Ebook' : 'Audio Track'),
+        'author' => $item_data['author'] ?? 'Unknown',
+        'price' => (float)($item_data['price'] ?? 0),
+        'image' => $item_data['thumbnail'] ?? $item_data['image'] ?? $item_data['cover_image'] ?? '',
+        'user_id' => isset($item_data['user_id']) ? intval($item_data['user_id']) : 0,
+    );
+    
+    if (is_user_logged_in()) {
+        $user_id = get_current_user_id();
+        $updated = update_user_meta($user_id, 'nymia_cart', $cart);
+        
+        // Verify the cart was saved
+        $saved_cart = get_user_meta($user_id, 'nymia_cart', true);
+        error_log('NYMIA_CART_SAVE: User ID: ' . $user_id . ', Cart items: ' . count($cart) . ', Saved items: ' . (is_array($saved_cart) ? count($saved_cart) : 0));
+        
+        if (!$updated && get_user_meta($user_id, 'nymia_cart', true) !== $cart) {
+            error_log('NYMIA_CART_SAVE_ERROR: Failed to save cart for user ' . $user_id);
+            return array('success' => false, 'message' => __('Failed to save cart. Please try again.', 'nymia'));
+        }
+    } else {
+        // Store in cookie for guests
+        setcookie('nymia_cart', json_encode($cart), time() + (30 * DAY_IN_SECONDS), '/');
+    }
+    
+    error_log('NYMIA_CART_ADD_SUCCESS: Item added. Cart now has ' . count($cart) . ' items');
+    return array('success' => true, 'message' => __('Item added to cart successfully.', 'nymia'));
+}
+
+/**
+ * Remove item from cart
+ */
+function nymia_remove_from_cart($item_type, $item_id) {
+    $cart = nymia_get_cart();
+    
+    foreach ($cart as $key => $item) {
+        if ($item['type'] === $item_type && (string)$item['id'] === (string)$item_id) {
+            unset($cart[$key]);
+            $cart = array_values($cart); // Re-index
+            
+            if (is_user_logged_in()) {
+                $user_id = get_current_user_id();
+                update_user_meta($user_id, 'nymia_cart', $cart);
+            } else {
+                setcookie('nymia_cart', json_encode($cart), time() + (30 * DAY_IN_SECONDS), '/');
+            }
+            
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+/**
+ * Clear cart
+ */
+function nymia_clear_cart() {
+    if (is_user_logged_in()) {
+        $user_id = get_current_user_id();
+        delete_user_meta($user_id, 'nymia_cart');
+    } else {
+        setcookie('nymia_cart', '', time() - 3600, '/');
+    }
+}
+
+/**
+ * Get cart total
+ */
+function nymia_get_cart_total() {
+    $cart = nymia_get_cart();
+    $total = 0;
+    
+    foreach ($cart as $item) {
+        $total += (float)($item['price'] ?? 0);
+    }
+    
+    return $total;
+}
+
+/**
+ * AJAX: Add to cart
+ */
+function nymia_ajax_add_to_cart() {
+    // Log incoming request for debugging
+    error_log('NYMIA_ADD_TO_CART: Request received. POST data: ' . print_r($_POST, true));
+    
+    try {
+        // Check if action is set correctly
+        if (!isset($_POST['action']) || $_POST['action'] !== 'nymia_add_to_cart') {
+            error_log('NYMIA_ADD_TO_CART: Invalid or missing action parameter');
+            wp_send_json_error(array('message' => __('Invalid request. Please refresh the page and try again.', 'nymia')));
+            return;
+        }
+        
+        // Verify nonce first to prevent 400 errors
+        $nonce = isset($_POST['nonce']) ? sanitize_text_field($_POST['nonce']) : '';
+        if (empty($nonce)) {
+            error_log('NYMIA_ADD_TO_CART: Nonce is empty');
+            wp_send_json_error(array('message' => __('Security check failed. Nonce is missing.', 'nymia')));
+            return;
+        }
+        
+        $nonce_verified = wp_verify_nonce($nonce, 'nymia_cart');
+        if (!$nonce_verified) {
+            error_log('NYMIA_ADD_TO_CART: Nonce verification failed. Nonce: ' . $nonce);
+            wp_send_json_error(array('message' => __('Security check failed. Please refresh the page and try again.', 'nymia')));
+            return;
+        }
+        
+        if (!is_user_logged_in()) {
+            error_log('NYMIA_ADD_TO_CART: User not logged in');
+            wp_send_json_error(array('message' => __('Please log in to add items to cart.', 'nymia')));
+            return;
+        }
+        
+        $item_type = isset($_POST['item_type']) ? sanitize_text_field($_POST['item_type']) : '';
+        $item_id = isset($_POST['item_id']) ? sanitize_text_field($_POST['item_id']) : '';
+        
+        error_log('NYMIA_ADD_TO_CART: Item type: ' . $item_type . ', Item ID: ' . $item_id);
+        
+        if (empty($item_type) || empty($item_id)) {
+            error_log('NYMIA_ADD_TO_CART: Missing item type or ID');
+            wp_send_json_error(array('message' => __('Invalid item. Missing item type or ID.', 'nymia')));
+            return;
+        }
+        
+        $result = nymia_add_to_cart($item_type, $item_id);
+        
+        // Handle new return format (array with success and message)
+        if (is_array($result)) {
+            if ($result['success']) {
+                // Get fresh cart data after adding item
+                $cart = nymia_get_cart();
+                error_log('NYMIA_AJAX_ADD_TO_CART_SUCCESS: Cart now has ' . count($cart) . ' items');
+                wp_send_json_success(array(
+                    'message' => isset($result['message']) ? $result['message'] : __('Item added to cart.', 'nymia'),
+                    'cart_count' => count($cart),
+                    'cart_total' => nymia_get_cart_total(),
+                    'cart' => $cart // Include cart data in response for debugging
+                ));
+            } else {
+                wp_send_json_error(array('message' => $result['message']));
+            }
+        } else {
+            // Backward compatibility - if function returns boolean
+            if ($result) {
+                $cart = nymia_get_cart();
+                wp_send_json_success(array(
+                    'message' => __('Item added to cart.', 'nymia'),
+                    'cart_count' => count($cart),
+                    'cart_total' => nymia_get_cart_total()
+                ));
+            } else {
+                wp_send_json_error(array('message' => __('Failed to add item to cart. Item may already be in cart, already purchased, or is free.', 'nymia')));
+            }
+        }
+    } catch (Exception $e) {
+        error_log('NYMIA Add to Cart Error: ' . $e->getMessage());
+        error_log('NYMIA Add to Cart Error Trace: ' . $e->getTraceAsString());
+        wp_send_json_error(array('message' => __('An error occurred while adding item to cart. Please try again.', 'nymia')));
+    } catch (Throwable $e) {
+        // Catch both Exception and Error (PHP 7+)
+        error_log('NYMIA Add to Cart Fatal Error: ' . $e->getMessage());
+        error_log('NYMIA Add to Cart Fatal Error Trace: ' . $e->getTraceAsString());
+        wp_send_json_error(array('message' => __('A system error occurred. Please contact support.', 'nymia')));
+    }
+}
+// Register AJAX handler for logged-in users
+add_action('wp_ajax_nymia_add_to_cart', 'nymia_ajax_add_to_cart');
+
+/**
+ * AJAX: Remove from cart
+ */
+function nymia_ajax_remove_from_cart() {
+    if (!is_user_logged_in()) {
+        wp_send_json_error(array('message' => __('Please log in.', 'nymia')));
+        return;
+    }
+    
+    check_ajax_referer('nymia_cart', 'nonce');
+    
+    $item_type = isset($_POST['item_type']) ? sanitize_text_field($_POST['item_type']) : '';
+    $item_id = isset($_POST['item_id']) ? sanitize_text_field($_POST['item_id']) : '';
+    
+    if (empty($item_type) || empty($item_id)) {
+        wp_send_json_error(array('message' => __('Invalid item.', 'nymia')));
+        return;
+    }
+    
+    $result = nymia_remove_from_cart($item_type, $item_id);
+    
+    if ($result) {
+        $cart = nymia_get_cart();
+        wp_send_json_success(array(
+            'message' => __('Item removed from cart.', 'nymia'),
+            'cart_count' => count($cart),
+            'cart_total' => nymia_get_cart_total()
+        ));
+    } else {
+        wp_send_json_error(array('message' => __('Failed to remove item from cart.', 'nymia')));
+    }
+}
+add_action('wp_ajax_nymia_remove_from_cart', 'nymia_ajax_remove_from_cart');
+
+/**
+ * AJAX: Get cart
+ */
+function nymia_ajax_get_cart() {
+    if (!is_user_logged_in()) {
+        wp_send_json_error(array('message' => __('Please log in.', 'nymia')));
+        return;
+    }
+    
+    check_ajax_referer('nymia_cart', 'nonce');
+    
+    $cart = nymia_get_cart();
+    wp_send_json_success(array(
+        'cart' => $cart,
+        'cart_count' => count($cart),
+        'cart_total' => nymia_get_cart_total()
+    ));
+}
+add_action('wp_ajax_nymia_get_cart', 'nymia_ajax_get_cart');
 

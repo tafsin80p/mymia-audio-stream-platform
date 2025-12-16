@@ -74,6 +74,319 @@ function nymia_handle_user_management_action() {
 add_action('admin_post_nymia_user_action', 'nymia_handle_user_management_action');
 
 /**
+ * Handle CSV Export for Creators
+ */
+function nymia_export_creators_csv() {
+    // Prevent any output before headers
+    if (ob_get_level()) {
+        ob_end_clean();
+    }
+    
+    if (!current_user_can('manage_options')) {
+        wp_die(__('Unauthorized', 'nymia'));
+    }
+    
+    check_admin_referer('nymia_export_creators_csv');
+    
+    // Get creator roles
+    $creator_roles = apply_filters('nymia_creator_roles', array('administrator', 'author'));
+    
+    // Check if specific user IDs are provided
+    $user_ids = isset($_POST['user_ids']) && is_array($_POST['user_ids']) ? array_map('intval', $_POST['user_ids']) : array();
+    
+    // Get creators
+    $args = array(
+        'role__in' => $creator_roles,
+        'number' => -1, // Get all
+        'orderby' => 'registered',
+        'order' => 'DESC',
+    );
+    
+    // If specific user IDs provided, filter by them
+    if (!empty($user_ids)) {
+        $args['include'] = $user_ids;
+    }
+    
+    $creators = get_users($args);
+    
+    // Set headers for CSV download
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="nymia-creators-' . date('Y-m-d') . '.csv"');
+    header('Pragma: no-cache');
+    header('Expires: 0');
+    
+    // Output UTF-8 BOM for Excel compatibility
+    echo "\xEF\xBB\xBF";
+    
+    // Open output stream
+    $output = fopen('php://output', 'w');
+    
+    // CSV Headers
+    $headers = array(
+        'ID',
+        'Username',
+        'Email',
+        'Display Name',
+        'First Name',
+        'Last Name',
+        'Phone',
+        'Location',
+        'Registered Date',
+        'Role',
+        'Status',
+        'KYC Status',
+        'Stripe Account ID',
+        'Stripe Payout Email',
+        'Stripe Payout Status',
+        'Bank Name',
+        'Account Holder Name',
+        'Account Number',
+        'Routing Number',
+        'SWIFT/BIC Code',
+        'Account Type',
+        'Bank Country',
+        'Bank Account Updated',
+        'Website',
+        'Bio'
+    );
+    
+    fputcsv($output, $headers);
+    
+    // Export creator data
+    foreach ($creators as $creator) {
+        $user_id = $creator->ID;
+        
+        // Get user meta
+        $first_name = get_user_meta($user_id, 'first_name', true);
+        $last_name = get_user_meta($user_id, 'last_name', true);
+        $phone = get_user_meta($user_id, 'phone', true);
+        $location = get_user_meta($user_id, 'location', true);
+        $user_status = get_user_meta($user_id, NYMIA_USER_STATUS_META, true) ?: 'active';
+        $kyc_status = get_user_meta($user_id, NYMIA_KYC_STATUS_META, true) ?: 'pending';
+        $stripe_account_id = get_user_meta($user_id, 'nymia_stripe_account_id', true);
+        if (empty($stripe_account_id)) {
+            $stripe_account_id = get_user_meta($user_id, 'stripe_account_no', true);
+        }
+        $stripe_payout_email = get_user_meta($user_id, 'nymia_stripe_payout_email', true);
+        $stripe_payout_status = get_user_meta($user_id, 'nymia_stripe_payout_status', true) ?: 'not_connected';
+        $bank_name = get_user_meta($user_id, 'nymia_bank_name', true);
+        $account_holder_name = get_user_meta($user_id, 'nymia_bank_account_holder_name', true);
+        $account_number = get_user_meta($user_id, 'nymia_bank_account_number', true);
+        $routing_number = get_user_meta($user_id, 'nymia_bank_routing_number', true);
+        $swift_bic = get_user_meta($user_id, 'nymia_bank_swift_bic', true);
+        if (empty($swift_bic)) {
+            $swift_bic = get_user_meta($user_id, 'nymia_swift_bic', true);
+        }
+        $account_type = get_user_meta($user_id, 'nymia_bank_account_type', true);
+        $bank_country = get_user_meta($user_id, 'nymia_bank_country', true);
+        $bank_account_updated = get_user_meta($user_id, 'nymia_bank_account_updated', true);
+        $bank_account_updated_date = $bank_account_updated ? date('Y-m-d H:i:s', $bank_account_updated) : '';
+        $bio = get_user_meta($user_id, 'description', true);
+        
+        // Parse display name for first/last name if not set
+        if (empty($first_name) && empty($last_name) && !empty($creator->display_name)) {
+            $name_parts = explode(' ', $creator->display_name, 2);
+            $first_name = isset($name_parts[0]) ? $name_parts[0] : '';
+            $last_name = isset($name_parts[1]) ? $name_parts[1] : '';
+        }
+        
+        $row = array(
+            $user_id,
+            $creator->user_login,
+            $creator->user_email,
+            $creator->display_name,
+            $first_name,
+            $last_name,
+            $phone,
+            $location,
+            $creator->user_registered,
+            implode(', ', $creator->roles),
+            ucfirst($user_status),
+            ucfirst($kyc_status),
+            $stripe_account_id,
+            $stripe_payout_email,
+            ucfirst($stripe_payout_status),
+            $bank_name,
+            $account_holder_name,
+            $account_number,
+            $routing_number,
+            $swift_bic,
+            $account_type,
+            $bank_country,
+            $bank_account_updated_date,
+            $creator->user_url,
+            $bio
+        );
+        
+        fputcsv($output, $row);
+    }
+    
+    fclose($output);
+    exit;
+}
+add_action('admin_post_nymia_export_creators_csv', 'nymia_export_creators_csv');
+
+/**
+ * Handle CSV Export for Customers
+ */
+function nymia_export_customers_csv() {
+    // Prevent any output before headers
+    if (ob_get_level()) {
+        ob_end_clean();
+    }
+    
+    if (!current_user_can('manage_options')) {
+        wp_die(__('Unauthorized', 'nymia'));
+    }
+    
+    check_admin_referer('nymia_export_customers_csv');
+    
+    // Get customer roles (subscribers)
+    $customer_roles = apply_filters('nymia_customer_roles', array('subscriber'));
+    
+    // Check if specific user IDs are provided
+    $user_ids = isset($_POST['user_ids']) && is_array($_POST['user_ids']) ? array_map('intval', $_POST['user_ids']) : array();
+    
+    // Get customers
+    $args = array(
+        'role__in' => $customer_roles,
+        'number' => -1, // Get all
+        'orderby' => 'registered',
+        'order' => 'DESC',
+    );
+    
+    // If specific user IDs provided, filter by them
+    if (!empty($user_ids)) {
+        $args['include'] = $user_ids;
+    }
+    
+    $customers = get_users($args);
+    
+    // Set headers for CSV download
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="nymia-customers-' . date('Y-m-d') . '.csv"');
+    header('Pragma: no-cache');
+    header('Expires: 0');
+    
+    // Output UTF-8 BOM for Excel compatibility
+    echo "\xEF\xBB\xBF";
+    
+    // Open output stream
+    $output = fopen('php://output', 'w');
+    
+    // CSV Headers
+    $headers = array(
+        'ID',
+        'Username',
+        'Email',
+        'Display Name',
+        'First Name',
+        'Last Name',
+        'Phone',
+        'Location',
+        'Registered Date',
+        'Status',
+        'Website',
+        'Bio'
+    );
+    
+    fputcsv($output, $headers);
+    
+    // Export customer data
+    foreach ($customers as $customer) {
+        $user_id = $customer->ID;
+        
+        // Get user meta
+        $first_name = get_user_meta($user_id, 'first_name', true);
+        $last_name = get_user_meta($user_id, 'last_name', true);
+        $phone = get_user_meta($user_id, 'phone', true);
+        $location = get_user_meta($user_id, 'location', true);
+        $user_status = get_user_meta($user_id, NYMIA_USER_STATUS_META, true) ?: 'active';
+        $bio = get_user_meta($user_id, 'description', true);
+        
+        // Parse display name for first/last name if not set
+        if (empty($first_name) && empty($last_name) && !empty($customer->display_name)) {
+            $name_parts = explode(' ', $customer->display_name, 2);
+            $first_name = isset($name_parts[0]) ? $name_parts[0] : '';
+            $last_name = isset($name_parts[1]) ? $name_parts[1] : '';
+        }
+        
+        $row = array(
+            $user_id,
+            $customer->user_login,
+            $customer->user_email,
+            $customer->display_name,
+            $first_name,
+            $last_name,
+            $phone,
+            $location,
+            $customer->user_registered,
+            ucfirst($user_status),
+            $customer->user_url,
+            $bio
+        );
+        
+        fputcsv($output, $row);
+    }
+    
+    fclose($output);
+    exit;
+}
+add_action('admin_post_nymia_export_customers_csv', 'nymia_export_customers_csv');
+
+/**
+ * AJAX Handler: Search users for export
+ */
+function nymia_ajax_search_users_for_export() {
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(array('message' => __('Unauthorized', 'nymia')));
+        return;
+    }
+    
+    check_ajax_referer('nymia_search_users_export', 'nonce');
+    
+    $query = isset($_POST['query']) ? sanitize_text_field($_POST['query']) : '';
+    $type = isset($_POST['type']) ? sanitize_text_field($_POST['type']) : 'creator';
+    
+    if (empty($query) || strlen($query) < 2) {
+        wp_send_json_error(array('message' => __('Query too short', 'nymia')));
+        return;
+    }
+    
+    // Determine roles based on type
+    if ($type === 'creator') {
+        $roles = apply_filters('nymia_creator_roles', array('administrator', 'author'));
+    } else {
+        $roles = apply_filters('nymia_customer_roles', array('subscriber'));
+    }
+    
+    // Search users
+    $args = array(
+        'role__in' => $roles,
+        'search' => '*' . esc_attr($query) . '*',
+        'search_columns' => array('user_login', 'user_nicename', 'user_email', 'display_name'),
+        'number' => 20, // Limit results
+        'orderby' => 'registered',
+        'order' => 'DESC',
+    );
+    
+    $users = get_users($args);
+    
+    $results = array();
+    foreach ($users as $user) {
+        $results[] = array(
+            'id' => $user->ID,
+            'username' => $user->user_login,
+            'email' => $user->user_email,
+            'display_name' => $user->display_name ?: $user->user_login,
+        );
+    }
+    
+    wp_send_json_success(array('users' => $results));
+}
+add_action('wp_ajax_nymia_search_users_for_export', 'nymia_ajax_search_users_for_export');
+
+/**
  * Render User Management page
  */
 function nymia_user_management_page() {
@@ -161,6 +474,44 @@ function nymia_user_management_page() {
                         <a class="nymia-pill" href="<?php echo esc_url(add_query_arg(array('status'=>'banned'))); ?>">Banned (<?php echo count(get_users(array('meta_query' => array(array('key' => NYMIA_USER_STATUS_META, 'value' => 'banned'))))); ?>)</a>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        <!-- Export Actions -->
+        <div class="nymia-admin-card" style="margin-bottom: 30px;">
+            <div class="nymia-card-body">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+                    <div>
+                        <h3 style="margin: 0 0 8px 0; color: #fff; font-size: 18px;">Export Data</h3>
+                        <p style="margin: 0; color: #888; font-size: 14px;">Export creator and customer data to CSV files</p>
+                    </div>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="margin: 0;">
+                            <?php wp_nonce_field('nymia_export_creators_csv'); ?>
+                            <input type="hidden" name="action" value="nymia_export_creators_csv" />
+                            <button type="submit" class="nymia-btn nymia-btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                Export Creators CSV
+                            </button>
+                        </form>
+                        <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="margin: 0;">
+                            <?php wp_nonce_field('nymia_export_customers_csv'); ?>
+                            <input type="hidden" name="action" value="nymia_export_customers_csv" />
+                            <button type="submit" class="nymia-btn nymia-btn-secondary" style="display: inline-flex; align-items: center; gap: 8px;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                Export Customers CSV
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
 

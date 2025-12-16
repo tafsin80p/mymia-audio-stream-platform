@@ -67,9 +67,15 @@ function nymia_get_all_ebooks() {
     $filtered_ebooks = array();
     foreach ($all_ebooks as $ebook) {
         $ebook_id = isset($ebook['id']) ? $ebook['id'] : 0;
-        if (nymia_is_content_visible_in_normal($ebook_id, $ebook)) {
-            $filtered_ebooks[] = $ebook;
+        
+        // Only filter if function exists and we have a valid check
+        if (function_exists('nymia_is_content_visible_in_normal')) {
+            if (!nymia_is_content_visible_in_normal($ebook_id, $ebook)) {
+                continue; // Skip Secret Room content
+            }
         }
+        
+        $filtered_ebooks[] = $ebook;
     }
     
     // Sort by date (most recent first)

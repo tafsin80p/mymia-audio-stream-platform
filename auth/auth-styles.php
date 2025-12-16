@@ -14,6 +14,8 @@ if (!defined('ABSPATH')) {
         --primary-dark: #9F2B1A;
         --primary-light: #FF6B3D;
         --background-dark: #0A0A0A;
+
+        
         --background-card: #1E1E1E;
         --text-light: #ffffff;
         --text-gray: #999999;

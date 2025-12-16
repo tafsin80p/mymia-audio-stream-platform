@@ -1054,8 +1054,8 @@ function nymia_theme_settings_page() {
             <div class="nymia-section-head">
                 <h2><?php esc_html_e('User Management', 'nymia'); ?></h2>
                 <div class="nymia-section-actions">
-                    <button type="button" class="nymia-secondary-btn"><?php esc_html_e('Open Users', 'nymia'); ?></button>
-                    <button type="button" class="nymia-tertiary-btn"><?php esc_html_e('Export CSV', 'nymia'); ?></button>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=nymia-user-management')); ?>" class="nymia-secondary-btn" style="text-decoration: none; display: inline-block;"><?php esc_html_e('Open Users', 'nymia'); ?></a>
+                    <button type="button" class="nymia-tertiary-btn" id="nymia-export-csv-btn" style="cursor: pointer;"><?php esc_html_e('Export CSV', 'nymia'); ?></button>
                 </div>
             </div>
             <div class="nymia-user-summary">
@@ -2039,6 +2039,49 @@ function nymia_theme_settings_page() {
             </div>
         </section>
     </div>
+    
+    <!-- Export CSV Modal -->
+    <div class="nymia-admin-dialog" id="nymia-export-csv-modal" role="dialog" aria-modal="true" aria-hidden="true" hidden>
+        <div class="nymia-admin-dialog-card" style="max-width: 600px;">
+            <div>
+                <h3 data-export-title><?php esc_html_e('Export CSV', 'nymia'); ?></h3>
+                <p data-export-message><?php esc_html_e('Select user type and search for users to export', 'nymia'); ?></p>
+            </div>
+            
+            <!-- User Type Selection -->
+            <div class="nymia-export-type-selector" style="display: flex; gap: 12px; margin-bottom: 20px;">
+                <button type="button" class="nymia-export-type-btn active" data-export-type="creator" style="flex: 1; padding: 12px; border-radius: 8px; background: rgba(191, 76, 26, 0.2); border: 2px solid rgba(191, 76, 26, 0.4); color: #fff; cursor: pointer; font-weight: 600;">
+                    <?php esc_html_e('Creators', 'nymia'); ?>
+                </button>
+                <button type="button" class="nymia-export-type-btn" data-export-type="customer" style="flex: 1; padding: 12px; border-radius: 8px; background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.7); cursor: pointer; font-weight: 600;">
+                    <?php esc_html_e('Customers', 'nymia'); ?>
+                </button>
+            </div>
+            
+            <!-- Search Field -->
+            <div style="margin-bottom: 20px;">
+                <input type="text" id="nymia-export-search" placeholder="<?php esc_attr_e('Search by name, username, or email...', 'nymia'); ?>" style="width: 100%; padding: 12px 14px; border-radius: 8px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; font-size: 14px;" />
+            </div>
+            
+            <!-- Selected Users List -->
+            <div id="nymia-export-selected" style="margin-bottom: 20px; min-height: 40px; max-height: 150px; overflow-y: auto; padding: 12px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px;">
+                <div style="color: rgba(255, 255, 255, 0.5); font-size: 13px; text-align: center; padding: 10px;">
+                    <?php esc_html_e('No users selected. Search and select users to export.', 'nymia'); ?>
+                </div>
+            </div>
+            
+            <!-- Search Results -->
+            <div id="nymia-export-results" style="max-height: 300px; overflow-y: auto; margin-bottom: 20px; display: none;">
+                <!-- Results will be populated here -->
+            </div>
+            
+            <div class="nymia-admin-dialog-actions">
+                <button type="button" class="nymia-dialog-btn-cancel" data-export-cancel><?php esc_html_e('Cancel', 'nymia'); ?></button>
+                <button type="button" class="nymia-dialog-btn-confirm" id="nymia-export-confirm-btn" disabled><?php esc_html_e('Export CSV', 'nymia'); ?></button>
+            </div>
+        </div>
+    </div>
+    
     <div class="nymia-admin-dialog" id="nymia-admin-dialog" role="dialog" aria-modal="true" aria-hidden="true" hidden>
         <div class="nymia-admin-dialog-card">
             <div>
@@ -2663,6 +2706,219 @@ function nymia_theme_settings_page() {
                 }
             });
         }
+
+        // Export CSV Modal Functionality
+        const exportModal = $('#nymia-export-csv-modal');
+        const exportTypeBtns = $('.nymia-export-type-btn');
+        const exportSearch = $('#nymia-export-search');
+        const exportResults = $('#nymia-export-results');
+        const exportSelected = $('#nymia-export-selected');
+        const exportConfirmBtn = $('#nymia-export-confirm-btn');
+        const exportCsvBtn = $('#nymia-export-csv-btn');
+        
+        let currentExportType = 'creator';
+        let selectedUsers = [];
+        let searchTimeout = null;
+        
+        // Open export modal
+        if (exportCsvBtn.length) {
+            exportCsvBtn.on('click', function() {
+                selectedUsers = [];
+                exportSearch.val('');
+                exportResults.hide().empty();
+                updateSelectedUsersDisplay();
+                exportModal.attr('aria-hidden', 'false').removeAttr('hidden').addClass('is-visible');
+            });
+        }
+        
+        // Close modal
+        exportModal.on('click', '[data-export-cancel]', function() {
+            closeExportModal();
+        });
+        
+        exportModal.on('click', function(e) {
+            if ($(e.target).is(exportModal)) {
+                closeExportModal();
+            }
+        });
+        
+        function closeExportModal() {
+            exportModal.attr('aria-hidden', 'true').attr('hidden', true).removeClass('is-visible');
+            selectedUsers = [];
+            exportSearch.val('');
+            exportResults.hide().empty();
+        }
+        
+        // User type selection
+        exportTypeBtns.on('click', function() {
+            const type = $(this).data('export-type');
+            currentExportType = type;
+            
+            exportTypeBtns.removeClass('active').css({
+                'background': 'rgba(255, 255, 255, 0.05)',
+                'border-color': 'rgba(255, 255, 255, 0.1)',
+                'color': 'rgba(255, 255, 255, 0.7)'
+            });
+            
+            $(this).addClass('active').css({
+                'background': 'rgba(191, 76, 26, 0.2)',
+                'border-color': 'rgba(191, 76, 26, 0.4)',
+                'color': '#fff'
+            });
+            
+            selectedUsers = [];
+            exportSearch.val('');
+            exportResults.hide().empty();
+            updateSelectedUsersDisplay();
+        });
+        
+        // Search functionality
+        exportSearch.on('input', function() {
+            const query = $(this).val().trim();
+            
+            clearTimeout(searchTimeout);
+            
+            if (query.length < 2) {
+                exportResults.hide().empty();
+                return;
+            }
+            
+            searchTimeout = setTimeout(function() {
+                searchUsers(query, currentExportType);
+            }, 300);
+        });
+        
+        function searchUsers(query, type) {
+            exportResults.html('<div style="padding: 20px; text-align: center; color: rgba(255, 255, 255, 0.5);"><?php echo esc_js(__('Searching...', 'nymia')); ?></div>').show();
+            
+            $.ajax({
+                url: getAjaxUrl(),
+                type: 'POST',
+                data: {
+                    action: 'nymia_search_users_for_export',
+                    nonce: '<?php echo wp_create_nonce('nymia_search_users_export'); ?>',
+                    query: query,
+                    type: type
+                },
+                success: function(response) {
+                    if (response.success && response.data.users) {
+                        displaySearchResults(response.data.users);
+                    } else {
+                        exportResults.html('<div style="padding: 20px; text-align: center; color: rgba(255, 255, 255, 0.5);"><?php echo esc_js(__('No users found', 'nymia')); ?></div>');
+                    }
+                },
+                error: function() {
+                    exportResults.html('<div style="padding: 20px; text-align: center; color: rgba(248, 113, 113, 0.8);"><?php echo esc_js(__('Error searching users', 'nymia')); ?></div>');
+                }
+            });
+        }
+        
+        function displaySearchResults(users) {
+            if (!users || users.length === 0) {
+                exportResults.html('<div style="padding: 20px; text-align: center; color: rgba(255, 255, 255, 0.5);"><?php echo esc_js(__('No users found', 'nymia')); ?></div>');
+                return;
+            }
+            
+            let html = '<div style="display: flex; flex-direction: column; gap: 8px;">';
+            users.forEach(function(user) {
+                const isSelected = selectedUsers.some(function(u) { return u.id === user.id; });
+                html += '<label style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; cursor: pointer; transition: background 0.2s;">' +
+                    '<input type="checkbox" value="' + user.id + '" ' + (isSelected ? 'checked' : '') + ' style="width: 18px; height: 18px; cursor: pointer;" />' +
+                    '<div style="flex: 1;">' +
+                    '<div style="font-weight: 600; color: #fff; margin-bottom: 4px;">' + escapeHtml(user.display_name || user.username) + '</div>' +
+                    '<div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">' + escapeHtml(user.email) + '</div>' +
+                    '</div>' +
+                    '</label>';
+            });
+            html += '</div>';
+            
+            exportResults.html(html);
+            
+            // Handle checkbox changes
+            exportResults.find('input[type="checkbox"]').on('change', function() {
+                const userId = parseInt($(this).val());
+                const user = users.find(function(u) { return u.id === userId; });
+                
+                if ($(this).is(':checked')) {
+                    if (!selectedUsers.some(function(u) { return u.id === userId; })) {
+                        selectedUsers.push(user);
+                    }
+                } else {
+                    selectedUsers = selectedUsers.filter(function(u) { return u.id !== userId; });
+                }
+                
+                updateSelectedUsersDisplay();
+            });
+        }
+        
+        function updateSelectedUsersDisplay() {
+            if (selectedUsers.length === 0) {
+                exportSelected.html('<div style="color: rgba(255, 255, 255, 0.5); font-size: 13px; text-align: center; padding: 10px;"><?php echo esc_js(__('No users selected. Search and select users to export.', 'nymia')); ?></div>');
+                exportConfirmBtn.prop('disabled', true);
+            } else {
+                let html = '<div style="display: flex; flex-wrap: wrap; gap: 8px;">';
+                selectedUsers.forEach(function(user) {
+                    html += '<div style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(191, 76, 26, 0.2); border: 1px solid rgba(191, 76, 26, 0.4); border-radius: 20px; font-size: 13px;">' +
+                        '<span style="color: #fff;">' + escapeHtml(user.display_name || user.username) + '</span>' +
+                        '<button type="button" class="nymia-remove-user-btn" data-user-id="' + user.id + '" style="background: none; border: none; color: rgba(255, 255, 255, 0.7); cursor: pointer; font-size: 16px; line-height: 1; padding: 0; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;">×</button>' +
+                        '</div>';
+                });
+                html += '</div>';
+                exportSelected.html(html);
+                exportConfirmBtn.prop('disabled', false);
+                
+                // Handle remove button
+                exportSelected.find('.nymia-remove-user-btn').on('click', function() {
+                    const userId = parseInt($(this).data('user-id'));
+                    selectedUsers = selectedUsers.filter(function(u) { return u.id !== userId; });
+                    updateSelectedUsersDisplay();
+                    // Uncheck in search results
+                    exportResults.find('input[type="checkbox"][value="' + userId + '"]').prop('checked', false);
+                });
+            }
+        }
+        
+        // Export button click
+        exportConfirmBtn.on('click', function() {
+            if (selectedUsers.length === 0) {
+                return;
+            }
+            
+            const userIds = selectedUsers.map(function(u) { return u.id; });
+            const exportType = currentExportType;
+            
+            // Create form and submit
+            const form = $('<form>', {
+                method: 'POST',
+                action: '<?php echo esc_url(admin_url('admin-post.php')); ?>',
+                style: 'display: none;'
+            });
+            
+            form.append($('<input>', {
+                type: 'hidden',
+                name: 'action',
+                value: exportType === 'creator' ? 'nymia_export_creators_csv' : 'nymia_export_customers_csv'
+            }));
+            
+            form.append($('<input>', {
+                type: 'hidden',
+                name: '_wpnonce',
+                value: exportType === 'creator' ? '<?php echo wp_create_nonce('nymia_export_creators_csv'); ?>' : '<?php echo wp_create_nonce('nymia_export_customers_csv'); ?>'
+            }));
+            
+            userIds.forEach(function(userId) {
+                form.append($('<input>', {
+                    type: 'hidden',
+                    name: 'user_ids[]',
+                    value: userId
+                }));
+            });
+            
+            $('body').append(form);
+            form.submit();
+            
+            closeExportModal();
+        });
 
     })(jQuery);
     </script>

@@ -505,6 +505,338 @@ body:not(.logged-in) .nymia-footer {
     flex-shrink: 0;
 }
 
+/* Shopping Cart Button - Matches Notification Button Style */
+.nymia-cart-btn {
+    position: relative;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: transparent;
+    border: 2px solid #C7541A;
+    color: #C7541A;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    text-decoration: none;
+}
+
+.nymia-cart-btn:hover {
+    background-color: rgba(199, 84, 26, 0.1);
+    transform: scale(1.05);
+}
+
+.nymia-cart-btn svg {
+    width: 22px;
+    height: 22px;
+}
+
+.nymia-cart-count {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: linear-gradient(135deg, #BF4C1A, #9F2B1A);
+    color: white;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    padding: 3px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+    line-height: 1.2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Cart Wrapper */
+.nymia-cart-wrapper {
+    position: relative;
+}
+
+/* Cart Dropdown - Matches Notification Dropdown Style */
+.nymia-cart-dropdown {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: 420px;
+    max-width: 90vw;
+    background: #1E1E1E;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px) scale(0.98);
+    transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 220ms ease, visibility 0s linear 220ms;
+    will-change: transform, opacity;
+    max-height: 560px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.nymia-cart-dropdown.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    z-index: 999;
+    transition-delay: 0s, 0s, 0s;
+}
+
+.nymia-cart-header {
+    padding: 24px 24px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #1E1E1E;
+}
+
+.nymia-cart-header h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+.nymia-cart-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+    color: #9CA3AF;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.nymia-cart-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #FFFFFF;
+}
+
+.nymia-cart-close svg {
+    width: 18px;
+    height: 18px;
+}
+
+.nymia-cart-body {
+    padding: 0;
+    overflow-y: auto;
+    max-height: 380px;
+    flex: 1;
+}
+
+.nymia-cart-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.nymia-cart-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.nymia-cart-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+.nymia-cart-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.nymia-cart-empty {
+    padding: 60px 24px;
+    text-align: center;
+}
+
+.nymia-cart-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    transition: background-color 0.2s ease;
+}
+
+.nymia-cart-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.nymia-cart-item-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.nymia-cart-item-image-placeholder {
+    width: 60px;
+    height: 60px;
+    background: #2a2a2a;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    flex-shrink: 0;
+}
+
+.nymia-cart-item-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.nymia-cart-item-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    margin: 0 0 4px 0;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nymia-cart-item-author {
+    font-size: 0.85rem;
+    color: #9CA3AF;
+    margin: 0 0 6px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nymia-cart-item-price {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #C7541A;
+}
+
+.nymia-cart-item-remove {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+    color: #9CA3AF;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.nymia-cart-item-remove:hover {
+    background: rgba(255, 107, 107, 0.1);
+    color: #ff6b6b;
+}
+
+.nymia-cart-item-remove svg {
+    width: 16px;
+    height: 16px;
+}
+
+.nymia-cart-footer {
+    padding: 20px 24px 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: #1E1E1E;
+}
+
+.nymia-cart-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nymia-cart-total span:first-child {
+    font-size: 1rem;
+    color: #9CA3AF;
+    font-weight: 500;
+}
+
+.nymia-cart-total-amount {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #FFFFFF;
+}
+
+.nymia-cart-checkout-btn {
+    display: block;
+    width: 100%;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #BF4C1A, #9F2B1A);
+    color: #FFFFFF;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.nymia-cart-checkout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(191, 76, 26, 0.4);
+}
+
+/* Checkout Page Billing Form Styles */
+.nymia-checkout-page input[type="text"],
+.nymia-checkout-page input[type="email"],
+.nymia-checkout-page input[type="tel"],
+.nymia-checkout-page select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.nymia-checkout-page input[type="text"]:focus,
+.nymia-checkout-page input[type="email"]:focus,
+.nymia-checkout-page input[type="tel"]:focus,
+.nymia-checkout-page select:focus {
+    outline: none;
+    border-color: #BF4C1A;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(191, 76, 26, 0.1);
+}
+
+.nymia-checkout-page input[type="text"]:invalid:not(:focus):not(:placeholder-shown),
+.nymia-checkout-page input[type="email"]:invalid:not(:focus):not(:placeholder-shown),
+.nymia-checkout-page select:invalid:not(:focus) {
+    border-color: rgba(255, 100, 100, 0.5);
+}
+
+.nymia-checkout-page label {
+    display: block;
+    margin-bottom: 8px;
+    color: #bbb;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.nymia-checkout-page select option {
+    background: #1a1a1a;
+    color: #fff;
+}
+
 /* Header Language Selector (Loco Translate) */
 .nymia-language-switcher {
     display: flex;
@@ -3278,6 +3610,12 @@ a.nymia-content-card:hover {
     overflow-y: auto;
 }
 
+/* Keep right sidebar visible for subscribers */
+body.subscriber .nymia-sidebar-right,
+.nymia-main-fullwidth~.nymia-sidebar-right {
+    display: block;
+}
+
 .nymia-sidebar-right h3 {
     font-size: 1.125rem;
     font-weight: 600;
@@ -3528,7 +3866,8 @@ a.nymia-content-card:hover {
     }
 
     .nymia-notification-btn,
-    .nymia-profile-btn {
+    .nymia-profile-btn,
+    .nymia-cart-btn {
         width: 50px;
         height: 50px;
     }
@@ -3749,12 +4088,14 @@ a.nymia-content-card:hover {
     }
 
     .nymia-notification-btn,
-    .nymia-profile-btn {
+    .nymia-profile-btn,
+    .nymia-cart-btn {
         width: 44px;
         height: 44px;
     }
 
-    .nymia-notification-btn svg {
+    .nymia-notification-btn svg,
+    .nymia-cart-btn svg {
         width: 18px;
         height: 18px;
     }
@@ -4557,12 +4898,14 @@ a.nymia-content-card:hover {
     }
 
     .nymia-notification-btn,
-    .nymia-profile-btn {
+    .nymia-profile-btn,
+    .nymia-cart-btn {
         width: 40px;
         height: 40px;
     }
 
-    .nymia-notification-btn svg {
+    .nymia-notification-btn svg,
+    .nymia-cart-btn svg {
         width: 16px;
         height: 16px;
     }
@@ -10985,6 +11328,19 @@ body>div[style*="fixed"][style*="inset: 0"] canvas {
     gap: 40px;
 }
 
+/* Keep right sidebar visible for subscribers (full width main content, right sidebar) */
+body.subscriber .nymia-audio-layout,
+.nymia-main-fullwidth .nymia-audio-layout {
+    grid-template-columns: 1fr 360px;
+    max-width: 100%;
+}
+
+/* Keep trending sidebar visible on right for subscribers */
+body.subscriber .nymia-trending-sidebar,
+.nymia-main-fullwidth .nymia-trending-sidebar {
+    display: block;
+}
+
 /* Prevent overflow in grid children */
 .nymia-audio-layout>* {
     min-width: 0;
@@ -11393,6 +11749,7 @@ body:not(.logged-in) .nymia-ebook-page,
     margin: 0 0 12px 0;
     display: flex;
     align-items: center;
+    gap: 12px;
 }
 
 /* Live Streams Page Styles */
@@ -11446,15 +11803,26 @@ body:not(.logged-in) .nymia-ebook-page,
 }
 
 /* Full width ebook layout for non-logged-in users (no sidebar) */
-body:not(.logged-in) .nymia-ebook-layout,
-.nymia-main-fullwidth .nymia-ebook-layout {
+body:not(.logged-in) .nymia-ebook-layout {
     grid-template-columns: 1fr !important;
 }
 
 /* Hide ebook sidebar for non-logged-in users */
-body:not(.logged-in) .nymia-ebook-sidebar,
-.nymia-main-fullwidth .nymia-ebook-sidebar {
+body:not(.logged-in) .nymia-ebook-sidebar {
     display: none;
+}
+
+/* Keep right sidebar visible for subscribers (full width main content, right sidebar) */
+body.subscriber .nymia-ebook-layout,
+.nymia-main-fullwidth .nymia-ebook-layout {
+    grid-template-columns: 1fr 320px;
+    max-width: 100%;
+}
+
+/* Keep ebook sidebar visible on right for subscribers */
+body.subscriber .nymia-ebook-sidebar,
+.nymia-main-fullwidth .nymia-ebook-sidebar {
+    display: block;
 }
 
 /* Ebook Grid */
@@ -12105,6 +12473,19 @@ body:not(.logged-in) .nymia-ebook-sidebar,
     gap: 24px;
 }
 
+/* Full width ebook reader layout for subscribers (with right sidebar) */
+body.subscriber .nymia-ebook-reader-layout,
+.nymia-main-fullwidth .nymia-ebook-reader-layout {
+    grid-template-columns: 1fr 320px;
+    max-width: 100%;
+}
+
+/* Keep ebook info sidebar visible on right for subscribers */
+body.subscriber .nymia-ebook-info-sidebar,
+.nymia-main-fullwidth .nymia-ebook-info-sidebar {
+    display: block;
+}
+
 /* Ebook Viewer */
 .nymia-ebook-viewer {
     background: #1E1E1E;
@@ -12255,6 +12636,9 @@ body:not(.logged-in) .nymia-ebook-sidebar,
     color: #ffffff;
     margin: 0 0 10px 0;
     line-height: 1.3;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .nymia-ebook-author-name {

@@ -6,7 +6,12 @@
  */
 
 get_header(); 
-get_sidebar();
+
+// Only show sidebar for logged-in users with edit_posts or manage_options capabilities
+// Subscribers and non-logged-in users don't see the sidebar (full width)
+if (is_user_logged_in() && (current_user_can('edit_posts') || current_user_can('manage_options'))) {
+    get_sidebar();
+}
 
 // Get Ebook ID from URL
 $ebook_id = isset($_GET['ebook']) ? sanitize_text_field($_GET['ebook']) : '';
@@ -16,10 +21,13 @@ $all_ebooks = function_exists('nymia_get_all_ebooks') ? nymia_get_all_ebooks() :
 
 // Find the requested ebook by id
 $ebook = null;
+$final_ebook_id = '';
+
 if (!empty($ebook_id) && !empty($all_ebooks)) {
 	foreach ($all_ebooks as $item) {
 		if (!empty($item['id']) && (string)$item['id'] === (string)$ebook_id) {
 			$ebook = $item;
+			$final_ebook_id = (string)$item['id'];
 			break;
 		}
 	}
@@ -28,6 +36,13 @@ if (!empty($ebook_id) && !empty($all_ebooks)) {
 // If not found, show a graceful message and fallback to first available (if any)
 if (!$ebook) {
 	$ebook = !empty($all_ebooks) ? $all_ebooks[0] : null;
+	if ($ebook && !empty($ebook['id'])) {
+		$final_ebook_id = (string)$ebook['id'];
+	} elseif (!empty($ebook_id)) {
+		$final_ebook_id = (string)$ebook_id;
+	}
+} else {
+	$final_ebook_id = !empty($ebook['id']) ? (string)$ebook['id'] : (string)$ebook_id;
 }
 
 $ebook_rating_value = 0;
@@ -59,7 +74,7 @@ $ebook_title_encoded = !empty($ebook['title']) ? urlencode($ebook['title']) : ''
 ?>
 
 <div class="nymia-container">
-    <main class="nymia-main">
+    <main class="nymia-main<?php echo (!is_user_logged_in() || (!current_user_can('edit_posts') && !current_user_can('manage_options'))) ? ' nymia-main-fullwidth' : ''; ?>">
         <?php get_template_part('template-parts/header'); ?>
         
         <div class="nymia-single-ebook-page">
@@ -138,13 +153,13 @@ $ebook_title_encoded = !empty($ebook['title']) ? urlencode($ebook['title']) : ''
                             <?php if (!empty($ebook['price'])): ?>
                                 <div style="font-size:14px; opacity:0.9;">Price: <?php echo esc_html(number_format((float)$ebook['price'], 2)); ?></div>
 							<?php endif; ?>
-						<a class="nymia-read-fullscreen-btn" href="<?php echo esc_url(home_url('/checkout?type=ebook&id=' . urlencode((string)($ebook['id'] ?? $ebook_id)))); ?>">
+						<button type="button" class="nymia-read-fullscreen-btn nymia-add-to-cart-btn" data-item-type="ebook" data-item-id="<?php echo esc_attr($final_ebook_id); ?>" style="cursor: pointer; border: none; background: inherit; color: inherit; font: inherit; padding: inherit; display: flex; align-items: center; gap: 8px;">
 								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 									<rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
 									<path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
 								</svg>
-								<span>Purchase to Read</span>
-							</a>
+								<span>Add to Cart</span>
+							</button>
 						</div>
 					</div>
 				<?php else: ?>
@@ -456,13 +471,14 @@ $ebook_title_encoded = !empty($ebook['title']) ? urlencode($ebook['title']) : ''
                         }
                         ?>
                         <?php if ($requires_payment && !$user_has_access): ?>
-                        <a class="nymia-premium-btn" href="<?php echo esc_url(home_url('/checkout?type=ebook&id=' . urlencode((string)($ebook['id'] ?? $ebook_id)))); ?>">
+                        <button type="button" class="nymia-premium-btn nymia-add-to-cart-btn" data-item-type="ebook" data-item-id="<?php echo esc_attr($final_ebook_id); ?>" style="cursor: pointer; border: none; background: inherit; color: inherit; font: inherit; padding: inherit; display: flex; align-items: center; gap: 8px;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                <circle cx="9" cy="21" r="1"></circle>
+                                <circle cx="20" cy="21" r="1"></circle>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                             </svg>
-                            <span>Unlock Full Access</span>
-                        </a>
+                            <span>Add to Cart</span>
+                        </button>
                         <?php elseif ($user_has_access && $ebook_url): ?>
                         <a class="nymia-premium-btn" href="<?php echo esc_url($ebook_url); ?>" target="_blank" rel="noopener" style="background:linear-gradient(135deg,#4CAF50,#45a049);">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1153,6 +1169,178 @@ $ebook_title_encoded = !empty($ebook['title']) ? urlencode($ebook['title']) : ''
     height: 18px;
 }
 </style>
+
+<script>
+// Add to Cart Handler
+(function() {
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.nymia-add-to-cart-btn');
+        if (!btn) return;
+        
+        e.preventDefault();
+        const itemType = btn.getAttribute('data-item-type');
+        const itemId = btn.getAttribute('data-item-id');
+        
+        if (!itemType || !itemId) {
+            console.error('Missing item type or ID:', { itemType, itemId, button: btn });
+            alert('Error: Missing item information. Please refresh the page and try again.');
+            return;
+        }
+        
+        // Disable button
+        const originalText = btn.querySelector('span') ? btn.querySelector('span').textContent : btn.textContent;
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+        if (btn.querySelector('span')) {
+            btn.querySelector('span').textContent = 'Adding...';
+        } else {
+            btn.textContent = 'Adding...';
+        }
+        
+        // Debug logging
+        console.log('Adding to cart:', { itemType, itemId });
+        
+        // AJAX request
+        const formData = new FormData();
+        formData.append('action', 'nymia_add_to_cart');
+        formData.append('item_type', itemType);
+        formData.append('item_id', itemId);
+        
+        const nonce = '<?php echo wp_create_nonce('nymia_cart'); ?>';
+        formData.append('nonce', nonce);
+        
+        const ajaxUrl = '<?php echo admin_url('admin-ajax.php'); ?>';
+        console.log('AJAX URL:', ajaxUrl);
+        console.log('Form data:', {
+            action: 'nymia_add_to_cart',
+            item_type: itemType,
+            item_id: itemId,
+            nonce: nonce
+        });
+        
+        // Log FormData contents for debugging
+        console.log('FormData entries:');
+        for (let pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1]);
+        }
+        
+        fetch(ajaxUrl, {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            // Log response status
+            console.log('Response status:', response.status, response.statusText);
+            console.log('Response headers:', response.headers);
+            
+            // Try to get response text first to see what the error is
+            if (!response.ok) {
+                return response.text().then(text => {
+                    console.error('Server response (not OK):', text);
+                    console.error('Response status:', response.status);
+                    console.error('Response URL:', response.url);
+                    
+                    // For 400 errors, provide more specific message
+                    if (response.status === 400) {
+                        console.error('400 Bad Request - This usually means:');
+                        console.error('1. The AJAX action is not registered');
+                        console.error('2. The nonce is invalid or expired');
+                        console.error('3. Required parameters are missing');
+                        console.error('4. WordPress rejected the request before our handler');
+                    }
+                    
+                    // Try to parse as JSON first
+                    try {
+                        const json = JSON.parse(text);
+                        if (json.data && json.data.message) {
+                            throw new Error(json.data.message);
+                        }
+                        throw new Error('Server error: ' + response.status);
+                    } catch (parseError) {
+                        // If not JSON, show the text (might be HTML error page)
+                        if (text.length > 0) {
+                            // Check if it's an HTML error page
+                            if (text.includes('<html') || text.includes('<!DOCTYPE')) {
+                                throw new Error('Server returned an error page. Status: ' + response.status + '. Please check if you are logged in and try again.');
+                            }
+                            // Try to extract error message from text
+                            const errorMatch = text.match(/error[^<]*/i);
+                            if (errorMatch) {
+                                throw new Error(errorMatch[0].substring(0, 200));
+                            }
+                            throw new Error('Server error: ' + response.status + '. ' + text.substring(0, 100));
+                        }
+                        throw new Error('Server error: ' + response.status + ' ' + response.statusText);
+                    }
+                });
+            }
+            
+            // Check content type
+            const contentType = response.headers.get('content-type');
+            if (contentType && !contentType.includes('application/json')) {
+                return response.text().then(text => {
+                    console.error('Unexpected content type:', contentType);
+                    console.error('Response text:', text.substring(0, 500));
+                    throw new Error('Server returned unexpected response format. Please refresh the page and try again.');
+                });
+            }
+            
+            return response.json();
+        })
+        .then(data => {
+            console.log('Add to cart response:', data);
+            console.log('Cart data in response:', data.data && data.data.cart ? data.data.cart : 'No cart data');
+            if (data.success) {
+                // Show success message
+                const message = document.createElement('div');
+                message.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #4CAF50; color: #fff; padding: 16px 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 10000; display: flex; align-items: center; gap: 12px; font-weight: 600;';
+                message.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px;"><polyline points="20 6 9 17 4 12"></polyline></svg><span>' + (data.data && data.data.message ? data.data.message : 'Item added to cart!') + '</span>';
+                document.body.appendChild(message);
+                
+                setTimeout(() => {
+                    message.style.transition = 'opacity 0.3s, transform 0.3s';
+                    message.style.opacity = '0';
+                    message.style.transform = 'translateX(20px)';
+                    setTimeout(() => message.remove(), 300);
+                }, 2000);
+                
+                // Redirect to cart after a short delay to ensure cart is saved
+                setTimeout(() => {
+                    console.log('Redirecting to cart page...');
+                    window.location.href = '<?php echo esc_url(home_url('/cart')); ?>';
+                }, 1000);
+            } else {
+                const errorMsg = data.data && data.data.message ? data.data.message : 'Failed to add item to cart';
+                console.error('Add to cart failed:', errorMsg, data);
+                alert(errorMsg);
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                if (btn.querySelector('span')) {
+                    btn.querySelector('span').textContent = originalText;
+                } else {
+                    btn.textContent = originalText;
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Add to cart error:', error);
+            const errorMessage = error.message || 'Network error. Please check your connection and try again.';
+            alert(errorMessage);
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            if (btn.querySelector('span')) {
+                btn.querySelector('span').textContent = originalText;
+            } else {
+                btn.textContent = originalText;
+            }
+        });
+    });
+})();
+</script>
 
 <?php get_footer(); ?>
 
