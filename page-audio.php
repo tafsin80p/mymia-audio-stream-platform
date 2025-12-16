@@ -613,7 +613,6 @@ get_header(); ?>
 <style>
 .nymia-audio-price-badge,
 .nymia-trending-price {
-    margin-right: 12px;
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -625,6 +624,7 @@ get_header(); ?>
     color: #e67444;
     border: 1px solid rgba(230, 116, 68, 0.25);
     margin-left: 8px;
+    margin-right: 12px;
 }
 
 .nymia-review-count {
