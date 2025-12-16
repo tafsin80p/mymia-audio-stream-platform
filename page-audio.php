@@ -361,20 +361,22 @@ get_header(); ?>
                                     <span class="nymia-trending-review-count"><?php echo esc_html($trend_review_label); ?></span>
                                 </div>
                                 <?php if (!empty($trending['paid_access']) && $trending['paid_access'] === 'yes' && !empty($trending['price'])): ?>
-                                    <span class="nymia-trending-price"><?php echo esc_html('$' . number_format($trending['price'], 2)); ?></span>
-                                    <?php if (!$trending_access): ?>
-                                        <?php $trending_audio_id = isset($trending['id']) ? (string)$trending['id'] : ''; ?>
-                                        <button type="button" class="nymia-add-to-cart-btn" data-item-type="audio" data-item-id="<?php echo esc_attr($trending_audio_id); ?>" style="background: linear-gradient(135deg, #BF4C1A, #9F2B1A); border: none; color: #fff; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s ease; margin-left: 12px;">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
-                                                <circle cx="9" cy="21" r="1"></circle>
-                                                <circle cx="20" cy="21" r="1"></circle>
-                                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                                            </svg>
-                                            <span><?php esc_html_e('Add to Cart', 'nymia'); ?></span>
-                                        </button>
-                                    <?php else: ?>
-                                        <span class="nymia-audio-unlocked"><?php esc_html_e('Unlocked', 'nymia'); ?></span>
-                                    <?php endif; ?>
+                                    <div style="display: flex; align-items: center; gap: 12px; margin-top: 8px;">
+                                        <span class="nymia-trending-price"><?php echo esc_html('$' . number_format($trending['price'], 2)); ?></span>
+                                        <?php if (!$trending_access): ?>
+                                            <?php $trending_audio_id = isset($trending['id']) ? (string)$trending['id'] : ''; ?>
+                                            <button type="button" class="nymia-add-to-cart-btn" data-item-type="audio" data-item-id="<?php echo esc_attr($trending_audio_id); ?>" style="background: linear-gradient(135deg, #BF4C1A, #9F2B1A); border: none; color: #fff; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s ease;">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
+                                                    <circle cx="9" cy="21" r="1"></circle>
+                                                    <circle cx="20" cy="21" r="1"></circle>
+                                                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                                </svg>
+                                                <span><?php esc_html_e('Add to Cart', 'nymia'); ?></span>
+                                            </button>
+                                        <?php else: ?>
+                                            <span class="nymia-audio-unlocked"><?php esc_html_e('Unlocked', 'nymia'); ?></span>
+                                        <?php endif; ?>
+                                    </div>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -611,8 +613,7 @@ get_header(); ?>
 <?php get_footer(); ?>
 
 <style>
-.nymia-audio-price-badge,
-.nymia-trending-price {
+.nymia-audio-price-badge {
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -624,7 +625,19 @@ get_header(); ?>
     color: #e67444;
     border: 1px solid rgba(230, 116, 68, 0.25);
     margin-left: 8px;
-    margin-right: 12px;
+}
+
+.nymia-trending-price {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    background: rgba(230, 116, 68, 0.12);
+    color: #e67444;
+    border: 1px solid rgba(230, 116, 68, 0.25);
 }
 
 .nymia-review-count {
